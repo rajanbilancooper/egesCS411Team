@@ -1,0 +1,30 @@
+# Maven files
+target/
+
+# IDEs files
+.vscode/
+.idea/
+*.iml
+
+# macOS files
+.DS_Store
+
+# Secrets and environment files
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+*.env.production
+application-local.properties
+.env
+
+# Logs
+*.log
+logs/
+
+# Uploads
+uploads/
+
+# Temp
+*.tmp
+*.swp
