@@ -10,13 +10,18 @@ public class Patient {
     private String address;
     private String phoneNumber;
 
-    // create the Constructor TODO
+    // create the Constructor
     public Patient(String id, String name, int age, String gender, String dateOfBirth, String address, String phoneNumber) {
         this.id = id;
         this.name = name;
         this.age = age;
         this.gender = gender;
-        this.dateOfBirth = dateOfBirth; 
+        this.dateOfBirth = dateOfBirth;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+
+        // need to validate inputs TODO
+
     }
 
 
