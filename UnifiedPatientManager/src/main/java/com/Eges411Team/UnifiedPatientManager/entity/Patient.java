@@ -1,4 +1,4 @@
-package com.Eges411Team.UnifiedPatientManager;
+package com.Eges411Team.UnifiedPatientManager.entity;
 
 // this allows for database mapping
 import jakarta.persistence.*;
@@ -8,10 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 // import the other classes needed for relationships
-import com.Eges411Team.UnifiedPatientManager.PatientRecord;
-import com.Eges411Team.UnifiedPatientManager.Allergy;
-import com.Eges411Team.UnifiedPatientManager.Medication;
-import com.Eges411Team.UnifiedPatientManager.Prescription;
+import com.Eges411Team.UnifiedPatientManager.entity.*;
 
 // entity annotation to map this class to a database table
 @Entity

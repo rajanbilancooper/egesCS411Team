@@ -1,4 +1,4 @@
-package com.Eges411Team.UnifiedPatientManager;
+package com.Eges411Team.UnifiedPatientManager.entity;
 
 // import 
 import jakarta.persistence.*;
