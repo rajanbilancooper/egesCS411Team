@@ -81,6 +81,8 @@ public class Patient {
         return id;
     }
 
+
+    // should we get rid of the setId method? IDs are auto generated TODO
     public void setId(Integer id) {
         this.id = id;
     }
