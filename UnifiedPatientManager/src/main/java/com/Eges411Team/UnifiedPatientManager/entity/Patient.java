@@ -5,10 +5,6 @@ import jakarta.persistence.*;
 
 // use the built in Date class and List class
 import java.util.Date;
-import java.util.List;
-
-// import the other classes needed for relationships
-import com.Eges411Team.UnifiedPatientManager.entity.*;
 
 // entity annotation to map this class to a database table
 @Entity
