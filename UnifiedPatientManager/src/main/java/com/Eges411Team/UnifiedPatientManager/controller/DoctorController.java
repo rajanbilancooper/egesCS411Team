@@ -10,4 +10,9 @@ public class DoctorController {
         // Logic to retrieve and return doctor details
         return "doctorDetails";
     }
+
+    public String updateDoctorDetails() {
+        // Logic to update and return updated doctor details
+        return "updateDoctorDetails";
+    }
 }
