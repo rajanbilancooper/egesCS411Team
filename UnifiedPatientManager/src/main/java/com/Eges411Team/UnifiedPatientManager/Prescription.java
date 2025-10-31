@@ -40,7 +40,10 @@ public class Prescription {
         // no params
     }
 
-    // dont need patientID getter/setter -- handled by JPA relationship??? TODO confirm with team
+    // dont need patientID setter -- handled by JPA relationship??? TODO confirm with team
+    public Integer getPatientID() {
+        return patientID;
+    }
 
     // getters and setters for the ID
     public Integer getPrescriptionID() {
