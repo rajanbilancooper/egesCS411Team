@@ -7,6 +7,12 @@ import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
 
+// import the other classes needed for relationships
+import com.Eges411Team.UnifiedPatientManager.PatientRecord;
+import com.Eges411Team.UnifiedPatientManager.Allergy;
+import com.Eges411Team.UnifiedPatientManager.Medication;
+import com.Eges411Team.UnifiedPatientManager.Prescription;
+
 // entity annotation to map this class to a database table
 @Entity
 // gives the database table a name 
@@ -71,11 +77,11 @@ public class Patient {
 
 
     // ID getter and setter
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -107,11 +113,11 @@ public class Patient {
     }
 
     // date of birth getter and setter
-    public String getDateOfBirth() {
+    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
