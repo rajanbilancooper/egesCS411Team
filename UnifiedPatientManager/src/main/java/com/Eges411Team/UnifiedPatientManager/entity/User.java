@@ -14,6 +14,8 @@ import java.util.List;
 
 // one database table for all user types
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 public class User {
     // fields common to all users
     @Id
@@ -34,9 +36,26 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     // role of the user (DOCTOR, NURSE, PATIENT)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     // every user must have a role
     private Role role; 
+
+    @Column(name = "first_name", length = 50)
+    // every user must have a first name
+    private String firstName;
+    
+    @Column(name = "last_name", length = 50)
+    // every user must have a last name
+    private String lastName;
+     
+    @Column(name = "phone_number", length = 20)
+    // every user must have a phone number
+    private String phoneNumber;
+   
+    @Column(name = "failed_login_attempts")
+    //every user has a count of failed login attempts
+    private int failedLoginAttempts = 0;
+
 
     // only patients have a patientRecord
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -89,7 +108,32 @@ public class User {
     public void setPassword(String password) {
         this.passwordHash = password;
     }
-
+    
+    public String getFirstName() {
+        return firstName;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;  
+    }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+    public void setFailedLoginAttempts(int failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+    
     public Role getRole() {
         return role;
     }
