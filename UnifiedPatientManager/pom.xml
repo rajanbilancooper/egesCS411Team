@@ -81,6 +81,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Hibernate Envers for auditing -->
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-envers</artifactId>
+			<version>6.6.1.Final</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
