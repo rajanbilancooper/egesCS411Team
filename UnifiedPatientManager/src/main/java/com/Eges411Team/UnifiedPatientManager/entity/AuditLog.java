@@ -8,6 +8,9 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "audit_logs")
+@Getter
+@Setter
+
 public class AuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
