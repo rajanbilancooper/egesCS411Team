@@ -23,8 +23,14 @@ public class AuditLog {
     @Column(name = "user_id")
     private Integer user_id;
 
+    @Column(name = "doctor_id")
+    private Integer doctor_id;
+
+    @Column(name = "performed_by")
+    private String performedBy;
+
     @Column(name = "timestamp")
-    private DateTime timestamp;
+    private Date timestamp;
 
     @Column(name = "field_changed")
     private String field_changed;
@@ -37,8 +43,8 @@ public class AuditLog {
         // no params
     }
 
-    public AuditLog(String action, Date timestamp, String performedBy) {
-        this.action = action;
+    public AuditLog(String change, Date timestamp, String performedBy) {
+        this.change_made = change;
         this.timestamp = timestamp;
         this.performedBy = performedBy;
     }
