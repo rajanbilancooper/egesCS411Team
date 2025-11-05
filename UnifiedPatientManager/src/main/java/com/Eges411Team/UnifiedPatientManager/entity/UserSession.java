@@ -1,4 +1,4 @@
-package com.Eges411Team.entity;
+package com.Eges411Team.UnifiedPatientManager.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -27,7 +27,7 @@ public class UserSession {
     private LocalDateTime expiresAt;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive; = true;
+    private boolean isActive = true;
 
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
@@ -50,16 +50,16 @@ public class UserSession {
     }
     
     public boolean isActive() {
-        return active && !isExpired();
+        return isActive && !isExpired();
     }
 
     // Getters and Setters
     public Long getId() {
-        return id;
+        return user.getId();
     }
 
     public void setId(Long id) {
-        this.id = id;
+        user.setId(id);
     }
 
     public User getUser() {
