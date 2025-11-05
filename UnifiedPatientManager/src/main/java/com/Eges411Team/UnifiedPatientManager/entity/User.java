@@ -8,6 +8,9 @@ import jakarta.persistence.*;
 // to use a list of prescriptions
 import java.util.List;
 
+// to use a set of allergies
+import java.util.Set;
+
 
 // base class for all users
 @Entity
@@ -47,10 +50,24 @@ public class User {
     // prescriptions this user authored (if doctor)
     @OneToMany(mappedBy = "doctor")
     private List<Prescription> prescriptionsAuthored;
+    // do we need this if we're gonna log who prescribed what in Prescription? TODO
 
     // prescriptions for this user (if patient)
     @OneToMany(mappedBy = "patient")
     private List<Prescription> prescriptionsReceived;
+
+    // allergies for this user (if patient) 
+    @OneToMany(mappedBy = "patient")
+    private Set<Allergy> allergies;
+
+    // medical history for this user (if patient)
+    @OneToOne(mappedBy = "patient")
+    private MedicalHistory medicalHistory;
+    // shouldnt one medical history be enough for a patient? TODO
+
+    // medications for this user (if patient)
+    @OneToMany(mappedBy = "patient")
+    private List<Medication> medications;
 
 
     // empty constructor required by JPA
