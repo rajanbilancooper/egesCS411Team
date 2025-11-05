@@ -17,6 +17,8 @@ import java.util.Set;
 
 // one database table for all user types
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 public class User {
     // fields common to all users
     @Id
@@ -31,15 +33,55 @@ public class User {
 
     @JsonIgnore
     // password does not get returned in JSON responses
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password", nullable = false)
     // every user must have a password
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
     // role of the user (DOCTOR, NURSE, PATIENT)
-    @Column(nullable = false)
+    @Column(name = "role", nullable = false, length = 20)
     // every user must have a role
     private Role role; 
+
+    @Column(name = "first_name", length = 50)
+    // every user must have a first name
+    private String firstName;
+    
+    @Column(name = "last_name", length = 50)
+    // every user must have a last name
+    private String lastName;
+     
+    @Column(name = "phone_number", length = 20)
+    // every user must have a phone number
+    private String phoneNumber;
+   
+    @Column(name = "failed_login_attempts")
+    //every user has a count of failed login attempts
+    private int failedLoginAttempts = 0;
+    
+    @Column(name = "gender", length = 10)
+    //every user has a gender 
+    private String gender;
+
+    @Column(name = "date_of_birth")
+    //every user has a date of birth
+    private String dateOfBirth;
+    
+    @Column(name = "address", length = 100)
+    //every user has an address
+    private String address;
+
+    @Column(name = "email", length = 50)
+    //every user has an email
+    private String email;
+
+    @Column(name = "creation_date")
+    //every user has a creation date
+    private String creationDate;
+
+    @Column(name = "update_date")
+    //every user has an update date
+    private String updateDate;
 
     // only patients have a patientRecord
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -106,7 +148,32 @@ public class User {
     public void setPassword(String password) {
         this.passwordHash = password;
     }
-
+    
+    public String getFirstName() {
+        return firstName;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;  
+    }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+    public void setFailedLoginAttempts(int failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+    
     public Role getRole() {
         return role;
     }
@@ -133,4 +200,40 @@ public class User {
     public void setPrescriptionsReceived(List<Prescription> prescriptionsReceived) {
         this.prescriptionsReceived = prescriptionsReceived;
     }
-}
+    public String getGender() {
+        return gender;
+    }
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getCreationDate() {
+        return creationDate;
+    }
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
+    public String getUpdateDate() {
+        return updateDate;
+    }   
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
+    }
+}      
