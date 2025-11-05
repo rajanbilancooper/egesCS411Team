@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "medical_history")
+@Table(name = "medical_history") // matches name in db
 @Getter
 @Setter
 
