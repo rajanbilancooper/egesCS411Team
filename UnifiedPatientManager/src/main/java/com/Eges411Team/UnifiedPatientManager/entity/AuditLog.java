@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "audit_logs")
+@Table(name = "audit_log")
 @Getter
 @Setter
 
