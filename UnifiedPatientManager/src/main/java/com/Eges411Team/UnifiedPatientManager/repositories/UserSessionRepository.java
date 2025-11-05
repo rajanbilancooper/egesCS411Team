@@ -1,4 +1,4 @@
-package com.Eges411Team.repositories;
+package com.Eges411Team.UnifiedPatientManager.repositories;
 
 import com.Eges411Team.UnifiedPatientManager.entity.User;
 import com.Eges411Team.UnifiedPatientManager.entity.UserSession;
