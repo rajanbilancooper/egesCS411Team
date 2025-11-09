@@ -1,7 +1,7 @@
 package com.Eges411Team.UnifiedPatientManager.ExceptionHandlers;
 //MAYUBE NEED TO IMPORT OUR ERROR RESPONSE DTO HERE
 //CALL IT ErrorResponse AND IMPORT FROM com.Eges411Team.UnifiedPatientManager.dto.ErrorResponse
-import com.Eges411Team.UnifiedPatientManager.DTOs.ErrorResponse;
+import com.Eges411Team.UnifiedPatientManager.DTOs.responses.ErrorResponse;
 
 //Basic SpringBoot and Java Imports for Exception Handling (DONE FOR US)
 import org.springframework.http.HttpStatus;
