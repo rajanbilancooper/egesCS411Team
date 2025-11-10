@@ -54,6 +54,8 @@ public class UserController {
         user.setUsername(userRequestDTO.getUsername());
         user.setEmail(userRequestDTO.getEmail());
         user.setPassword(userRequestDTO.getPassword());
+        user.setFirstName(userRequestDTO.getFirstName());
+        user.setLastName(userRequestDTO.getLastName());
 
         // save the user using the userService
         User savedUser = userService.saveUser(user);
