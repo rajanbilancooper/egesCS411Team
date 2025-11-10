@@ -27,8 +27,8 @@ public class UserController {
         Optional<User> user = userService.getUserById(id);
         
         // if user is found, return 200 OK with UserResponseDTO, else return 404 Not Found
-        return user.map(u -> ResponseEntity.ok(new UserResponseDTO(u.getId(), u.getUsername(), u.getEmail())))
-                   .orElseGet(() -> ResponseEntity.notFound().build());
+        return user.map(u -> ResponseEntity.ok(new UserResponseDTO(u.getId(), u.getUsername(), u.getEmail(), u.getFirstName(), u.getLastName())))
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Endpoint to get user by username
@@ -39,8 +39,8 @@ public class UserController {
         Optional<User> user = userService.getUserByUsername(username);
 
         // returns 200 OK with UserResponseDTO if user is found, else 404 Not Found
-        return user.map(u -> ResponseEntity.ok(new UserResponseDTO(u.getId(), u.getUsername(), u.getEmail())))
-                   .orElseGet(() -> ResponseEntity.notFound().build());
+        return user.map(u -> ResponseEntity.ok(new UserResponseDTO(u.getId(), u.getUsername(), u.getEmail(), u.getFirstName(), u.getLastName())))
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Endpoint to create a new user
@@ -59,7 +59,8 @@ public class UserController {
         User savedUser = userService.saveUser(user);
 
         // return 200 OK with the saved user's details
-        return ResponseEntity.ok(new UserResponseDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail()));
+        return ResponseEntity.ok(new UserResponseDTO(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail(), 
+            savedUser.getFirstName(), savedUser.getLastName()));
     }
 
     
