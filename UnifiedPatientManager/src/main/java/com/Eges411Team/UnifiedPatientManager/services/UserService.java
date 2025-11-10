@@ -11,12 +11,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserSessionRepository userSessionRepository;
-
     
     @Autowired
     // dependency injection of UserRepository - means we can use its methods here

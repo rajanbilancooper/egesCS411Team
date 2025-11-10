@@ -10,9 +10,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-public class UserSessionRepository {
-//Package delcration 
-package com.Eges411Team.UnifiedPatientManager.repositories;
 
 //Imports user entity class and UserSession entity class from specified packages
 import com.Eges411Team.UnifiedPatientManager.entity.User;
