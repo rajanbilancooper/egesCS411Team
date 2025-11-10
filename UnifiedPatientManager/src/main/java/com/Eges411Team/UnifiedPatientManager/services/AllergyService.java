@@ -1,0 +1,92 @@
+package com.Eges411Team.UnifiedPatientManager.services;
+
+import com.Eges411Team.UnifiedPatientManager.entity.Allergy;
+import com.Eges411Team.UnifiedPatientManager.repositories.AllergyRepository;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+@Service
+@Transactional
+public class AllergyService {
+
+    private final AllergyRepository allergyRepository;
+
+    public AllergyService(AllergyRepository allergyRepository) {
+        this.allergyRepository = allergyRepository;
+    }
+
+    // GET /{patient_id}/allergies
+    public List<Allergy> getAllergiesByPatientId(int patientId) {
+        return allergyRepository.findAllByPatient_id(patientId);
+    }
+
+    // POST /{patient_id}/allergies
+    // Replace all allergies for this patient with the provided list
+    public List<Allergy> saveAllergies(int patientId, List<Allergy> allergies) {
+        // delete existing
+        List<Allergy> existing = allergyRepository.findAllByPatient_id(patientId);
+        allergyRepository.deleteAll(existing);
+
+        // set patient_id for each new allergy
+        for (Allergy allergy : allergies) {
+            allergy.setPatient_id(patientId);
+        }
+
+        return allergyRepository.saveAll(allergies);
+    }
+
+    // PUT /{patient_id}/allergies/{allergy_id}
+    public Allergy updateAllergy(int patientId, int allergyId, Allergy updated) {
+        Allergy existing = allergyRepository.findById(allergyId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Allergy not found with id: " + allergyId
+            ));
+
+        // ensure this allergy belongs to the given patient
+        if (existing.getPatient_id() != patientId) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Allergy does not belong to the specified patient"
+            );
+        }
+
+        // update allowed fields
+        existing.setSubstance(updated.getSubstance());
+        existing.setReaction(updated.getReaction());
+        existing.setSeverity(updated.getSeverity());
+
+        return allergyRepository.save(existing);
+    }
+
+    // GET /{patient_id}/allergies/refresh
+    // Currently same as getAllergies; hook external sync here if needed
+    public List<Allergy> refreshAllergies(int patientId) {
+        return allergyRepository.findAllByPatient_id(patientId);
+    }
+
+    // DELETE /{patient_id}/allergies/{allergy_id}
+    public void deleteAllergy(int patientId, int allergyId) {
+        Optional<Allergy> existingOpt = allergyRepository.findById(allergyId);
+
+        Allergy existing = existingOpt.orElseThrow(() ->
+            new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Allergy not found with id: " + allergyId
+            )
+        );
+
+        if (existing.getPatient_id() != patientId) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Allergy does not belong to the specified patient"
+            );
+        }
+
+        allergyRepository.delete(existing);
+    }
+}
