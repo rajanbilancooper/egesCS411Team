@@ -11,6 +11,12 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 @Service
 public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserSessionRepository userSessionRepository;
+
     
     @Autowired
     // dependency injection of UserRepository - means we can use its methods here
@@ -28,6 +34,7 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    // first must implement createUserSession in UserSessionRepository
     // finds a user by their username
     public Optional<User> getUserByUsername(String username) {
         return userRepository.findByUsername(username);
