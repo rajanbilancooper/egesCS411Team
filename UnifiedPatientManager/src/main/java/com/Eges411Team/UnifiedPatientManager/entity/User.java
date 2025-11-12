@@ -145,7 +145,9 @@ public class User {
         return passwordHash;
     }
 
+    // when setting password, hash it before storing
     public void setPassword(String password) {
+        // TODO - implement password hashing
         this.passwordHash = password;
     }
     
