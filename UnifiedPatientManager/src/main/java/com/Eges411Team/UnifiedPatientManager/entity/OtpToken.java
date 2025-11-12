@@ -5,18 +5,18 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "otp_tokens")
+@Table(name = "otp_token")
 public class OtpToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "otp_id")
+    @Column(name = "id")
     private Long otpId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "id", nullable = false)
     private User user;
 
-    @Column(name = "otp_code", nullable = false)
+    @Column(name = "code", nullable = false)
     private String otpCode;
 
     @Column(name = "created_at", nullable = false)
