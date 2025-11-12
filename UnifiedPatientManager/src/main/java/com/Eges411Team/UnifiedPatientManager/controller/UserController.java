@@ -65,5 +65,40 @@ public class UserController {
             savedUser.getFirstName(), savedUser.getLastName()));
     }
 
-    
+    // method to update user information
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO userRequestDTO) {
+        // retrieve the existing user by ID
+        Optional<User> existingUserOpt = userService.getUserById(id);
+
+        // check if the user we want exists
+        if (existingUserOpt.isEmpty()) {
+            // if user not found, return 404 Not Found
+            return ResponseEntity.notFound().build();
+        }
+
+        // update the existing user's information using the data from the request DTO, even if unchanged
+        User existingUser = existingUserOpt.get();
+        existingUser.setUsername(userRequestDTO.getUsername());
+        existingUser.setEmail(userRequestDTO.getEmail());
+        existingUser.setPassword(userRequestDTO.getPassword());
+        existingUser.setFirstName(userRequestDTO.getFirstName());
+        existingUser.setLastName(userRequestDTO.getLastName());
+
+        // phone number update
+        existingUser.setPhoneNumber(userRequestDTO.getPhoneNumber());
+
+        // address?
+        existingUser.setAddress(userRequestDTO.getAddress());
+
+        // save the updated user
+        User updatedUser = userService.updateUser(existingUser);
+
+        // return 200 OK with the updated user's details - only the fields in UserResponseDTO - we don't want to
+        // show password hash or other sensitive info like phone number and address
+        return ResponseEntity.ok(new UserResponseDTO(updatedUser.getId(), updatedUser.getUsername(), updatedUser.getEmail(),
+            updatedUser.getFirstName(), updatedUser.getLastName()));
+    }
+
+    // what if we want to update a prescription? -- done in PrescriptionController?
 }
