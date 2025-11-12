@@ -66,6 +66,7 @@ public class UserController {
     }
 
     // method to update user information
+    // TODO - add authorization checks to ensure only authorized users (e.g., Doctors) can update user info
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO userRequestDTO) {
         // retrieve the existing user by ID
