@@ -16,7 +16,7 @@ import java.util.Set;
 @Entity
 
 // one database table for all user types
-@Table(name = "users")
+@Table(name = "user")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 public class User {

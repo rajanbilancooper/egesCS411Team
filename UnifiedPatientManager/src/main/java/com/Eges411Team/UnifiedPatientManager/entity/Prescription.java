@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 // entity annotation to map this class to a database table
 @Entity
 // gives the database table a name
-@Table(name = "prescriptions")
+@Table(name = "prescription")
 public class Prescription {
 
     // attributes

@@ -5,7 +5,7 @@ import java.util.List;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "patient_records")
+@Table(name = "patient_record")
 public class PatientRecord {
 
     // attributes
