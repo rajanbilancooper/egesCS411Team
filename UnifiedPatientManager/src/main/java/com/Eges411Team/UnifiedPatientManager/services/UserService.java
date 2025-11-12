@@ -25,7 +25,8 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    // update a user's information in the database
+    // update a user's information in the database - only a Doctor can perform this action
+    // must run authorization check in the controller before calling this method
     public User updateUser(User user) {
         return userRepository.save(user);
     }
