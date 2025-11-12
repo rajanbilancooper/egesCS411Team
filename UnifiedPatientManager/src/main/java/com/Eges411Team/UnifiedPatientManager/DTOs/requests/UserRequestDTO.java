@@ -7,18 +7,20 @@ public class UserRequestDTO {
     private String password;
     private String firstName;
     private String lastName;
+    private String phoneNumber;
 
     // Constructor
     public UserRequestDTO() {
         // Default constructor required by frameworks
     }
 
-    public UserRequestDTO(String username, String email, String password, String firstName, String lastName) {
+    public UserRequestDTO(String username, String email, String password, String firstName, String lastName, String phoneNumber) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
     }
 
     // Getters and Setters
@@ -60,5 +62,13 @@ public class UserRequestDTO {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
