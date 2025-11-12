@@ -1,4 +1,4 @@
-package com.Eges411Team.UnifiedPatientManager.dto.requests;
+package com.Eges411Team.UnifiedPatientManager.DTOs.requests;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
