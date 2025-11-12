@@ -1,13 +1,10 @@
 package com.Eges411Team.UnifiedPatientManager.services;
 
 import com.Eges411Team.UnifiedPatientManager.entity.User;
-import com.Eges411Team.UnifiedPatientManager.entity.UserSession;
 import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
-import com.Eges411Team.UnifiedPatientManager.repositories.UserSessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 @Service
 public class UserService {
@@ -16,30 +13,25 @@ public class UserService {
     // dependency injection of UserRepository - means we can use its methods here
     private UserRepository userRepository;
 
-    @Autowired
-    // dependency injection of UserSessionRepository - means we can use its methods here
-    private UserSessionRepository userSessionRepository;
-
-
-    // *********** use case methods for retrieving a user from the database ******************
+    // *********** use case methods for retrieving a user from the database and editing ******************
 
     // finds a user by their ID
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
-    // first must implement createUserSession in UserSessionRepository
     // finds a user by their username
     public Optional<User> getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    // *********************************************************************************
+    // update a user's information in the database
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
 
-    
-    // public UserSession createUserSession(User user) {
-        
-    // }
+
+    // *********************************************************************************
 
     // *********** use case methods for saving a user to the database ******************
     
@@ -49,6 +41,8 @@ public class UserService {
     }
 
     // *********************************************************************************
+
+    // ** all methods for user sessions will be in their own service class ** 
 
 
 }
