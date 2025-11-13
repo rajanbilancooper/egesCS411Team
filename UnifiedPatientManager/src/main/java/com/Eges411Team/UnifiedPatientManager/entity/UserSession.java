@@ -11,7 +11,7 @@ public class UserSession {
     private Long sessionId;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(name = "login_time", nullable = false)
