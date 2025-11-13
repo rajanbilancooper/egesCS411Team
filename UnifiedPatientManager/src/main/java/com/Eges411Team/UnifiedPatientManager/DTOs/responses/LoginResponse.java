@@ -6,14 +6,15 @@ public class LoginResponse {
     private String tokenType = "Bearer"; //Token type field with default value
     private Long expiresIn; //Token expiration time field
 
-    private Integer userId; //User ID field
+    private Long userId; //User ID field
     private String username; //Username field
     private String role; //User role field
     private String firstName; //User first name field
     private String lastName; //User last name field
 
     //Constructor for LoginResponse class
-    public LoginResponse(String token, Long expiresIn, Integer userId, String username, String role, String firstName, String lastName) {
+    public LoginResponse() {} //Default constructor
+    public LoginResponse(String token, Long expiresIn, Long userId, String username, String role, String firstName, String lastName) {
         this.token = token;
         this.expiresIn = expiresIn;
         this.userId = userId;
@@ -47,11 +48,11 @@ public class LoginResponse {
         this.expiresIn = expiresIn;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

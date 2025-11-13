@@ -11,6 +11,7 @@ import java.util.List;
 // to use a set of allergies
 import java.util.Set;
 
+import java.time.LocalDateTime;
 
 // base class for all users
 @Entity
@@ -82,7 +83,14 @@ public class User {
     @Column(name = "update_date")
     //every user has an update date
     private String updateDate;
+    
+    //ADDED BY RAJ 13th NOV 2023
+    @Column(name = "lastLogin")
+    private LocalDateTime lastLoginTime;
 
+
+    @Column(name = "isLocked", nullable = false)
+    private boolean isLocked = false;
     // only patients have a patientRecord
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
@@ -167,6 +175,13 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public boolean getIsLocked() {
+        return isLocked;
+    }
+    public void setIsLocked(boolean isLocked) {
+        this.isLocked = isLocked;
+    }
     public int getFailedLoginAttempts() {
         return failedLoginAttempts;
     }
@@ -182,6 +197,12 @@ public class User {
         this.role = role;
     }
     
+    public LocalDateTime getLastLoginTime() {
+        return lastLoginTime;
+    }
+    public void setLastLoginTime(LocalDateTime lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
     public PatientRecord getPatientRecord() {
         return patientRecord;
     }

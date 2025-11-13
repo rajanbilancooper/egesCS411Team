@@ -17,6 +17,9 @@ public class UserSession {
     @Column(name = "login_time", nullable = false)
     private LocalDateTime loginTime;
 
+    @Column(name = "sessionToken", nullable = false, unique = true)
+    private String sessionToken;
+
     @Column(name = "logout_time")
     private LocalDateTime logoutTime;
 
@@ -66,6 +69,13 @@ public class UserSession {
         return user;
     }
 
+    public String getSessionToken() {
+        return sessionToken;
+    }   
+    public void setSessionToken(String sessionToken) {
+        this.sessionToken = sessionToken;
+    }
+    
     public void setUser(User user) {
         this.user = user;
     }

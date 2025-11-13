@@ -48,5 +48,4 @@ public class AuditLog {
         this.timestamp = timestamp;
         this.performedBy = performedBy;
     }
-
 }
