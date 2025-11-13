@@ -83,29 +83,34 @@ public class User {
     //every user has an update date
     private String updateDate;
 
-    // only patients have a patientRecord
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    // avoids returning entire patient record in user JSON
-    private PatientRecord patientRecord;
+
+    // omitting patient record relationship - deprecated entity - means that patient records
+    // should be handled via PatientRecordService and PatientRecordDTO, NOT via JPA entity mapping.
 
     // ** relationships -- necessary because without them JPA/Hibernate will not create the foreign key constraints in the database **
 
     // prescriptions for this user (if patient)
-    @OneToMany(mappedBy = "patient")
+    // NOTE: These mappedBy annotations are INCORRECT - child entities use primitive patient_id fields, not "patient" object refs.
+    // They are marked @Transient to prevent JPA mapping errors. Use repositories directly instead.
+    @Transient
     private List<Prescription> prescriptionsReceived;
 
     // allergies for this user (if patient) 
-    @OneToMany(mappedBy = "patient")
+    // NOTE: @OneToMany(mappedBy = "patient") was INCORRECT; Allergy uses patient_id int field.
+    // Marked @Transient. Use AllergyRepository.findAllByPatient_id() instead.
+    @Transient
     private Set<Allergy> allergies;
 
     // medical history for this user (if patient)
-    @OneToOne(mappedBy = "patient")
+    // NOTE: @OneToOne(mappedBy = "patient") was INCORRECT; MedicalHistory uses patient_id int field.
+    // Marked @Transient. Use MedicalHistoryRepo.findAllByPatient_id() instead.
+    @Transient
     private MedicalHistory medicalHistory;
-    // shouldnt one medical history be enough for a patient? TODO
 
     // medications for this user (if patient)
-    @OneToMany(mappedBy = "patient")
+    // NOTE: @OneToMany(mappedBy = "patient") was INCORRECT; Medication uses patient_id int field.
+    // Marked @Transient. Use MedicationRepository.findAllByPatient_id() instead.
+    @Transient
     private List<Medication> medications;
 
 
@@ -181,12 +186,6 @@ public class User {
         this.role = role;
     }
     
-    public PatientRecord getPatientRecord() {
-        return patientRecord;
-    }
-    public void setPatientRecord(PatientRecord patientRecord) {
-        this.patientRecord = patientRecord;
-    }
     public List<Prescription> getPrescriptionsReceived() {
         return prescriptionsReceived;
     }

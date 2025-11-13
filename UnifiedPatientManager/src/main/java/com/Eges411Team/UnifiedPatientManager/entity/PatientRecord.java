@@ -4,22 +4,27 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+/**
+ * DEPRECATED: PatientRecord should NOT be a JPA entity.
+ * Use PatientRecordDTO (in DTOs/responses) and PatientRecordService instead.
+ * 
+ * The @OneToMany mappedBy annotations were INCORRECT because child entities 
+ * (Allergy, Medication, Prescription) use primitive patient_id fields, not object references.
+ * These have been removed. Use PatientRecordService.getPatientRecord(patientId) to assemble records.
+ */
 @Entity
 @Table(name = "patient_record")
+@Deprecated(since = "1.0", forRemoval = true)
 public class PatientRecord {
 
-    // attributes
-
-    // a patient can have many allergies
-    @OneToMany(mappedBy = "patient", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    // DEPRECATED: Removed incorrect @OneToMany(mappedBy = "patient") annotations.
+    // Child entities do NOT have a "patient" field; they use patient_id (int).
+    // Use PatientRecordService.getPatientRecord(patientId) instead.
+    
     private List<Allergy> allergies;
 
-    // and many medications
-    @OneToMany(mappedBy = "patient", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Medication> medications;
 
-    // and prescriptions
-    @OneToMany(mappedBy = "patient", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Prescription> prescriptions; 
 
 
