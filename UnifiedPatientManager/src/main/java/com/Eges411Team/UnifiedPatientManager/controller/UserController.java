@@ -6,7 +6,6 @@ import com.Eges411Team.UnifiedPatientManager.services.UserService;
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.UserRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;

@@ -1,10 +1,5 @@
-package com.Eges411Team.UnifiedPatientManager.repositories;
-import org.springframework.stereotype.Repository;
-
-import com.Eges411Team.UnifiedPatientManager.entity.User;
-
-import org.springframework.data.jpa.repository.JpaRepository;
 //Current package declaration
+package com.Eges411Team.UnifiedPatientManager.repositories;
 
 //Imports @Repository annotation from Spring Framework, marks the class as a DAO
 import org.springframework.stereotype.Repository;
