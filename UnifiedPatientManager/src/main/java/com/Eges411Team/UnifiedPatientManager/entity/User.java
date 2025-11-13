@@ -89,10 +89,7 @@ public class User {
     // avoids returning entire patient record in user JSON
     private PatientRecord patientRecord;
 
-    // prescriptions this user authored (if doctor)
-    @OneToMany(mappedBy = "doctor")
-    private List<Prescription> prescriptionsAuthored;
-    // do we need this if we're gonna log who prescribed what in Prescription? TODO
+    // ** relationships -- necessary because without them JPA/Hibernate will not create the foreign key constraints in the database **
 
     // prescriptions for this user (if patient)
     @OneToMany(mappedBy = "patient")
@@ -189,12 +186,6 @@ public class User {
     }
     public void setPatientRecord(PatientRecord patientRecord) {
         this.patientRecord = patientRecord;
-    }
-    public List<Prescription> getPrescriptionsAuthored() {
-        return prescriptionsAuthored;
-    }
-    public void setPrescriptionsAuthored(List<Prescription> prescriptionsAuthored) {
-        this.prescriptionsAuthored = prescriptionsAuthored;
     }
     public List<Prescription> getPrescriptionsReceived() {
         return prescriptionsReceived;
