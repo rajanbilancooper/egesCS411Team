@@ -8,16 +8,16 @@ public class UserSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long sessionId;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "login_time", nullable = false)
+    @Column(name = "login_time")
     private LocalDateTime loginTime;
 
-    @Column(name = "sessionToken", nullable = false, unique = true)
+    @Column(name = "session_token", nullable = false, unique = true)
     private String sessionToken;
 
     @Column(name = "logout_time")
@@ -30,7 +30,7 @@ public class UserSession {
     private LocalDateTime expiresAt;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private boolean active = true;
 
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
@@ -45,24 +45,25 @@ public class UserSession {
     public UserSession(User user, LocalDateTime loginTime) {
         this.user = user;
         this.loginTime = loginTime;
-        this.isActive = true;
+        this.active = true;
     }
     //Business logic methods
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiresAt);
     }
     
+    // used by Spring Data and logical checks
     public boolean isActive() {
-        return isActive && !isExpired();
+        return active && !isExpired();
     }
 
     // Getters and Setters
     public Long getId() {
-        return user.getId();
+        return id;
     }
 
     public void setId(Long id) {
-        user.setId(id);
+        this.id = id;
     }
 
     public User getUser() {
@@ -107,11 +108,12 @@ public class UserSession {
     public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
     }
+    // keep old-style getter/setter names used by callers
     public boolean getIsActive() {
-        return isActive;
+        return active;
     }
     public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
+        this.active = isActive;
     }
     public String getIpAddress() {
         return ipAddress;

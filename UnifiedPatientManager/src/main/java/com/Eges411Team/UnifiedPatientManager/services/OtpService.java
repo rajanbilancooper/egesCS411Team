@@ -16,16 +16,16 @@ import org.springframework.stereotype.Service;
 //import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Random;
+import java.security.SecureRandom;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-//ASK RHEA IF NEED TRANSACTIONAL
 public class OtpService {
 
     private final OtpTokenRepository otpTokenRepository;
     private final UserRepository userRepository;
     private final UserSessionRepository userSessionRepository;
-    private final SmsService smsService;
+    private final EmailService EmailService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     
@@ -34,25 +34,26 @@ public class OtpService {
     public OtpService(OtpTokenRepository otpTokenRepository,
                      UserRepository userRepository,
                      UserSessionRepository userSessionRepository,
-                     SmsService smsService,
+                     EmailService EmailService,
                      PasswordEncoder passwordEncoder,
                      JwtTokenProvider jwtTokenProvider) {
         this.otpTokenRepository = otpTokenRepository;
         this.userRepository = userRepository;
         this.userSessionRepository = userSessionRepository;
-        this.smsService = smsService;
+        this.EmailService = EmailService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
     //LETS CREATE A METHOD TO GENERATE AND SEND OTP
+    @Transactional
     public void generateAndSendOtp(User user) {
         // Step 1: Invalidate any existing unused OTPs for this user/type
         // This ensures only ONE valid OTP exists at a time
         otpTokenRepository.invalidateUnusedOtps(user.getId());
 
         // Step 2: Generate random 6-digit code
-        String otpCode = generateRandomCode();
+    String otpCode = generateRandomCode();
 
         // Step 3: Hash the OTP before storing in database for security
         String hashedOtp = passwordEncoder.encode(otpCode);
@@ -67,23 +68,32 @@ public class OtpService {
         otpToken.setAttemptCount(0);
 
         // Step 5: Save OTP token to database
-        otpTokenRepository.save(otpToken);
+    otpTokenRepository.save(otpToken);
 
-        //Actually send the OTP via SMS
-        smsService.sendOtpSms(user.getPhoneNumber(), otpCode); 
+        // Validate email exists before attempting send
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalStateException("User does not have an email address configured");
+        }
+
+        // Actually send the OTP via Email (EmailService logs and throws on failure)
+        EmailService.sendOtpEmail(user.getEmail(), otpCode);
 
     }
     //Now they have the OTP, they inpyt it... so need to verify its legit 
+    @Transactional
     public LoginResponse verifyAndCompleteLogin(OtpVerificationRequest request) {
+        
+        
+       
         
         //1: Find user by username
         User user = userRepository.findByUsername(request.getUsername())
-            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + request.getUsername()));
+           .orElseThrow(() -> new UsernameNotFoundException("User not found: " + request.getUsername()));
 
         //2: Retrieve the most recent valid OTP for this user
-         OtpToken otpToken = otpTokenRepository
-            .findValidOtp(user.getId())
-            .orElseThrow(() -> new InvalidOtpException("No valid OTP found for this user"));
+            OtpToken otpToken = otpTokenRepository
+                .findFirstByUser_IdAndExpiresAtAfterAndUsedFalseOrderByCreatedAtDesc(user.getId(), LocalDateTime.now())
+                .orElseThrow(() -> new InvalidOtpException("No valid OTP found for this user"));
 
         //3: Check if OTP is expired
         if (otpToken.getExpiresAt().isBefore(LocalDateTime.now())) {
@@ -141,10 +151,10 @@ public class OtpService {
     }
         //MAYBE FIGURE OUT HOW TO RESEND OTPs IF TIME PREVAILS 
 
-        //Make One Time Passwword 
+        //Make One Time Password using SecureRandom
         private String generateRandomCode() {
-        Random random = new Random();
-        int code = 100000 + random.nextInt(900000); //6 digit code, needs to be at least 100000
+        SecureRandom random = new SecureRandom();
+        int code = 100000 + random.nextInt(900000); //6 digit code
         return String.valueOf(code);
     }
 

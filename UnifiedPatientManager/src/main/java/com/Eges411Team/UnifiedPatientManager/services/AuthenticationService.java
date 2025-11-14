@@ -3,7 +3,7 @@ import com.Eges411Team.UnifiedPatientManager.DTOs.requests.LoginRequest;
 import com.Eges411Team.UnifiedPatientManager.DTOs.responses.LoginResponse;
 import com.Eges411Team.UnifiedPatientManager.entity.User;
 import com.Eges411Team.UnifiedPatientManager.entity.UserSession;
-//import com.Eges411Team.UnifiedPatientManager.ExceptionHandlers.InvalidOtpException;
+import com.Eges411Team.UnifiedPatientManager.ExceptionHandlers.InvalidOtpException;
 import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
 import com.Eges411Team.UnifiedPatientManager.repositories.UserSessionRepository;
 import com.Eges411Team.UnifiedPatientManager.services.JwtTokenProvider;
@@ -25,7 +25,7 @@ public class AuthenticationService {
     //Dependencies
     private final UserRepository userRepository;
     private final UserSessionRepository userSessionRepository;
-    //NOT MADE YET private final OtpService otpService;
+    private final OtpService otpService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
@@ -52,6 +52,11 @@ public class AuthenticationService {
         User user = userRepository.findByUsername(request.getUsername())
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + request.getUsername()));
         
+        // If account is locked, reject early (handled by GlobalExceptionHandler)
+        if (user.getIsLocked()) {
+            throw new LockedException("User account is locked");
+        }
+        
         // Step 2: Verify password
         // Compare plain text password with hashed password in database
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
@@ -66,10 +71,16 @@ public class AuthenticationService {
 
         // Step 4: Generate OTP and send to user
         otpService.generateAndSendOtp(user);
+
+        LoginResponse response = new LoginResponse();
+        response.setUserId(user.getId());
+        response.setUsername(user.getUsername());
+        return response; 
+
     }
 
     //NOW THEY ARE PASSED 2FA, they NEED A JWT TOKEN TO ACCESS RESOURCES
-     private LoginResponse completeLogin(User user, String ipAddress) {
+     private LoginResponse completeLogin(User user, String ipAddress) { //WILL THIS BE CALLED AFTER OTP VERIFIED?
         
         // Step 1: Generate JWT token
         String token = jwtTokenProvider.generateToken(user);

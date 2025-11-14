@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserSessionRepository extends JpaRepository<UserSession, Integer> {
+public interface UserSessionRepository extends JpaRepository<UserSession, Long> {
     
-    // Find all sessions for a specific user
+    // Find all sessions for a specific user (active/inactive)
     List<UserSession> findByUserAndActive(User user, boolean active);
     
     // Find an active session by its token
@@ -45,8 +45,8 @@ public interface UserSessionRepository extends JpaRepository<UserSession, Intege
     
     //Deactivate all sessions for a specific user
     @Modifying
-    @Query("UPDATE UserSession s SET s.active = false WHERE s.user.userId = :userId")
-    void deactivateAllUserSessions(@Param("userId") Integer userId);
+    @Query("UPDATE UserSession s SET s.active = false WHERE s.user.id = :userId")
+    void deactivateAllUserSessions(@Param("userId") Long userId);
 
     //Deactivate all sessions
     @Modifying

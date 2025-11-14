@@ -13,7 +13,7 @@ public class OtpToken {
     private Long otpId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(name = "code", nullable = false)
