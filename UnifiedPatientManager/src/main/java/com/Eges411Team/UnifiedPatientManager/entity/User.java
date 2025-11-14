@@ -5,11 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 // this will be a class for users in the system
 import jakarta.persistence.*;
 
-// to use a list of prescriptions
-import java.util.List;
-
-// to use a set of allergies
-import java.util.Set;
+import java.time.LocalDateTime;
 
 import java.time.LocalDateTime;
 
@@ -18,8 +14,6 @@ import java.time.LocalDateTime;
 
 // one database table for all user types
 @Table(name = "user")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 public class User {
     // fields common to all users
     @Id
@@ -66,7 +60,7 @@ public class User {
 
     @Column(name = "date_of_birth")
     //every user has a date of birth
-    private String dateOfBirth;
+    private LocalDateTime dateOfBirth;
     
     @Column(name = "address", length = 100)
     //every user has an address
@@ -78,7 +72,7 @@ public class User {
 
     @Column(name = "creation_date")
     //every user has a creation date
-    private String creationDate;
+    private LocalDateTime creationDate;
 
     @Column(name = "update_date")
     //every user has an update date
@@ -105,20 +99,13 @@ public class User {
     // prescriptions for this user (if patient)
     @OneToMany(mappedBy = "patient")
     private List<Prescription> prescriptionsReceived;
+    private LocalDateTime updateDate;
 
-    // allergies for this user (if patient) 
-    @OneToMany(mappedBy = "patient")
-    private Set<Allergy> allergies;
 
-    // medical history for this user (if patient)
-    @OneToOne(mappedBy = "patient")
-    private MedicalHistory medicalHistory;
-    // shouldnt one medical history be enough for a patient? TODO
+    // omitting patient record relationship - deprecated entity - means that patient records
+    // should be handled via PatientRecordService and PatientRecordDTO, NOT via JPA entity mapping.
 
-    // medications for this user (if patient)
-    @OneToMany(mappedBy = "patient")
-    private List<Medication> medications;
-
+    // ** relationships - removed because all these will be handled via services and DTOs **
 
     // empty constructor required by JPA
     public User() {
@@ -153,7 +140,9 @@ public class User {
         return passwordHash;
     }
 
+    // when setting password, hash it before storing
     public void setPassword(String password) {
+        // TODO - implement password hashing
         this.passwordHash = password;
     }
     
@@ -224,37 +213,45 @@ public class User {
     public String getGender() {
         return gender;
     }
+
     public void setGender(String gender) {
         this.gender = gender;
     }
-    public String getDateOfBirth() {
+
+    public LocalDateTime getDateOfBirth() {
         return dateOfBirth;
     }
-    public void setDateOfBirth(String dateOfBirth) {
+
+    public void setDateOfBirth(LocalDateTime dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
+
     public String getAddress() {
         return address;
     }
+
     public void setAddress(String address) {
         this.address = address;
     }
+
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
-    public String getCreationDate() {
+
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
-    public void setCreationDate(String creationDate) {
+    public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
-    public String getUpdateDate() {
+    public LocalDateTime getUpdateDate() {
         return updateDate;
     }   
-    public void setUpdateDate(String updateDate) {
+    public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
     }
 }      

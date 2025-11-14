@@ -47,7 +47,7 @@ public class AllergyController {
     public ResponseEntity<List<Allergy>> find(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Allergy> allergies = allergyService.getAllergiesByPatientId(patientId);
         return ResponseEntity.ok(allergies);
@@ -59,7 +59,7 @@ public class AllergyController {
         @RequestBody List<Allergy> allergyList,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Allergy> saved = allergyService.saveAllergies(patientId, allergyList);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -71,10 +71,10 @@ public class AllergyController {
         @RequestBody Allergy allergy,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("allergy_id")
         @Parameter(example = "1")
-        int allergyId
+        Long allergyId
     ) {
         Allergy updated = allergyService.updateAllergy(patientId, allergyId, allergy);
         return ResponseEntity.ok(updated);
@@ -85,7 +85,7 @@ public class AllergyController {
     public ResponseEntity<List<Allergy>> refresh(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Allergy> refreshed = allergyService.refreshAllergies(patientId);
         return ResponseEntity.ok(refreshed);
@@ -96,10 +96,10 @@ public class AllergyController {
     public ResponseEntity<HttpStatus> delete(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("allergy_id")
         @Parameter(example = "1")
-        int allergyId
+        Long allergyId
     ) {
         allergyService.deleteAllergy(patientId, allergyId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
