@@ -1,23 +1,22 @@
 package com.Eges411Team.UnifiedPatientManager.services;
 
-import org.apache.catalina.connector.Response;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import com.Eges411Team.UnifiedPatientManager.DTOs.requests.PatientRecordUpdateDTO;
 // import necessary repositories and DTOs
 import com.Eges411Team.UnifiedPatientManager.DTOs.responses.PatientRecordDTO;
-import com.Eges411Team.UnifiedPatientManager.DTOs.responses.PatientRecordDTO.AllergyDTO;
-import com.Eges411Team.UnifiedPatientManager.DTOs.requests.PatientRecordUpdateDTO;
-import com.Eges411Team.UnifiedPatientManager.repositories.MedicationRepository;
-import com.Eges411Team.UnifiedPatientManager.repositories.MedicalHistoryRepo;
-import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
-import com.Eges411Team.UnifiedPatientManager.repositories.AllergyRepository;
-
-import java.util.List;
 import com.Eges411Team.UnifiedPatientManager.entity.Allergy;
-import com.Eges411Team.UnifiedPatientManager.entity.Medication;
 import com.Eges411Team.UnifiedPatientManager.entity.MedicalHistory;
+import com.Eges411Team.UnifiedPatientManager.entity.Medication;
+import com.Eges411Team.UnifiedPatientManager.repositories.AllergyRepository;
+import com.Eges411Team.UnifiedPatientManager.repositories.MedicalHistoryRepo;
+import com.Eges411Team.UnifiedPatientManager.repositories.MedicationRepository;
+import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
 
 // service class for patient record related operations
 // going to call repositories for Allergy, Medication, Prescription, MedicalHistory
@@ -34,18 +33,40 @@ public class PatientRecordService {
     @Autowired
     private UserRepository userRepository;
 
-    public ResponseEntity<PatientRecordDTO> getPatientRecord(Long userID) {
+    public PatientRecordDTO getPatientRecord(Long userID) {
         // need dependencies for repositories
         PatientRecordDTO patientRecord = new PatientRecordDTO();
-        // populate patientRecord with data from repositories
+
+        // Map all patient fields from User to the DTO (firstName, lastName, email, phoneNumber, address, dateOfBirth).
+        userRepository.findById(userID).ifPresent(user -> {
+            patientRecord.setPatientId(user.getId());
+            patientRecord.setFirstName(user.getFirstName());
+            patientRecord.setLastName(user.getLastName());
+            patientRecord.setEmail(user.getEmail());
+            patientRecord.setPhoneNumber(user.getPhoneNumber());
+            patientRecord.setAddress(user.getAddress());
+            patientRecord.setDateOfBirth(user.getDateOfBirth() != null ? user.getDateOfBirth().toLocalDate() : null);
+            patientRecord.setGender(user.getGender());
+        });
+
+
+        // populate patientRecord with empty arraylists to be populated
+        patientRecord.setAllergies(new ArrayList<>());
+        patientRecord.setMedications(new ArrayList<>());
+        patientRecord.setPrescriptions(new ArrayList<>());
+        patientRecord.setMedicalHistory(new ArrayList<>());
 
         // get the allergies
         List<Allergy> allergies = allergyRepository.findAllByPatient_id(userID);
 
+        // check if allergies isnt null
+
+
         // convert Allergy entities to AllergyDTOs in a loop
         for (Allergy allergy : allergies) {
-            AllergyDTO allergyDTO = new AllergyDTO();
+            PatientRecordDTO.AllergyDTO allergyDTO = new PatientRecordDTO.AllergyDTO();
             allergyDTO.setAllergyId(allergy.getId());
+            allergyDTO.setSubstance(allergy.getSubstance());
             allergyDTO.setReaction(allergy.getReaction());
             allergyDTO.setSeverity(allergy.getSeverity());
             patientRecord.getAllergies().add(allergyDTO);
@@ -68,9 +89,19 @@ public class PatientRecordService {
         // get the medical history
         List<MedicalHistory> medicalHistories = medicalHistoryRepository.findAllByPatient_id(userID);
         
-        
-        userRepository.findById(userID).ifPresent(user -> patientRecord.setPatientId(user.getId()));
-        
+        // convert MedicalHistory entities to MedicalHistoryDTOs
+        for (MedicalHistory history : medicalHistories) {
+            PatientRecordDTO.MedicalHistoryDTO historyDTO = new PatientRecordDTO.MedicalHistoryDTO();
+            historyDTO.setId(history.getId());
+            historyDTO.setDoctorId(history.getDoctor_id());
+            historyDTO.setNotes(history.getDiagnosis());
+            if (history.getStart_date() != null) {
+                historyDTO.setStartDate(history.getStart_date().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+            }
+            patientRecord.getMedicalHistory().add(historyDTO);
+        }
+
+        return patientRecord;
 
     }
 

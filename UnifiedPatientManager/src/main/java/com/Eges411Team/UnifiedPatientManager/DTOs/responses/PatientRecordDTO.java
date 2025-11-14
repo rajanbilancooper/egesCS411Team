@@ -144,17 +144,17 @@ public class PatientRecordDTO {
 
     // medication DTO nested class
     public static class MedicationDTO {
-        private Integer medicationId; // so doctor can reference it for update/remove
+        private Long medicationId; // so doctor can reference it for update/remove
         private String drugName;      // ibuprofen, lisinopril, etc
         private String dose;          // 500mg, 10mg, etc
         private String frequency;     // once daily, twice daily, etc
         private String duration;      // 30 days, ongoing, etc
 
         // getters and setters
-        public Integer getMedicationId() {
+        public Long getMedicationId() {
             return medicationId;
         }
-        public void setMedicationId(Integer medicationId) {
+        public void setMedicationId(Long medicationId) {
             this.medicationId = medicationId;
         }
         public String getDrugName() {
@@ -195,22 +195,22 @@ public class PatientRecordDTO {
 
     // nested PrescriptionDTO class
     public static class PrescriptionDTO {
-        private Integer id;           // identifies the prescription
-        private Integer doctorId;     // which doctor issued it
+        private Long id;           // identifies the prescription
+        private Long doctorId;     // which doctor issued it
         private String medicationName;// the medication prescribed
         private LocalDateTime dateIssued; // when it was issued
 
         // getters and setters
-        public Integer getId() {
+        public Long getId() {
             return id;
         }
-        public void setId(Integer id) {
+        public void setId(Long id) {
             this.id = id;
         }
-        public Integer getDoctorId() {
+        public Long getDoctorId() {
             return doctorId;
         }
-        public void setDoctorId(Integer doctorId) {
+        public void setDoctorId(Long doctorId) {
             this.doctorId = doctorId;
         }
         public String getMedicationName() {
@@ -239,22 +239,22 @@ public class PatientRecordDTO {
 
     // nested MedicalHistoryDTO class
     public static class MedicalHistoryDTO {
-        private Integer id;           // identifies the history entry
-        private Integer doctorId;     // which doctor made this entry
+        private Long id;           // identifies the history entry
+        private Long doctorId;     // which doctor made this entry
         private String notes;         // what the doctor observed/wrote
         private LocalDateTime startDate; // when this entry was created
 
         // getters and setters
-        public Integer getId() {
+        public Long getId() {
             return id;
         }
-        public void setId(Integer id) {
+        public void setId(Long id) {
             this.id = id;
         }
-        public Integer getDoctorId() {
+        public Long getDoctorId() {
             return doctorId;
         }
-        public void setDoctorId(Integer doctorId) {
+        public void setDoctorId(Long doctorId) {
             this.doctorId = doctorId;
         }
         public String getNotes() {
