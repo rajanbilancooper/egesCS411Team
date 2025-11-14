@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 
 // base class for all users
 @Entity
@@ -75,6 +76,29 @@ public class User {
 
     @Column(name = "update_date")
     //every user has an update date
+    private String updateDate;
+    
+    //ADDED BY RAJ 13th NOV 2023
+    @Column(name = "lastLogin")
+    private LocalDateTime lastLoginTime;
+
+
+    @Column(name = "isLocked", nullable = false)
+    private boolean isLocked = false;
+    // only patients have a patientRecord
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    // avoids returning entire patient record in user JSON
+    private PatientRecord patientRecord;
+
+    // prescriptions this user authored (if doctor)
+    @OneToMany(mappedBy = "doctor")
+    private List<Prescription> prescriptionsAuthored;
+    // do we need this if we're gonna log who prescribed what in Prescription? TODO
+
+    // prescriptions for this user (if patient)
+    @OneToMany(mappedBy = "patient")
+    private List<Prescription> prescriptionsReceived;
     private LocalDateTime updateDate;
 
 
@@ -140,6 +164,13 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public boolean getIsLocked() {
+        return isLocked;
+    }
+    public void setIsLocked(boolean isLocked) {
+        this.isLocked = isLocked;
+    }
     public int getFailedLoginAttempts() {
         return failedLoginAttempts;
     }
@@ -155,6 +186,30 @@ public class User {
         this.role = role;
     }
     
+    public LocalDateTime getLastLoginTime() {
+        return lastLoginTime;
+    }
+    public void setLastLoginTime(LocalDateTime lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+    public PatientRecord getPatientRecord() {
+        return patientRecord;
+    }
+    public void setPatientRecord(PatientRecord patientRecord) {
+        this.patientRecord = patientRecord;
+    }
+    public List<Prescription> getPrescriptionsAuthored() {
+        return prescriptionsAuthored;
+    }
+    public void setPrescriptionsAuthored(List<Prescription> prescriptionsAuthored) {
+        this.prescriptionsAuthored = prescriptionsAuthored;
+    }
+    public List<Prescription> getPrescriptionsReceived() {
+        return prescriptionsReceived;
+    }
+    public void setPrescriptionsReceived(List<Prescription> prescriptionsReceived) {
+        this.prescriptionsReceived = prescriptionsReceived;
+    }
     public String getGender() {
         return gender;
     }
