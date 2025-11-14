@@ -20,13 +20,13 @@ public class MedicalHistoryService {
     }
 
     // GET /{patient_id}/medicalhistory
-    public List<MedicalHistory> getMedicalHistoryByPatientId(int patientId) {
+    public List<MedicalHistory> getMedicalHistoryByPatientId(Long patientId) {
         return medicalHistoryRepository.findAllByPatient_id(patientId);
     }
 
     // POST /{patient_id}/medicalhistory
     // Replace all medical-history records for this patient with the provided list
-    public List<MedicalHistory> saveMedicalHistory(int patientId, List<MedicalHistory> historyList) {
+    public List<MedicalHistory> saveMedicalHistory(Long patientId, List<MedicalHistory> historyList) {
         // delete existing for the patient
         List<MedicalHistory> existing = medicalHistoryRepository.findAllByPatient_id(patientId);
         medicalHistoryRepository.deleteAll(existing);
@@ -40,7 +40,7 @@ public class MedicalHistoryService {
     }
 
     // PUT /{patient_id}/medicalhistory/{history_id}
-    public MedicalHistory updateMedicalHistory(int patientId, int historyId, MedicalHistory updated) {
+    public MedicalHistory updateMedicalHistory(Long patientId, Long historyId, MedicalHistory updated) {
         MedicalHistory existing = medicalHistoryRepository.findById(historyId)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -67,12 +67,12 @@ public class MedicalHistoryService {
 
     // GET /{patient_id}/medicalhistory/refresh
     // Currently same as get; hook external sync here if needed
-    public List<MedicalHistory> refreshMedicalHistory(int patientId) {
+    public List<MedicalHistory> refreshMedicalHistory(Long patientId) {
         return medicalHistoryRepository.findAllByPatient_id(patientId);
     }
 
     // DELETE /{patient_id}/medicalhistory/{history_id}
-    public void deleteMedicalHistory(int patientId, int historyId) {
+    public void deleteMedicalHistory(Long patientId, Long historyId) {
         Optional<MedicalHistory> existingOpt = medicalHistoryRepository.findById(historyId);
 
         MedicalHistory existing = existingOpt.orElseThrow(() ->

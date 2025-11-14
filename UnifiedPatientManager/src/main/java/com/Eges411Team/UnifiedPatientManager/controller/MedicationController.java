@@ -49,7 +49,7 @@ public class MedicationController {
     public ResponseEntity<List<Medication>> find(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Medication> medications = medicationService.getMedicationsByPatientId(patientId);
         return ResponseEntity.ok(medications);
@@ -61,10 +61,10 @@ public class MedicationController {
         @RequestBody List<Medication> medicationList,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("provider_id")
         @Parameter(example = "10")
-        int providerId
+        Long providerId
     ) {
         List<Medication> saved = medicationService.saveMedications(patientId, providerId, medicationList);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -76,13 +76,13 @@ public class MedicationController {
         @RequestBody Medication medication,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("provider_id")
         @Parameter(example = "10")
-        int providerId,
+        Long providerId,
         @PathVariable("medication_id")
         @Parameter(example = "1")
-        int medicationId
+        Long medicationId
     ) {
         Medication updated = medicationService.updateMedication(patientId, providerId, medicationId, medication);
         return ResponseEntity.ok(updated);
@@ -93,7 +93,7 @@ public class MedicationController {
     public ResponseEntity<List<Medication>> refresh(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Medication> refreshed = medicationService.refreshMedications(patientId);
         return ResponseEntity.ok(refreshed);
@@ -104,10 +104,10 @@ public class MedicationController {
     public ResponseEntity<HttpStatus> delete(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("medication_id")
         @Parameter(example = "1")
-        int medicationId
+        Long medicationId
     ) {
         medicationService.deleteMedication(patientId, medicationId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
