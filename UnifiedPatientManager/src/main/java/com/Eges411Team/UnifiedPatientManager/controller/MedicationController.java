@@ -1,6 +1,9 @@
 package com.Eges411Team.UnifiedPatientManager.controller;
 
+import com.Eges411Team.UnifiedPatientManager.DTOs.requests.MedicationRequest;
+import com.Eges411Team.UnifiedPatientManager.DTOs.responses.MedicationResponse;
 import com.Eges411Team.UnifiedPatientManager.entity.Medication;
+import com.Eges411Team.UnifiedPatientManager.DTOs.mappers.MedicationMapper;
 import com.Eges411Team.UnifiedPatientManager.services.MedicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/default/patient")
@@ -38,7 +42,7 @@ public class MedicationController {
                             summary = "Retrieves a patient's medication list.",
                             description = "Sample medication list for a patient.",
                             value = "[" +
-                                "{\"id\":1,\"doctor_id\":10,\"patient_id\":3,\"drug_name\":\"Amoxicillin\",\"dose\":\"500mg\",\"frequency\":\"BID\",\"duration\":\"7 days\",\"notes\":\"Take with food\",\"status\":1,\"is_perscription\":1}" +
+                                "{\"id\":1,\"doctor_id\":10,\"patient_id\":3,\"drug_name\":\"Amoxicillin\",\"dose\":\"500mg\",\"frequency\":\"BID\",\"duration\":\"7 days\",\"notes\":\"Take with food\",\"status\":true,\"is_perscription\":true}" +
                                 "]"
                         )
                     }
@@ -46,19 +50,24 @@ public class MedicationController {
             )
         }
     )
-    public ResponseEntity<List<Medication>> find(
+    public ResponseEntity<List<MedicationResponse>> find(
         @PathVariable("patient_id")
         @Parameter(example = "3")
         int patientId
     ) {
         List<Medication> medications = medicationService.getMedicationsByPatientId(patientId);
-        return ResponseEntity.ok(medications);
+
+        List<MedicationResponse> response = medications.stream()
+            .map(MedicationMapper::toResponseDto)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{patient_id}/providers/{provider_id}/medications")
     @Operation(summary = "Create or replace a patient's medication list for a given provider")
-    public ResponseEntity<List<Medication>> createOrUpdate(
-        @RequestBody List<Medication> medicationList,
+    public ResponseEntity<List<MedicationResponse>> createOrUpdate(
+        @RequestBody List<MedicationRequest> medicationList,
         @PathVariable("patient_id")
         @Parameter(example = "3")
         int patientId,
@@ -66,14 +75,26 @@ public class MedicationController {
         @Parameter(example = "10")
         int providerId
     ) {
-        List<Medication> saved = medicationService.saveMedications(patientId, providerId, medicationList);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        // DTOs from UI -> entities
+        List<Medication> entities = medicationList.stream()
+            .map(MedicationMapper::toEntity)
+            .collect(Collectors.toList());
+
+        // service still works with entities
+        List<Medication> saved = medicationService.saveMedications(patientId, providerId, entities);
+
+        // entities -> response DTOs
+        List<MedicationResponse> response = saved.stream()
+            .map(MedicationMapper::toResponseDto)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{patient_id}/providers/{provider_id}/medications/{medication_id}")
     @Operation(summary = "Update a specific medication for a patient and provider")
-    public ResponseEntity<Medication> update(
-        @RequestBody Medication medication,
+    public ResponseEntity<MedicationResponse> update(
+        @RequestBody MedicationRequest medicationDto,
         @PathVariable("patient_id")
         @Parameter(example = "3")
         int patientId,
@@ -84,19 +105,34 @@ public class MedicationController {
         @Parameter(example = "1")
         int medicationId
     ) {
-        Medication updated = medicationService.updateMedication(patientId, providerId, medicationId, medication);
-        return ResponseEntity.ok(updated);
+        Medication updatedEntity = MedicationMapper.toEntity(medicationDto);
+
+        Medication updated = medicationService.updateMedication(
+            patientId,
+            providerId,
+            medicationId,
+            updatedEntity
+        );
+
+        MedicationResponse response = MedicationMapper.toResponseDto(updated);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{patient_id}/medications/refresh")
     @Operation(summary = "Refresh a patient's medication list")
-    public ResponseEntity<List<Medication>> refresh(
+    public ResponseEntity<List<MedicationResponse>> refresh(
         @PathVariable("patient_id")
         @Parameter(example = "3")
         int patientId
     ) {
         List<Medication> refreshed = medicationService.refreshMedications(patientId);
-        return ResponseEntity.ok(refreshed);
+
+        List<MedicationResponse> response = refreshed.stream()
+            .map(MedicationMapper::toResponseDto)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{patient_id}/medications/{medication_id}")
