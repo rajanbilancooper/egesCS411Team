@@ -85,20 +85,7 @@ public class User {
 
     @Column(name = "isLocked", nullable = false)
     private boolean isLocked = false;
-    // only patients have a patientRecord
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    // avoids returning entire patient record in user JSON
-    private PatientRecord patientRecord;
-
-    // prescriptions this user authored (if doctor)
-    @OneToMany(mappedBy = "doctor")
-    private List<Prescription> prescriptionsAuthored;
-    // do we need this if we're gonna log who prescribed what in Prescription? TODO
-
-    // prescriptions for this user (if patient)
-    @OneToMany(mappedBy = "patient")
-    private List<Prescription> prescriptionsReceived;
+    
     private LocalDateTime updateDate;
 
 
