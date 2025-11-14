@@ -5,20 +5,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 // this will be a class for users in the system
 import jakarta.persistence.*;
 
-// to use a list of prescriptions
-import java.util.List;
+import java.time.LocalDateTime;
 
-// to use a set of allergies
-import java.util.Set;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDateTime;
 
 // base class for all users
 @Entity
 
 // one database table for all user types
 @Table(name = "user")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 public class User {
     // fields common to all users
     @Id
@@ -65,7 +62,7 @@ public class User {
 
     @Column(name = "date_of_birth")
     //every user has a date of birth
-    private String dateOfBirth;
+    private LocalDateTime dateOfBirth;
     
     @Column(name = "address", length = 100)
     //every user has an address
@@ -77,42 +74,25 @@ public class User {
 
     @Column(name = "creation_date")
     //every user has a creation date
-    private String creationDate;
+    private LocalDateTime creationDate;
 
     @Column(name = "update_date")
     //every user has an update date
-    private String updateDate;
+    private LocalDateTime updateDate;
+    
+    //ADDED BY RAJ 13th NOV 2023
+    @Column(name = "lastLogin")
+    private LocalDateTime lastLoginTime;
 
+
+    @Column(name = "isLocked", nullable = false)
+    private boolean isLocked = false;
+    
 
     // omitting patient record relationship - deprecated entity - means that patient records
     // should be handled via PatientRecordService and PatientRecordDTO, NOT via JPA entity mapping.
 
-    // ** relationships -- necessary because without them JPA/Hibernate will not create the foreign key constraints in the database **
-
-    // prescriptions for this user (if patient)
-    // NOTE: These mappedBy annotations are INCORRECT - child entities use primitive patient_id fields, not "patient" object refs.
-    // They are marked @Transient to prevent JPA mapping errors. Use repositories directly instead.
-    @Transient
-    private List<Prescription> prescriptionsReceived;
-
-    // allergies for this user (if patient) 
-    // NOTE: @OneToMany(mappedBy = "patient") was INCORRECT; Allergy uses patient_id int field.
-    // Marked @Transient. Use AllergyRepository.findAllByPatient_id() instead.
-    @Transient
-    private Set<Allergy> allergies;
-
-    // medical history for this user (if patient)
-    // NOTE: @OneToOne(mappedBy = "patient") was INCORRECT; MedicalHistory uses patient_id int field.
-    // Marked @Transient. Use MedicalHistoryRepo.findAllByPatient_id() instead.
-    @Transient
-    private MedicalHistory medicalHistory;
-
-    // medications for this user (if patient)
-    // NOTE: @OneToMany(mappedBy = "patient") was INCORRECT; Medication uses patient_id int field.
-    // Marked @Transient. Use MedicationRepository.findAllByPatient_id() instead.
-    @Transient
-    private List<Medication> medications;
-
+    // ** relationships - removed because all these will be handled via services and DTOs **
 
     // empty constructor required by JPA
     public User() {
@@ -171,6 +151,13 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public boolean getIsLocked() {
+        return isLocked;
+    }
+    public void setIsLocked(boolean isLocked) {
+        this.isLocked = isLocked;
+    }
     public int getFailedLoginAttempts() {
         return failedLoginAttempts;
     }
@@ -186,46 +173,55 @@ public class User {
         this.role = role;
     }
     
-    public List<Prescription> getPrescriptionsReceived() {
-        return prescriptionsReceived;
+    public LocalDateTime getLastLoginTime() {
+        return lastLoginTime;
     }
-    public void setPrescriptionsReceived(List<Prescription> prescriptionsReceived) {
-        this.prescriptionsReceived = prescriptionsReceived;
+    public void setLastLoginTime(LocalDateTime lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
     }
+    
     public String getGender() {
         return gender;
     }
+
     public void setGender(String gender) {
         this.gender = gender;
     }
-    public String getDateOfBirth() {
+
+    public LocalDateTime getDateOfBirth() {
         return dateOfBirth;
     }
-    public void setDateOfBirth(String dateOfBirth) {
+
+    public void setDateOfBirth(LocalDateTime dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
+
     public String getAddress() {
         return address;
     }
+
     public void setAddress(String address) {
         this.address = address;
     }
+
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
-    public String getCreationDate() {
+
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
-    public void setCreationDate(String creationDate) {
+    public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
-    public String getUpdateDate() {
+    public LocalDateTime getUpdateDate() {
         return updateDate;
     }   
-    public void setUpdateDate(String updateDate) {
+    public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
     }
 }      

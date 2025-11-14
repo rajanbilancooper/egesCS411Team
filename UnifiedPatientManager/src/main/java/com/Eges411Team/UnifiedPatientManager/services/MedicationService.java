@@ -147,7 +147,7 @@ public class MedicationService {
     }
 
     // GET /{patient_id}/medications
-    public List<Medication> getMedicationsByPatientId(int patientId) {
+    public List<Medication> getMedicationsByPatientId(Long patientId) {
         return medicationRepository.findAllByPatient_id(patientId);
     }
 
@@ -157,6 +157,7 @@ public class MedicationService {
         //Check conflicts BEFORE saving
         checkForConflictsOrThrow(patientId, medications);
 
+    public List<Medication> saveMedications(Long patientId, Long providerId, List<Medication> medications) {
         // Remove existing meds for this patient
         List<Medication> existing = medicationRepository.findAllByPatient_id(patientId);
         medicationRepository.deleteAll(existing);
@@ -171,7 +172,7 @@ public class MedicationService {
     }
 
     // PUT /{patient_id}/providers/{provider_id}/medications/{medication_id}
-    public Medication updateMedication(int patientId, int providerId, int medicationId, Medication updated) {
+    public Medication updateMedication(Long patientId, Long providerId, Long medicationId, Medication updated) {
         Medication existing = medicationRepository.findById(medicationId)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -207,12 +208,12 @@ public class MedicationService {
 
     // GET /{patient_id}/medications/refresh
     // Currently same as getMedicationsByPatientId; hook external sync if needed.
-    public List<Medication> refreshMedications(int patientId) {
+    public List<Medication> refreshMedications(Long patientId) {
         return medicationRepository.findAllByPatient_id(patientId);
     }
 
     // DELETE /{patient_id}/medications/{medication_id}
-    public void deleteMedication(int patientId, int medicationId) {
+    public void deleteMedication(Long patientId, Long medicationId) {
         Medication existing = medicationRepository.findById(medicationId)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,

@@ -20,16 +20,12 @@ import java.util.Optional;
 @Repository
 public interface OtpTokenRepository extends JpaRepository<OtpToken, Long> {
     
-    // Find the most recent valid OTP for a user
-     @Query("SELECT o FROM OtpToken o WHERE o.user.userId = :userId " +
-           "AND o.expiresAt > CURRENT_TIMESTAMP " +
-           "ORDER BY o.createdAt DESC")
-    Optional<OtpToken> findValidOtp(@Param("userId") Integer userId);
+      // Find the most recent valid (unused, unexpired) OTP for a user
+      Optional<OtpToken> findFirstByUser_IdAndExpiresAtAfterAndUsedFalseOrderByCreatedAtDesc(Long userId, java.time.LocalDateTime now);
    
-    //Invalidates unused OTPs 
-    @Modifying
-    @Query("UPDATE OtpToken o SET o.used = true WHERE o.user.userId = :userId " +
-          " AND o.used = false")
-    void invalidateUnusedOtps(@Param("userId") Integer userId);
+      // Invalidates unused OTPs for the given user
+      @Modifying
+      @Query("UPDATE OtpToken o SET o.used = true WHERE o.user.id = :userId AND o.used = false")
+      void invalidateUnusedOtps(@Param("userId") Long userId);
 }
 

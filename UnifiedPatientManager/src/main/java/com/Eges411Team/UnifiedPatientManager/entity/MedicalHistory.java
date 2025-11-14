@@ -17,13 +17,13 @@ public class MedicalHistory {
     @Id
 
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "patient_id")
-    private Integer patient_id;
+    private Long patient_id;
 
     @Column(name = "doctor_id")
-    private Integer doctor_id;
+    private Long doctor_id;
 
     @Column(name = "diagnosis")
     private String diagnosis;

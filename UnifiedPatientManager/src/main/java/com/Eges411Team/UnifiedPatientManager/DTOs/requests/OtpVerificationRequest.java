@@ -15,8 +15,9 @@ public class OtpVerificationRequest {
     private String ipAddress;
 
     // Constructors
-    public OtpVerificationRequest() {}
+    public OtpVerificationRequest() {} //No-arg constructor
 
+    //Parameterized constructor 
     public OtpVerificationRequest(String username, String otpCode, String ipAddress) {
         this.username = username;
         this.otpCode = otpCode;
