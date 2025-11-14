@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 public class MedicationResponse {
 
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
 
     @JsonProperty("patient_id")
-    private Integer patientId;
+    private Long patientId;
 
     @JsonProperty("doctor_id")
-    private Integer doctorId;
+    private Long doctorId;
 
     @JsonProperty("drug_name")
     private String drugName;

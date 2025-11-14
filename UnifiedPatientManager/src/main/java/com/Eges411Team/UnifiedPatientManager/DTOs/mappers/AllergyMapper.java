@@ -12,12 +12,12 @@ public class AllergyMapper {
 
         Allergy allergy = new Allergy();
 
-        // Only set id/patient_id if included in request
+        // Only set id/patientId if included in request
         if (dto.getId() != null) {
             allergy.setId(dto.getId());
         }
         if (dto.getPatientId() != null) {
-            allergy.setPatient_id(dto.getPatientId());
+            allergy.setPatientId(dto.getPatientId());
         }
 
         allergy.setReaction(dto.getReaction());
@@ -34,7 +34,7 @@ public class AllergyMapper {
         AllergyResponse dto = new AllergyResponse();
 
         dto.setId(entity.getId());
-        dto.setPatientId(entity.getPatient_id());
+    dto.setPatientId(entity.getPatientId());
         dto.setReaction(entity.getReaction());
         dto.setSeverity(entity.getSeverity());
         dto.setSubstance(entity.getSubstance());

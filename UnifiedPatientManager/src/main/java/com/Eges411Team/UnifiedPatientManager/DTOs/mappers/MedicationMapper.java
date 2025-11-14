@@ -16,20 +16,20 @@ public class MedicationMapper {
             med.setId(dto.getId());
         }
         if (dto.getPatientId() != null) {
-            med.setPatient_id(dto.getPatientId());
+            med.setPatientId(dto.getPatientId());
         }
         if (dto.getDoctorId() != null) {
-            med.setDoctor_id(dto.getDoctorId());
+            med.setDoctorId(dto.getDoctorId());
         }
 
-        med.setDrug_name(dto.getDrugName());
+    med.setDrugName(dto.getDrugName());
         med.setDose(dto.getDose());
         med.setFrequency(dto.getFrequency());
         med.setDuration(dto.getDuration());
         med.setNotes(dto.getNotes());
         med.setTimestamp(dto.getTimestamp());
         med.setStatus(dto.getStatus());
-        med.setIs_perscription(dto.getIsPerscription());
+    med.setIsPerscription(dto.getIsPerscription());
 
         return med;
     }
@@ -41,16 +41,16 @@ public class MedicationMapper {
         MedicationResponse dto = new MedicationResponse();
 
         dto.setId(entity.getId());
-        dto.setPatientId(entity.getPatient_id());
-        dto.setDoctorId(entity.getDoctor_id());
-        dto.setDrugName(entity.getDrug_name());
+    dto.setPatientId(entity.getPatientId());
+    dto.setDoctorId(entity.getDoctorId());
+    dto.setDrugName(entity.getDrugName());
         dto.setDose(entity.getDose());
         dto.setFrequency(entity.getFrequency());
         dto.setDuration(entity.getDuration());
         dto.setNotes(entity.getNotes());
         dto.setTimestamp(entity.getTimestamp());
         dto.setStatus(entity.getStatus());
-        dto.setIsPerscription(entity.getIs_perscription());
+    dto.setIsPerscription(entity.getIsPerscription());
 
         return dto;
     }

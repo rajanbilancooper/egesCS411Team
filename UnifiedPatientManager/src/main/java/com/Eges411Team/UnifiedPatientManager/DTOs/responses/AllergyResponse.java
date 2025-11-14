@@ -9,10 +9,10 @@ import lombok.Setter;
 public class AllergyResponse {
 
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
 
     @JsonProperty("patient_id")
-    private Integer patientId;
+    private Long patientId;
 
     @JsonProperty("reaction")
     private String reaction;

@@ -22,13 +22,13 @@ public class Medication{
     private Long id;
 
     @Column(name = "patient_id")
-    private Long patient_id;
+    private Long patientId;
 
     @Column(name = "doctor_id")
-    private Long doctor_id;
+    private Long doctorId;
 
     @Column (name = "drug_name")
-    private String drug_name;
+    private String drugName;
 
     @Column (name = "dose")
     private String dose;
@@ -49,5 +49,5 @@ public class Medication{
     private Boolean status;
 
     @Column (name = "is_perscription")
-    private Boolean is_perscription;
+    private Boolean isPerscription;
 }

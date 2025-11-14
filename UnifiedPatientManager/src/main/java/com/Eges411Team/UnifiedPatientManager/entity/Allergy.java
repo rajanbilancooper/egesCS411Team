@@ -20,7 +20,7 @@ public class Allergy{
     private Long id;
 
     @Column(name = "patient_id")
-    private Long patient_id;
+    private Long patientId;
 
     @Column (name = "reaction")
     private String reaction;

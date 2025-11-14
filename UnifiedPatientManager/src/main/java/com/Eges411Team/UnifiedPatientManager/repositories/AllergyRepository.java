@@ -7,5 +7,5 @@ import java.util.List;
 public interface AllergyRepository extends JpaRepository<Allergy, Long> {
 
     // Uses the Java field name "patient_id"
-    List<Allergy> findAllByPatient_id(Long patient_id);
+    List<Allergy> findAllByPatientId(Long patientId);
 }

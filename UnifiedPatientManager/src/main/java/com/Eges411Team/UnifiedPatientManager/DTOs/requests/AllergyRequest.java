@@ -10,10 +10,10 @@ public class AllergyRequest {
 
     // optional: let client send id if needed (e.g. for updates)
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
 
     @JsonProperty("patient_id")
-    private Integer patientId;
+    private Long patientId;
 
     @JsonProperty("reaction")
     private String reaction;

@@ -20,27 +20,27 @@ public class NoteService {
     }
 
     // GET /{patient_id}/notes
-    public List<Note> getNotesByPatientId(int patientId) {
-        return noteRepository.findAllByPatient_id(patientId);
+    public List<Note> getNotesByPatientId(Long patientId) {
+        return noteRepository.findAllByPatientId(patientId);
     }
 
     // POST /{patient_id}/notes
     // Replace all notes for this patient with the provided list
-    public List<Note> saveNotes(int patientId, List<Note> notes) {
+    public List<Note> saveNotes(Long patientId, List<Note> notes) {
         // Delete existing notes for this patient
-        List<Note> existing = noteRepository.findAllByPatient_id(patientId);
+        List<Note> existing = noteRepository.findAllByPatientId(patientId);
         noteRepository.deleteAll(existing);
- 
-        // Ensure correct patient_id
+
+        // Ensure correct patientId
         for (Note note : notes) {
-            note.setPatient_id(patientId);
+            note.setPatientId(patientId);
         }
 
         return noteRepository.saveAll(notes);
     }
 
     // PUT /{patient_id}/notes/{note_id}
-    public Note updateNote(int patientId, int noteId, Note updated) {
+    public Note updateNote(Long patientId, Long noteId, Note updated) {
         Note existing = noteRepository.findById(noteId)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -48,7 +48,7 @@ public class NoteService {
             ));
 
         // Ensure note belongs to the correct patient
-        if (existing.getPatient_id() != patientId) {
+        if (existing.getPatientId() == null || !existing.getPatientId().equals(patientId)) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Note does not belong to the specified patient"
@@ -56,8 +56,8 @@ public class NoteService {
         }
 
         // Update allowed fields
-        existing.setDoctor_id(updated.getDoctor_id());
-        existing.setNote_type(updated.getNote_type());
+        existing.setDoctorId(updated.getDoctorId());
+        existing.setNoteType(updated.getNoteType());
         existing.setContent(updated.getContent());
         existing.setTimestamp(updated.getTimestamp());
 
@@ -66,12 +66,12 @@ public class NoteService {
 
     // GET /{patient_id}/notes/refresh
     // Currently same as get; could later sync with an external system
-    public List<Note> refreshNotes(int patientId) {
-        return noteRepository.findAllByPatient_id(patientId);
+    public List<Note> refreshNotes(Long patientId) {
+        return noteRepository.findAllByPatientId(patientId);
     }
 
     // DELETE /{patient_id}/notes/{note_id}
-    public void deleteNote(int patientId, int noteId) {
+    public void deleteNote(Long patientId, Long noteId) {
         Optional<Note> existingOpt = noteRepository.findById(noteId);
 
         Note existing = existingOpt.orElseThrow(() ->
@@ -81,7 +81,7 @@ public class NoteService {
             )
         );
 
-        if (existing.getPatient_id() != patientId) {
+        if (existing.getPatientId() == null || !existing.getPatientId().equals(patientId)) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Note does not belong to the specified patient"

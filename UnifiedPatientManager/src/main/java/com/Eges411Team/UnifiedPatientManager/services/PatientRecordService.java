@@ -56,8 +56,8 @@ public class PatientRecordService {
         patientRecord.setPrescriptions(new ArrayList<>());
         patientRecord.setMedicalHistory(new ArrayList<>());
 
-        // get the allergies
-        List<Allergy> allergies = allergyRepository.findAllByPatient_id(userID);
+    // get the allergies
+    List<Allergy> allergies = allergyRepository.findAllByPatientId(userID);
 
         // check if allergies isnt null
 
@@ -72,31 +72,31 @@ public class PatientRecordService {
             patientRecord.getAllergies().add(allergyDTO);
         }
         
-        // get the medications
-        List<Medication> medications = medicationRepository.findAllByPatient_id(userID);
+    // get the medications
+    List<Medication> medications = medicationRepository.findAllByPatientId(userID);
 
         // convert Medication entities to MedicationDTOs in the PatientRecordDTO
         for (Medication medication : medications) {
             PatientRecordDTO.MedicationDTO medicationDTO = new PatientRecordDTO.MedicationDTO();
             medicationDTO.setMedicationId(medication.getId());
-            medicationDTO.setDrugName(medication.getDrug_name());
+            medicationDTO.setDrugName(medication.getDrugName());
             medicationDTO.setDose(medication.getDose());
             medicationDTO.setFrequency(medication.getFrequency());
             patientRecord.getMedications().add(medicationDTO);
         }
 
 
-        // get the medical history
-        List<MedicalHistory> medicalHistories = medicalHistoryRepository.findAllByPatient_id(userID);
+    // get the medical history
+    List<MedicalHistory> medicalHistories = medicalHistoryRepository.findAllByPatientId(userID);
         
         // convert MedicalHistory entities to MedicalHistoryDTOs
         for (MedicalHistory history : medicalHistories) {
             PatientRecordDTO.MedicalHistoryDTO historyDTO = new PatientRecordDTO.MedicalHistoryDTO();
             historyDTO.setId(history.getId());
-            historyDTO.setDoctorId(history.getDoctor_id());
+            historyDTO.setDoctorId(history.getDoctorId());
             historyDTO.setNotes(history.getDiagnosis());
-            if (history.getStart_date() != null) {
-                historyDTO.setStartDate(history.getStart_date().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+            if (history.getStartDate() != null) {
+                historyDTO.setStartDate(history.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
             }
             patientRecord.getMedicalHistory().add(historyDTO);
         }

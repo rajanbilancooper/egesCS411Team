@@ -18,16 +18,16 @@ import lombok.Setter;
 public class Note{
     @Id
     @Column(name = "id")
-    private int id;
+    private Long id;
 
     @Column(name = "patient_id")
-    private int patient_id;
+    private Long patientId;
 
     @Column(name = "doctor_id")
-    private int doctor_id;
+    private Long doctorId;
 
     @Column (name = "note_type")
-    private Blob note_type;
+    private Blob noteType;
 
     @Column (name = "content")
     private Blob content;

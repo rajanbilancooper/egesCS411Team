@@ -48,7 +48,7 @@ public class NoteController {
     public ResponseEntity<List<Note>> find(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Note> notes = noteService.getNotesByPatientId(patientId);
         return ResponseEntity.ok(notes);
@@ -61,7 +61,7 @@ public class NoteController {
         @RequestBody List<Note> notes,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Note> saved = noteService.saveNotes(patientId, notes);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -74,10 +74,10 @@ public class NoteController {
         @RequestBody Note note,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("note_id")
         @Parameter(example = "1")
-        int noteId
+        Long noteId
     ) {
         Note updated = noteService.updateNote(patientId, noteId, note);
         return ResponseEntity.ok(updated);
@@ -89,7 +89,7 @@ public class NoteController {
     public ResponseEntity<List<Note>> refresh(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Note> refreshed = noteService.refreshNotes(patientId);
         return ResponseEntity.ok(refreshed);
@@ -101,10 +101,10 @@ public class NoteController {
     public ResponseEntity<HttpStatus> delete(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("note_id")
         @Parameter(example = "1")
-        int noteId
+        Long noteId
     ) {
         noteService.deleteNote(patientId, noteId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
