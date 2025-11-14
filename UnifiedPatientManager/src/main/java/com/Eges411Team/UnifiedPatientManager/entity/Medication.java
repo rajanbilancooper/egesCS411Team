@@ -19,13 +19,13 @@ import java.time.LocalDateTime;
 public class Medication{
     @Id
     @Column(name = "id")
-    private int id;
+    private Long id;
 
     @Column(name = "patient_id")
-    private int patient_id;
+    private Long patient_id;
 
     @Column(name = "doctor_id")
-    private int doctor_id;
+    private Long doctor_id;
 
     @Column (name = "drug_name")
     private String drug_name;

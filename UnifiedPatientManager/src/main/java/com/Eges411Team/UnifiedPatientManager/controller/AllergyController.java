@@ -53,7 +53,7 @@ public class AllergyController {
     public ResponseEntity<List<AllergyResponse>> find(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Allergy> allergies = allergyService.getAllergiesByPatientId(patientId);
 
@@ -70,7 +70,7 @@ public class AllergyController {
         @RequestBody List<AllergyRequest> allergyList,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         // convert request DTOs -> entity list
         List<Allergy> entities = allergyList.stream()
@@ -94,10 +94,10 @@ public class AllergyController {
         @RequestBody AllergyRequest allergyDto,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("allergy_id")
         @Parameter(example = "1")
-        int allergyId
+        Long allergyId
     ) {
         // map DTO -> entity with updated fields
         Allergy updatedEntity = AllergyMapper.toEntity(allergyDto);
@@ -114,7 +114,7 @@ public class AllergyController {
     public ResponseEntity<List<AllergyResponse>> refresh(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Allergy> refreshed = allergyService.refreshAllergies(patientId);
 
@@ -130,10 +130,10 @@ public class AllergyController {
     public ResponseEntity<HttpStatus> delete(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("allergy_id")
         @Parameter(example = "1")
-        int allergyId
+        Long allergyId
     ) {
         allergyService.deleteAllergy(patientId, allergyId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

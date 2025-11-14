@@ -5,13 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Date;
 
-public interface MedicalHistoryRepo extends JpaRepository<MedicalHistory, Integer> {
+public interface MedicalHistoryRepo extends JpaRepository<MedicalHistory, Long> {
 
     // Fetch all medical history records for a given patient
-    List<MedicalHistory> findAllByPatient_id(int patient_id);
+    List<MedicalHistory> findAllByPatient_id(Long patient_id);
 
     // Fetch medical history by doctor
-    List<MedicalHistory> findAllByDoctor_id(int doctor_id);
+    List<MedicalHistory> findAllByDoctor_id(Long doctor_id);
 
     // Get active medical histories (no end_date yet)
     List<MedicalHistory> findAllByEnd_dateIsNull();

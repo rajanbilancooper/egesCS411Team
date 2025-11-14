@@ -53,7 +53,7 @@ public class MedicationController {
     public ResponseEntity<List<MedicationResponse>> find(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Medication> medications = medicationService.getMedicationsByPatientId(patientId);
 
@@ -70,10 +70,10 @@ public class MedicationController {
         @RequestBody List<MedicationRequest> medicationList,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("provider_id")
         @Parameter(example = "10")
-        int providerId
+        Long providerId
     ) {
         // DTOs from UI -> entities
         List<Medication> entities = medicationList.stream()
@@ -97,13 +97,13 @@ public class MedicationController {
         @RequestBody MedicationRequest medicationDto,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("provider_id")
         @Parameter(example = "10")
-        int providerId,
+        Long providerId,
         @PathVariable("medication_id")
         @Parameter(example = "1")
-        int medicationId
+        Long medicationId
     ) {
         Medication updatedEntity = MedicationMapper.toEntity(medicationDto);
 
@@ -124,7 +124,7 @@ public class MedicationController {
     public ResponseEntity<List<MedicationResponse>> refresh(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Medication> refreshed = medicationService.refreshMedications(patientId);
 
@@ -140,10 +140,10 @@ public class MedicationController {
     public ResponseEntity<HttpStatus> delete(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("medication_id")
         @Parameter(example = "1")
-        int medicationId
+        Long medicationId
     ) {
         medicationService.deleteMedication(patientId, medicationId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
