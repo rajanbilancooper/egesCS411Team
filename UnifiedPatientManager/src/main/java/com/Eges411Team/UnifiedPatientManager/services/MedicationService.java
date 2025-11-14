@@ -153,10 +153,6 @@ public class MedicationService {
 
     // POST /{patient_id}/providers/{provider_id}/medications
     // Replace all medications for this patient; assign provider (doctor) to each entry.
-    public List<Medication> saveMedications(int patientId, int providerId, List<Medication> medications) {
-        //Check conflicts BEFORE saving
-        checkForConflictsOrThrow(patientId, medications);
-
     public List<Medication> saveMedications(Long patientId, Long providerId, List<Medication> medications) {
         // Remove existing meds for this patient
         List<Medication> existing = medicationRepository.findAllByPatient_id(patientId);
