@@ -100,16 +100,16 @@ public class PatientRecordDTO {
 
     // nested DTO
     public static class AllergyDTO {
-        private Integer allergyId;    // so doctor can reference it for update/remove
+        private Long allergyId;    // so doctor can reference it for update/remove
         private String substance;     // what the patient is allergic to
         private String severity;      // low/medium/high/critical
         private String reaction;      // what happens: rash, swelling, etc
 
         // getters and setters
-        public Integer getAllergyId() {
+        public Long getAllergyId() {
             return allergyId;
         }
-        public void setAllergyId(Integer allergyId) {
+        public void setAllergyId(Long allergyId) {
             this.allergyId = allergyId;
         }
         public String getSubstance() {

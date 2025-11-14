@@ -20,13 +20,13 @@ public class AllergyService {
     }
 
     // GET /{patient_id}/allergies
-    public List<Allergy> getAllergiesByPatientId(int patientId) {
+    public List<Allergy> getAllergiesByPatientId(Long patientId) {
         return allergyRepository.findAllByPatient_id(patientId);
     }
 
     // POST /{patient_id}/allergies
     // Replace all allergies for this patient with the provided list
-    public List<Allergy> saveAllergies(int patientId, List<Allergy> allergies) {
+    public List<Allergy> saveAllergies(Long patientId, List<Allergy> allergies) {
         // delete existing
         List<Allergy> existing = allergyRepository.findAllByPatient_id(patientId);
         allergyRepository.deleteAll(existing);
@@ -40,7 +40,7 @@ public class AllergyService {
     }
 
     // PUT /{patient_id}/allergies/{allergy_id}
-    public Allergy updateAllergy(int patientId, int allergyId, Allergy updated) {
+    public Allergy updateAllergy(Long patientId, Long allergyId, Allergy updated) {
         Allergy existing = allergyRepository.findById(allergyId)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -65,12 +65,12 @@ public class AllergyService {
 
     // GET /{patient_id}/allergies/refresh
     // Currently same as getAllergies; hook external sync here if needed
-    public List<Allergy> refreshAllergies(int patientId) {
+    public List<Allergy> refreshAllergies(Long patientId) {
         return allergyRepository.findAllByPatient_id(patientId);
     }
 
     // DELETE /{patient_id}/allergies/{allergy_id}
-    public void deleteAllergy(int patientId, int allergyId) {
+    public void deleteAllergy(Long patientId, Long allergyId) {
         Optional<Allergy> existingOpt = allergyRepository.findById(allergyId);
 
         Allergy existing = existingOpt.orElseThrow(() ->
