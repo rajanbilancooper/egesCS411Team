@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+import org.springframework.cglib.core.Local;
+
 import java.time.LocalDateTime;
 
 // base class for all users
@@ -76,7 +78,7 @@ public class User {
 
     @Column(name = "update_date")
     //every user has an update date
-    private String updateDate;
+    private LocalDateTime updateDate;
     
     //ADDED BY RAJ 13th NOV 2023
     @Column(name = "lastLogin")
@@ -86,8 +88,6 @@ public class User {
     @Column(name = "isLocked", nullable = false)
     private boolean isLocked = false;
     
-    private LocalDateTime updateDate;
-
 
     // omitting patient record relationship - deprecated entity - means that patient records
     // should be handled via PatientRecordService and PatientRecordDTO, NOT via JPA entity mapping.
@@ -179,24 +179,7 @@ public class User {
     public void setLastLoginTime(LocalDateTime lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
     }
-    public PatientRecord getPatientRecord() {
-        return patientRecord;
-    }
-    public void setPatientRecord(PatientRecord patientRecord) {
-        this.patientRecord = patientRecord;
-    }
-    public List<Prescription> getPrescriptionsAuthored() {
-        return prescriptionsAuthored;
-    }
-    public void setPrescriptionsAuthored(List<Prescription> prescriptionsAuthored) {
-        this.prescriptionsAuthored = prescriptionsAuthored;
-    }
-    public List<Prescription> getPrescriptionsReceived() {
-        return prescriptionsReceived;
-    }
-    public void setPrescriptionsReceived(List<Prescription> prescriptionsReceived) {
-        this.prescriptionsReceived = prescriptionsReceived;
-    }
+    
     public String getGender() {
         return gender;
     }
