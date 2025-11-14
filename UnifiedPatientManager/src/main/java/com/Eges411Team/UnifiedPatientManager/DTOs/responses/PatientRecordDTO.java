@@ -11,9 +11,11 @@ public class PatientRecordDTO {
     // field for patient ID
     private Long patientId;
 
-    // only a getter for patientId to make it read-only
     public Long getPatientId() {
         return patientId;
+    }
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
     }
 
     // first name field
