@@ -65,7 +65,7 @@ public class AuthenticationService {
         userRepository.save(user);
 
         // Step 4: Generate OTP and send to user
-        otpService.generateAndSendOtp(user, OtpType.LOGIN);
+        otpService.generateAndSendOtp(user);
     }
 
     //NOW THEY ARE PASSED 2FA, they NEED A JWT TOKEN TO ACCESS RESOURCES
