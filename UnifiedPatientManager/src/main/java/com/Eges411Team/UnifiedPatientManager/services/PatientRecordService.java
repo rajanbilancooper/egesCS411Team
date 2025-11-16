@@ -112,9 +112,92 @@ public class PatientRecordService {
 
     }
 
-    public ResponseEntity<PatientRecordUpdateDTO> updatePatientRecord(Long userID, PatientRecordUpdateDTO recordDTO) {
+    public ResponseEntity<PatientRecordDTO> updatePatientRecord(Long userID, PatientRecordUpdateDTO recordDTO) {
         // Implementation to update patient record by userID
-        return ResponseEntity.ok(recordDTO);
+
+        // firstly obtain the user or throw an exception if they don't exist
+        User user = userRepository.findById(userID).orElseThrow(() 
+            -> new RuntimeException("User not found with ID: " + userID));
+        
+        // we want to save the information from the  PatientRecordUpdateDTO that maps to the user being updated
+        
+        // set new phone number and address and save them
+        // we need null checks to determine if the recordDTO has these fields as null or not
+        if (recordDTO.getPhoneNumber() != null) {
+            user.setPhoneNumber(recordDTO.getPhoneNumber());
+        }
+        if (recordDTO.getAddress() != null) {
+            user.setAddress(recordDTO.getAddress());
+        }
+        // save the user at this point
+        userRepository.save(user);
+
+        // now we must go through the allergies, medication and medical history (they each have an enum with ADD, DELETE, UPDATE)
+
+        // ** ALLERGIES **
+        // first see if the DTO contains allergy actions made
+        if (recordDTO.getAllergyActions() != null) {
+            // loop through each action and determine what to do based on the action enum
+            for (PatientRecordUpdateDTO.AllergyAction action : recordDTO.getAllergyActions()) {
+                switch (action.getAction()) {
+                    case ADD:
+                        // logic for adding an allergy
+                        break;
+
+                    case UPDATE:
+                        // logic for updating an allergy
+                        break;
+
+                    case REMOVE:
+                        // logic for removing an allergy
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        
+        // ** MEDICATIONS **
+        // check if DTO contains changes made to medications
+        if (recordDTO.getMedicationActions() != null) {
+            for (PatientRecordUpdateDTO.MedicationAction action : recordDTO.getMedicationActions()) {
+                switch (action.getAction()) {
+                    case ADD:
+                    // logic for adding a medication
+                        break;
+
+
+                    case UPDATE:
+                    // logic for updating a medication
+                        break;
+
+
+                    case REMOVE:
+                    // logic for removing a medication
+                        break;
+
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        // ** MEDICAL HISTORY ** 
+        // we have a 'medicalNote' as an attribute -- treat as a new Medical History -- TODO
+
+
+        // finally, create a patientRecordDTO to return
+        PatientRecordDTO patientRecord = new PatientRecordDTO();
+
+        // update the necessary fields in patientRecord
+        
+
+
+
+        return ResponseEntity.ok(patientRecord);
+
     }
 
 }
