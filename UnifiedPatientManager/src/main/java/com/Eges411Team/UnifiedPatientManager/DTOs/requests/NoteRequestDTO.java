@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.sql.Blob;
 
 import java.time.LocalDateTime;
 
@@ -19,19 +20,19 @@ public class NoteRequestDTO {
 
     @NotNull(message = "Patient ID is required")
     @Schema(example = "3", description = "ID of the patient associated with this note")
-    private Integer patient_id;
+    private Long patient_id;
 
     @NotNull(message = "Doctor ID is required")
     @Schema(example = "5", description = "ID of the doctor who wrote the note")
-    private Integer doctor_id;
+    private Long doctor_id;
 
     @NotBlank(message = "Note type cannot be blank")
     @Schema(example = "Progress", description = "Type of note (e.g., Progress, SOAP, Summary)")
-    private String note_type;
+    private Blob note_type;
 
     @NotBlank(message = "Note content cannot be blank")
     @Schema(example = "Patient reports improved mobility and reduced pain.", description = "Main content or body of the note")
-    private String content;
+    private Blob content;
 
     @Schema(example = "2025-11-12T14:30:00", description = "Timestamp when the note was created or updated")
     private LocalDateTime timestamp;

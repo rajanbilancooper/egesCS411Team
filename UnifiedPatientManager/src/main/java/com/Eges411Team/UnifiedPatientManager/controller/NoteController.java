@@ -69,9 +69,9 @@ public class NoteController {
     Note note = new Note();
 
     // Set entity fields from DTO
-    note.setPatient_id(patientId);                   
-    note.setDoctor_id(noteRequestDTO.getDoctor_id()); 
-    note.setNote_type(noteRequestDTO.getNote_type());
+    note.setPatientId(patientId);                   
+    note.setDoctorId(noteRequestDTO.getDoctor_id()); 
+    note.setNoteType(noteRequestDTO.getNote_type());
     note.setContent(noteRequestDTO.getContent());
     note.setTimestamp(noteRequestDTO.getTimestamp());
 

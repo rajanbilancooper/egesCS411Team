@@ -95,8 +95,8 @@ public class MedicalHistoryService {
 
     // saving a single record
     public MedicalHistory saveMedicalHistory(MedicalHistory entity) {
-        if (entity.getStart_date() != null && entity.getEnd_date() != null
-                && entity.getEnd_date().before(entity.getStart_date())) {
+        if (entity.getStartDate() != null && entity.getEndDate() != null
+                && entity.getEndDate().before(entity.getStartDate())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "end_date must be after or equal to start_date");
         }
 
