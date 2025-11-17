@@ -20,27 +20,27 @@ public class AllergyService {
     }
 
     // GET /{patient_id}/allergies
-    public List<Allergy> getAllergiesByPatientId(int patientId) {
-        return allergyRepository.findAllByPatient_id(patientId);
+    public List<Allergy> getAllergiesByPatientId(Long patientId) {
+        return allergyRepository.findAllByPatientId(patientId);
     }
 
     // POST /{patient_id}/allergies
     // Replace all allergies for this patient with the provided list
-    public List<Allergy> saveAllergies(int patientId, List<Allergy> allergies) {
+    public List<Allergy> saveAllergies(Long patientId, List<Allergy> allergies) {
         // delete existing
-        List<Allergy> existing = allergyRepository.findAllByPatient_id(patientId);
+        List<Allergy> existing = allergyRepository.findAllByPatientId(patientId);
         allergyRepository.deleteAll(existing);
 
         // set patient_id for each new allergy
         for (Allergy allergy : allergies) {
-            allergy.setPatient_id(patientId);
+            allergy.setPatientId(patientId);
         }
 
         return allergyRepository.saveAll(allergies);
     }
 
     // PUT /{patient_id}/allergies/{allergy_id}
-    public Allergy updateAllergy(int patientId, int allergyId, Allergy updated) {
+    public Allergy updateAllergy(Long patientId, Long allergyId, Allergy updated) {
         Allergy existing = allergyRepository.findById(allergyId)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -48,7 +48,7 @@ public class AllergyService {
             ));
 
         // ensure this allergy belongs to the given patient
-        if (existing.getPatient_id() != patientId) {
+        if (existing.getPatientId() == null || !existing.getPatientId().equals(patientId)) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Allergy does not belong to the specified patient"
@@ -65,12 +65,12 @@ public class AllergyService {
 
     // GET /{patient_id}/allergies/refresh
     // Currently same as getAllergies; hook external sync here if needed
-    public List<Allergy> refreshAllergies(int patientId) {
-        return allergyRepository.findAllByPatient_id(patientId);
+    public List<Allergy> refreshAllergies(Long patientId) {
+        return allergyRepository.findAllByPatientId(patientId);
     }
 
     // DELETE /{patient_id}/allergies/{allergy_id}
-    public void deleteAllergy(int patientId, int allergyId) {
+    public void deleteAllergy(Long patientId, Long allergyId) {
         Optional<Allergy> existingOpt = allergyRepository.findById(allergyId);
 
         Allergy existing = existingOpt.orElseThrow(() ->
@@ -80,7 +80,7 @@ public class AllergyService {
             )
         );
 
-        if (existing.getPatient_id() != patientId) {
+        if (existing.getPatientId() == null || !existing.getPatientId().equals(patientId)) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Allergy does not belong to the specified patient"

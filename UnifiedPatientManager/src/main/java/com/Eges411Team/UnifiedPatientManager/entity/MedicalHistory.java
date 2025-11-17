@@ -17,13 +17,13 @@ public class MedicalHistory {
     @Id
 
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "patient_id")
-    private Integer patient_id;
+    private Long patientId;
 
     @Column(name = "doctor_id")
-    private Integer doctor_id;
+    private Long doctorId;
 
     @Column(name = "diagnosis")
     private String diagnosis;
@@ -33,10 +33,10 @@ public class MedicalHistory {
 
     @Column(name = "start_date")
     @Temporal(TemporalType.DATE)
-    private Date start_date;
+    private Date startDate;
 
     @Column(name = "end_date")
     @Temporal(TemporalType.DATE)
-    private Date end_date;
+    private Date endDate;
 
 }

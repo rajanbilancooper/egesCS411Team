@@ -17,10 +17,10 @@ import lombok.Setter;
 public class Allergy{
     @Id
     @Column(name = "id")
-    private int id;
+    private Long id;
 
     @Column(name = "patient_id")
-    private int patient_id;
+    private Long patientId;
 
     @Column (name = "reaction")
     private String reaction;

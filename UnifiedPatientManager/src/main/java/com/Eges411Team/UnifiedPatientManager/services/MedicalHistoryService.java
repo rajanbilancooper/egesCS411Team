@@ -21,27 +21,27 @@ public class MedicalHistoryService {
     }
 
     // GET /{patient_id}/medicalhistory
-    public List<MedicalHistory> getMedicalHistoryByPatientId(int patientId) {
-        return medicalHistoryRepository.findAllByPatient_id(patientId);
+    public List<MedicalHistory> getMedicalHistoryByPatientId(Long patientId) {
+        return medicalHistoryRepository.findAllByPatientId(patientId);
     }
 
     // POST /{patient_id}/medicalhistory
     // Replace all medical-history records for this patient with the provided list
-    public List<MedicalHistory> saveMedicalHistory(int patientId, List<MedicalHistory> historyList) {
+    public List<MedicalHistory> saveMedicalHistory(Long patientId, List<MedicalHistory> historyList) {
         // delete existing for the patient
-        List<MedicalHistory> existing = medicalHistoryRepository.findAllByPatient_id(patientId);
+        List<MedicalHistory> existing = medicalHistoryRepository.findAllByPatientId(patientId);
         medicalHistoryRepository.deleteAll(existing);
 
         // enforce ownership
         for (MedicalHistory mh : historyList) {
-            mh.setPatient_id(patientId);
+            mh.setPatientId(patientId);
         }
 
         return medicalHistoryRepository.saveAll(historyList);
     }
 
     // PUT /{patient_id}/medicalhistory/{history_id}
-    public MedicalHistory updateMedicalHistory(int patientId, int historyId, MedicalHistory updated) {
+    public MedicalHistory updateMedicalHistory(Long patientId, Long historyId, MedicalHistory updated) {
         MedicalHistory existing = medicalHistoryRepository.findById(historyId)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -49,7 +49,7 @@ public class MedicalHistoryService {
             ));
 
         // ensure this record belongs to the given patient
-        if (existing.getPatient_id() != patientId) {
+        if (existing.getPatientId() == null || !existing.getPatientId().equals(patientId)) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Medical history record does not belong to the specified patient"
@@ -57,23 +57,23 @@ public class MedicalHistoryService {
         }
 
         // update allowed fields
-        existing.setDoctor_id(updated.getDoctor_id());
+        existing.setDoctorId(updated.getDoctorId());
         existing.setDiagnosis(updated.getDiagnosis());
         existing.setFrequency(updated.getFrequency());
-        existing.setStart_date(updated.getStart_date());
-        existing.setEnd_date(updated.getEnd_date());
+        existing.setStartDate(updated.getStartDate());
+        existing.setEndDate(updated.getEndDate());
 
         return medicalHistoryRepository.save(existing);
     }
 
     // GET /{patient_id}/medicalhistory/refresh
     // Currently same as get; hook external sync here if needed
-    public List<MedicalHistory> refreshMedicalHistory(int patientId) {
-        return medicalHistoryRepository.findAllByPatient_id(patientId);
+    public List<MedicalHistory> refreshMedicalHistory(Long patientId) {
+        return medicalHistoryRepository.findAllByPatientId(patientId);
     }
 
     // DELETE /{patient_id}/medicalhistory/{history_id}
-    public void deleteMedicalHistory(int patientId, int historyId) {
+    public void deleteMedicalHistory(Long patientId, Long historyId) {
         Optional<MedicalHistory> existingOpt = medicalHistoryRepository.findById(historyId);
 
         MedicalHistory existing = existingOpt.orElseThrow(() ->
@@ -83,7 +83,7 @@ public class MedicalHistoryService {
             )
         );
 
-        if (existing.getPatient_id() != patientId) {
+        if (existing.getPatientId() == null || !existing.getPatientId().equals(patientId)) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Medical history record does not belong to the specified patient"

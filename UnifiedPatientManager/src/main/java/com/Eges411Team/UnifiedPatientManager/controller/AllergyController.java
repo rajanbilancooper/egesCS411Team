@@ -1,17 +1,22 @@
 package com.Eges411Team.UnifiedPatientManager.controller;
 
+import com.Eges411Team.UnifiedPatientManager.DTOs.requests.AllergyRequest;
+import com.Eges411Team.UnifiedPatientManager.DTOs.responses.AllergyResponse;
 import com.Eges411Team.UnifiedPatientManager.entity.Allergy;
+import com.Eges411Team.UnifiedPatientManager.DTOs.mappers.AllergyMapper;
 import com.Eges411Team.UnifiedPatientManager.services.AllergyService;
-import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/default/patient")
@@ -37,6 +42,7 @@ public class AllergyController {
                             name = "AllergyList",
                             summary = "Retrieves a patient's allergy list.",
                             description = "Retrieves a patient's allergy list.",
+                            // same JSON structure, now coming from DTO instead of entity
                             value = "[{\"id\":3,\"patient_id\":3,\"reaction\":\"GIintolerance\",\"severity\":\"HighRisk\",\"substance\":\"Pollen\"}]"
                         )
                     }
@@ -44,51 +50,79 @@ public class AllergyController {
             )
         }
     )
-    public ResponseEntity<List<Allergy>> find(
+    public ResponseEntity<List<AllergyResponse>> find(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Allergy> allergies = allergyService.getAllergiesByPatientId(patientId);
-        return ResponseEntity.ok(allergies);
+
+        List<AllergyResponse> response = allergies.stream()
+            .map(AllergyMapper::toResponseDto)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{patient_id}/allergies")
     @Operation(summary = "Create or replace a patient's allergy list")
-    public ResponseEntity<List<Allergy>> createOrUpdate(
-        @RequestBody List<Allergy> allergyList,
+    public ResponseEntity<List<AllergyResponse>> createOrUpdate(
+        @RequestBody List<AllergyRequest> allergyList,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
-        List<Allergy> saved = allergyService.saveAllergies(patientId, allergyList);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        // convert request DTOs -> entity list
+        List<Allergy> entities = allergyList.stream()
+            .map(AllergyMapper::toEntity)
+            .collect(Collectors.toList());
+
+        // service still works with entities
+        List<Allergy> saved = allergyService.saveAllergies(patientId, entities);
+
+        // convert back to response DTOs
+        List<AllergyResponse> response = saved.stream()
+            .map(AllergyMapper::toResponseDto)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{patient_id}/allergies/{allergy_id}")
     @Operation(summary = "Update a specific allergy for a patient")
-    public ResponseEntity<Allergy> update(
-        @RequestBody Allergy allergy,
+    public ResponseEntity<AllergyResponse> update(
+        @RequestBody AllergyRequest allergyDto,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("allergy_id")
         @Parameter(example = "1")
-        int allergyId
+        Long allergyId
     ) {
-        Allergy updated = allergyService.updateAllergy(patientId, allergyId, allergy);
-        return ResponseEntity.ok(updated);
+        // map DTO -> entity with updated fields
+        Allergy updatedEntity = AllergyMapper.toEntity(allergyDto);
+
+        Allergy updated = allergyService.updateAllergy(patientId, allergyId, updatedEntity);
+
+        AllergyResponse response = AllergyMapper.toResponseDto(updated);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{patient_id}/allergies/refresh")
     @Operation(summary = "Refresh a patient's allergy list")
-    public ResponseEntity<List<Allergy>> refresh(
+    public ResponseEntity<List<AllergyResponse>> refresh(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<Allergy> refreshed = allergyService.refreshAllergies(patientId);
-        return ResponseEntity.ok(refreshed);
+
+        List<AllergyResponse> response = refreshed.stream()
+            .map(AllergyMapper::toResponseDto)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{patient_id}/allergies/{allergy_id}")
@@ -96,10 +130,10 @@ public class AllergyController {
     public ResponseEntity<HttpStatus> delete(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("allergy_id")
         @Parameter(example = "1")
-        int allergyId
+        Long allergyId
     ) {
         allergyService.deleteAllergy(patientId, allergyId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

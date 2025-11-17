@@ -53,7 +53,7 @@ public class MedicalHistoryController {
     public ResponseEntity<List<MedicalHistory>> find(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
 
         List<MedicalHistory> records = medicalHistoryService.getMedicalHistoryByPatientId(patientId);
@@ -105,10 +105,10 @@ public class MedicalHistoryController {
         @Valid @RequestBody MedicalHistory medicalHistory,
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("history_id")
         @Parameter(example = "1")
-        int historyId
+        Long historyId
     ) {
         MedicalHistory updated = medicalHistoryService.updateMedicalHistory(patientId, historyId, medicalHistory);
         return ResponseEntity.ok(updated);
@@ -120,7 +120,7 @@ public class MedicalHistoryController {
     public ResponseEntity<List<MedicalHistory>> refresh(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId
+        Long patientId
     ) {
         List<MedicalHistory> refreshed = medicalHistoryService.refreshMedicalHistory(patientId);
         return ResponseEntity.ok(refreshed);
@@ -132,10 +132,10 @@ public class MedicalHistoryController {
     public ResponseEntity<HttpStatus> delete(
         @PathVariable("patient_id")
         @Parameter(example = "3")
-        int patientId,
+        Long patientId,
         @PathVariable("history_id")
         @Parameter(example = "1")
-        int historyId
+        Long historyId
     ) {
         medicalHistoryService.deleteMedicalHistory(patientId, historyId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
