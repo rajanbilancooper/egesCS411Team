@@ -19,11 +19,11 @@ public class MedicalHistoryRequestDTO {
 
     @NotNull(message = "Patient ID is required")
     @Schema(example = "3", description = "ID of the patient associated with this medical record")
-    private Integer patient_id;
+    private Long patient_id;
 
     @NotNull(message = "Doctor ID is required")
     @Schema(example = "5", description = "ID of the doctor who created or managed this record")
-    private Integer doctor_id;
+    private Long doctor_id;
 
     @NotBlank(message = "Diagnosis cannot be blank")
     @Schema(example = "Asthma", description = "Primary diagnosis for this medical record")

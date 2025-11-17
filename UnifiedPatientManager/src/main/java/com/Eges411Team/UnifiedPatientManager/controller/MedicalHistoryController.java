@@ -74,26 +74,26 @@ public class MedicalHistoryController {
     MedicalHistory medicalHistory = new MedicalHistory();
 
     // Set the entity fields from the request DTO
-    medicalHistory.setPatient_id(patientId); 
-    medicalHistory.setDoctor_id(MHrequestDTO.getDoctor_id());
+    medicalHistory.setPatientId(patientId); 
+    medicalHistory.setDoctorId(MHrequestDTO.getDoctor_id());
     medicalHistory.setDiagnosis(MHrequestDTO.getDiagnosis());
     medicalHistory.setFrequency(MHrequestDTO.getFrequency());
-    medicalHistory.setStart_date(MHrequestDTO.getStart_date());
-    medicalHistory.setEnd_date(MHrequestDTO.getEnd_date());
+    medicalHistory.setStartDate(MHrequestDTO.getStart_date());
+    medicalHistory.setEndDate(MHrequestDTO.getEnd_date());
 
     // Save the entity using your service
     MedicalHistory saved = medicalHistoryService.saveMedicalHistory(medicalHistory);
 
     // Convert the saved entity to a Response DTO
-    MedicalHistoryResponseDTO responseDTO = new MedicalHistoryResponseDTO(
-            saved.getId(),
-            saved.getPatient_id(),
-            saved.getDoctor_id(),
-            saved.getDiagnosis(),
-            saved.getFrequency(),
-            saved.getStart_date(),
-            saved.getEnd_date()
-    );
+    MedicalHistoryResponseDTO responseDTO = new MedicalHistoryResponseDTO();
+
+            saved.getId();
+            saved.getPatientId();
+            saved.getDoctorId();
+            saved.getDiagnosis();
+            saved.getFrequency();
+            saved.getStartDate();
+            saved.getEndDate();
 
     // Return a created response with the saved record
     return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
