@@ -18,6 +18,7 @@ public class OtpToken {
 
     @Column(name = "code", nullable = false)
     private String otpCode;
+    //Test branch commit
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
