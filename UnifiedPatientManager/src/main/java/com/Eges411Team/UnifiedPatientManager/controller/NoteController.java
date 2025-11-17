@@ -1,5 +1,6 @@
 package com.Eges411Team.UnifiedPatientManager.controller;
 
+import com.Eges411Team.UnifiedPatientManager.DTOs.requests.NoteRequestDTO;
 import com.Eges411Team.UnifiedPatientManager.entity.Note;
 import com.Eges411Team.UnifiedPatientManager.services.NoteService;
 import java.util.List;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/default/patient")
@@ -55,17 +57,28 @@ public class NoteController {
     }
 
     // Create or replace patient's notes
+
     @PostMapping("/{patient_id}/notes")
-    @Operation(summary = "Create or replace a patient's notes")
-    public ResponseEntity<List<Note>> createOrUpdate(
-        @RequestBody List<Note> notes,
-        @PathVariable("patient_id")
-        @Parameter(example = "3")
-        Long patientId
-    ) {
-        List<Note> saved = noteService.saveNotes(patientId, notes);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
+    @Operation(summary = "Create a new note for a patient")
+    public ResponseEntity<Note> createNote(
+        @PathVariable("patient_id") 
+        @Parameter(example = "3") int patientId,
+        @Valid @RequestBody NoteRequestDTO noteRequestDTO) {
+
+    // Create a new Note entity 
+    Note note = new Note();
+
+    // Set entity fields from DTO
+    note.setPatient_id(patientId);                   
+    note.setDoctor_id(noteRequestDTO.getDoctor_id()); 
+    note.setNote_type(noteRequestDTO.getNote_type());
+    note.setContent(noteRequestDTO.getContent());
+    note.setTimestamp(noteRequestDTO.getTimestamp());
+
+    // Save using the service
+    Note saved = noteService.saveSingleNote(note);
+    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+}
 
     // Update a specific note
     @PutMapping("/{patient_id}/notes/{note_id}")

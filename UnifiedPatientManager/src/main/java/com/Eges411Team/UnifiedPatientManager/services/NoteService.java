@@ -90,4 +90,9 @@ public class NoteService {
 
         noteRepository.delete(existing);
     }
+
+    // save a single note
+    public Note saveSingleNote(Note note) {
+    return noteRepository.save(note);
+}
 }

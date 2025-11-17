@@ -1,5 +1,7 @@
 package com.Eges411Team.UnifiedPatientManager.controller;
 
+import com.Eges411Team.UnifiedPatientManager.DTOs.requests.MedicalHistoryRequestDTO;
+import com.Eges411Team.UnifiedPatientManager.DTOs.responses.MedicalHistoryResponseDTO;
 import com.Eges411Team.UnifiedPatientManager.entity.MedicalHistory;
 import com.Eges411Team.UnifiedPatientManager.services.MedicalHistoryService;
 import java.util.List;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/default/patient")
@@ -23,7 +26,7 @@ public class MedicalHistoryController {
         this.medicalHistoryService = medicalHistoryService;
     }
 
-    // 🩺 Get all medical history records for a patient
+    // Get all medical history records for a patient
     @GetMapping("/{patient_id}/medicalhistory")
     @Operation(
         summary = "Get a patient's medical history list",
@@ -45,33 +48,61 @@ public class MedicalHistoryController {
             )
         }
     )
+
+
     public ResponseEntity<List<MedicalHistory>> find(
         @PathVariable("patient_id")
         @Parameter(example = "3")
         Long patientId
     ) {
+
         List<MedicalHistory> records = medicalHistoryService.getMedicalHistoryByPatientId(patientId);
         return ResponseEntity.ok(records);
     }
 
     // Create or replace a patient's medical history records
-    @PostMapping("/{patient_id}/medicalhistory")
-    @Operation(summary = "Create or replace a patient's medical history records")
-    public ResponseEntity<List<MedicalHistory>> createOrUpdate(
-        @RequestBody List<MedicalHistory> historyList,
-        @PathVariable("patient_id")
-        @Parameter(example = "3")
-        Long patientId
-    ) {
-        List<MedicalHistory> saved = medicalHistoryService.saveMedicalHistory(patientId, historyList);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
 
-    // Update a specific medical history record
+    @PostMapping("/{patient_id}/medicalhistory")
+    @Operation(summary = "Create a new medical history record for a patient")
+    public ResponseEntity<MedicalHistoryResponseDTO> createMedicalHistory(
+        @PathVariable("patient_id") 
+        @Parameter(example = "3") 
+        int patientId,
+        @Valid @RequestBody MedicalHistoryRequestDTO MHrequestDTO) {
+
+    // Create a new entity instance
+    MedicalHistory medicalHistory = new MedicalHistory();
+
+    // Set the entity fields from the request DTO
+    medicalHistory.setPatient_id(patientId); 
+    medicalHistory.setDoctor_id(MHrequestDTO.getDoctor_id());
+    medicalHistory.setDiagnosis(MHrequestDTO.getDiagnosis());
+    medicalHistory.setFrequency(MHrequestDTO.getFrequency());
+    medicalHistory.setStart_date(MHrequestDTO.getStart_date());
+    medicalHistory.setEnd_date(MHrequestDTO.getEnd_date());
+
+    // Save the entity using your service
+    MedicalHistory saved = medicalHistoryService.saveMedicalHistory(medicalHistory);
+
+    // Convert the saved entity to a Response DTO
+    MedicalHistoryResponseDTO responseDTO = new MedicalHistoryResponseDTO(
+            saved.getId(),
+            saved.getPatient_id(),
+            saved.getDoctor_id(),
+            saved.getDiagnosis(),
+            saved.getFrequency(),
+            saved.getStart_date(),
+            saved.getEnd_date()
+    );
+
+    // Return a created response with the saved record
+    return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+}
+    // Update a specific medical history record 
     @PutMapping("/{patient_id}/medicalhistory/{history_id}")
     @Operation(summary = "Update a specific medical history record for a patient")
     public ResponseEntity<MedicalHistory> update(
-        @RequestBody MedicalHistory medicalHistory,
+        @Valid @RequestBody MedicalHistory medicalHistory,
         @PathVariable("patient_id")
         @Parameter(example = "3")
         Long patientId,
