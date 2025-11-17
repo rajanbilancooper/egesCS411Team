@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NotesAPI } from "./api/notes";
+import { NotesAPI } from "./api/note";
 
 export default function NotesPanel({ patientId = 3 }) {
   const [notes, setNotes] = useState([]);
