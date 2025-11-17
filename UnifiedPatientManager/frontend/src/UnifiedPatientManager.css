@@ -1,0 +1,224 @@
+/* UnifiedPatientManager.css */
+
+:root {
+  --upm-blue: #4263eb;
+  --upm-bg: #f3f4f7;
+  --upm-card-bg: #ffffff;
+  --upm-border: #dde1ea;
+  --upm-text-main: #111827;
+  --upm-text-muted: #6b7280;
+  --upm-pill: #e5e7eb;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", Arial, sans-serif;
+  background: var(--upm-bg);
+}
+
+/* Root */
+.upm-root {
+  min-height: 100vh;
+  background: var(--upm-bg);
+}
+
+/* Header */
+.upm-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 32px;
+  background: var(--upm-blue);
+  color: #fff;
+  gap: 10px;
+}
+
+.upm-logo-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upm-logo-cross {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.upm-title {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+/* Main */
+.upm-main {
+  padding: 24px 40px 40px;
+}
+
+/* Search */
+.upm-search-wrapper {
+  position: relative;
+  max-width: 900px;
+  margin-bottom: 20px;
+}
+
+.upm-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+}
+
+.upm-search-input {
+  width: 100%;
+  padding: 10px 14px 10px 36px;
+  border-radius: 999px;
+  border: 1px solid var(--upm-border);
+  font-size: 14px;
+}
+
+/* Tabs */
+.upm-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.upm-tab {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--upm-border);
+  background: var(--upm-pill);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.upm-tab--active {
+  background: #ffffff;
+  border-color: var(--upm-blue);
+  color: var(--upm-blue);
+  font-weight: 600;
+}
+
+.upm-tab--grid {
+  background-image: linear-gradient(#f97373 1px, transparent 1px),
+    linear-gradient(90deg, #f97373 1px, transparent 1px);
+  background-size: 8px 8px;
+  background-color: #fde4e4;
+}
+
+/* Layout grid */
+.upm-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 24px;
+}
+
+.upm-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Cards */
+.upm-card {
+  background: var(--upm-card-bg);
+  border-radius: 18px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  color: var(--upm-text-main);
+}
+
+.upm-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.upm-appointment-card {
+  min-height: 100%;
+}
+
+/* Profile */
+.upm-profile-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-width: 170px;
+}
+
+.upm-avatar-wrapper {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  padding: 4px;
+  border: 3px solid var(--upm-border);
+  overflow: hidden;
+}
+
+.upm-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upm-patient-name {
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.upm-profile-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--upm-border);
+}
+
+.upm-profile-details p {
+  margin: 4px 0;
+}
+
+/* Typography */
+.upm-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.upm-appointment-subtitle {
+  margin-top: 18px;
+}
+
+.upm-horizontal-line {
+  height: 1px;
+  background: var(--upm-border);
+  margin-bottom: 14px;
+}
+
+.upm-label {
+  font-weight: 600;
+}
+
+/* Basic info layout */
+.upm-basic-grid {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 8px;
+}
+
+.upm-card p {
+  margin: 4px 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .upm-grid {
+    grid-template-columns: 1fr;
+  }
+}
