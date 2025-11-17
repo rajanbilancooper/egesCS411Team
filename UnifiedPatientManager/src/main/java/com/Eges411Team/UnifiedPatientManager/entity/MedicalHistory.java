@@ -1,6 +1,6 @@
 package com.Eges411Team.UnifiedPatientManager.entity;
 
-// this will be a class for users in the system
+// this will be a class for users in the system PUSHING NOW 
 import jakarta.persistence.*;
 import java.util.Date;
 
