@@ -67,7 +67,7 @@ public class MedicalHistoryController {
     public ResponseEntity<MedicalHistoryResponseDTO> createMedicalHistory(
         @PathVariable("patient_id") 
         @Parameter(example = "3") 
-        int patientId,
+        long patientId,
         @Valid @RequestBody MedicalHistoryRequestDTO MHrequestDTO) {
 
     // Create a new entity instance
