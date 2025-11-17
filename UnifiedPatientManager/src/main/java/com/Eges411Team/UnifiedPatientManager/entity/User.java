@@ -5,11 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 // this will be a class for users in the system
 import jakarta.persistence.*;
 
+// allows us to use the 'LocalDateTime' type
 import java.time.LocalDateTime;
 
-import org.springframework.cglib.core.Local;
 
-import java.time.LocalDateTime;
 
 // base class for all users
 @Entity
@@ -40,15 +39,15 @@ public class User {
     // every user must have a role
     private Role role; 
 
-    @Column(name = "first_name", length = 50)
+    @Column(name = "first_name", length = 50, nullable = false)
     // every user must have a first name
     private String firstName;
     
-    @Column(name = "last_name", length = 50)
+    @Column(name = "last_name", length = 50, nullable = false)
     // every user must have a last name
     private String lastName;
      
-    @Column(name = "phone_number", length = 20)
+    @Column(name = "phone_number", length = 20, nullable = false)
     // every user must have a phone number
     private String phoneNumber;
    
@@ -56,27 +55,27 @@ public class User {
     //every user has a count of failed login attempts
     private int failedLoginAttempts = 0;
     
-    @Column(name = "gender", length = 10)
+    @Column(name = "gender", length = 10, nullable = false)
     //every user has a gender 
     private String gender;
 
-    @Column(name = "date_of_birth")
+    @Column(name = "date_of_birth", nullable = false)
     //every user has a date of birth
     private LocalDateTime dateOfBirth;
     
-    @Column(name = "address", length = 100)
+    @Column(name = "address", length = 100, nullable = false)
     //every user has an address
     private String address;
 
-    @Column(name = "email", length = 50)
+    @Column(name = "email", length = 50, nullable = false)
     //every user has an email
     private String email;
 
-    @Column(name = "creation_date")
+    @Column(name = "creation_date", nullable = false)
     //every user has a creation date
     private LocalDateTime creationDate;
 
-    @Column(name = "update_date")
+    @Column(name = "update_date", nullable = false)
     //every user has an update date
     private LocalDateTime updateDate;
     
