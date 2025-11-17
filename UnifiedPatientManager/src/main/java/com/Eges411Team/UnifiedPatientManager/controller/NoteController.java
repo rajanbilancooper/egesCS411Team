@@ -62,7 +62,7 @@ public class NoteController {
     @Operation(summary = "Create a new note for a patient")
     public ResponseEntity<Note> createNote(
         @PathVariable("patient_id") 
-        @Parameter(example = "3") int patientId,
+        @Parameter(example = "3") Long patientId,
         @Valid @RequestBody NoteRequestDTO noteRequestDTO) {
 
     // Create a new Note entity 
