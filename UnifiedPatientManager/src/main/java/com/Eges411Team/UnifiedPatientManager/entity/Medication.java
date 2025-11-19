@@ -2,9 +2,6 @@ package com.Eges411Team.UnifiedPatientManager.entity;
 
 // this will be a class for users in the system
 import jakarta.persistence.*;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +15,7 @@ import java.time.LocalDateTime;
 
 public class Medication{
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
