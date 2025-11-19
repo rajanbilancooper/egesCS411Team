@@ -16,9 +16,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username); //OPTIONAL is used to avoid NullPointer Exceptions, will allow a null to be returned
-    Optional<User> findById(Long id);
     boolean existsByUsername(String username);
-    boolean existsById(Long id);
     Optional<User> findByFirstNameAndLastName(String firstName, String lastName);
     Optional<User> findByFirstNameAndLastNameAndDateOfBirth(String firstName, String lastName, java.time.LocalDateTime dateOfBirth);
     

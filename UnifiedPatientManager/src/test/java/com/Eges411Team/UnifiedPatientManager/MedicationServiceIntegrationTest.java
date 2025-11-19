@@ -36,11 +36,9 @@ public class MedicationServiceIntegrationTest {
     void validPrescriptionNoAllergyConflicts() {
         Long patientId = 100L;
         Long doctorId = 200L;
-        Long medicationId = 1L; // manual id because entity lacks generation strategy
 
         // Pre-condition setup: existing medication record (will be updated to prescription Amoxicillin)
         Medication existing = new Medication();
-        existing.setId(medicationId);
         existing.setPatientId(patientId);
         existing.setDoctorId(doctorId);
         existing.setDrugName("Placeholder");
@@ -76,7 +74,7 @@ public class MedicationServiceIntegrationTest {
         // Execute: should NOT throw a conflict exception
         Medication result;
         try {
-            result = medicationService.updateMedication(patientId, doctorId, medicationId, updated);
+            result = medicationService.updateMedication(patientId, doctorId, existing.getId(),updated);
         } catch (ResponseStatusException ex) {
             Assertions.fail("Unexpected conflict detected: " + ex.getReason());
             return; // unreachable after fail, but keeps compiler happy
@@ -90,7 +88,7 @@ public class MedicationServiceIntegrationTest {
         Assertions.assertTrue(Boolean.TRUE.equals(result.getIsPerscription()));
 
         // Verify persisted state
-        Medication persisted = medicationRepository.findById(medicationId).orElseThrow();
+        Medication persisted = medicationRepository.findById(existing.getId()).orElseThrow();
         Assertions.assertEquals("Amoxicillin", persisted.getDrugName());
     }
 }
