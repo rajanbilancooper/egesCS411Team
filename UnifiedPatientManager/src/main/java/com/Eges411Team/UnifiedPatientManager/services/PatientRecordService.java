@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-// import necessary repositories, DTOs, and entities
-import com.Eges411Team.UnifiedPatientManager.entity.User;
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.PatientRecordUpdateDTO;
 import com.Eges411Team.UnifiedPatientManager.DTOs.responses.PatientRecordDTO;
 import com.Eges411Team.UnifiedPatientManager.entity.Allergy;
 import com.Eges411Team.UnifiedPatientManager.entity.MedicalHistory;
 import com.Eges411Team.UnifiedPatientManager.entity.Medication;
+// import necessary repositories, DTOs, and entities
+import com.Eges411Team.UnifiedPatientManager.entity.User;
 import com.Eges411Team.UnifiedPatientManager.repositories.AllergyRepository;
 import com.Eges411Team.UnifiedPatientManager.repositories.MedicalHistoryRepo;
 import com.Eges411Team.UnifiedPatientManager.repositories.MedicationRepository;
@@ -55,14 +55,13 @@ public class PatientRecordService {
         patientRecord.setEmail(user.getEmail());
         patientRecord.setPhoneNumber(user.getPhoneNumber());
         patientRecord.setAddress(user.getAddress());
-        patientRecord.setDateOfBirth(user.getDateOfBirth().toLocalDate());
+        patientRecord.setDateOfBirth(user.getDateOfBirth());
         patientRecord.setGender(user.getGender());
 
 
         // populate patientRecord with empty arraylists to be populated
         patientRecord.setAllergies(new ArrayList<>());
         patientRecord.setMedications(new ArrayList<>());
-        patientRecord.setPrescriptions(new ArrayList<>());
         patientRecord.setMedicalHistory(new ArrayList<>());
 
 
@@ -232,16 +231,41 @@ public class PatientRecordService {
 
         // ** MEDICAL HISTORY ** 
         // we have a 'medicalNote' as an attribute -- treat as a new Medical History -- TODO
+        if (recordDTO.getMedicalNote() != null && !recordDTO.getMedicalNote().trim().isEmpty()) {
+
+            // create a new medical history
+            MedicalHistory medicalHistory = new MedicalHistory();
+            
+            // link the medical history to the current patient
+            medicalHistory.setPatientId(userID);
+            medicalHistory.setDiagnosis(recordDTO.getMedicalNote());
+            medicalHistory.setStartDate(new java.util.Date()); // Current timestamp
+
+            // save to repo
+            medicalHistoryRepository.save(medicalHistory);
+        }
 
 
         // finally, create a patientRecordDTO to return
         PatientRecordDTO patientRecord = new PatientRecordDTO();
 
         // update the necessary fields in patientRecord
+        patientRecord.setFirstName(user.getFirstName());
+        patientRecord.setLastName(user.getLastName());
+        patientRecord.setAddress(user.getAddress());
+
+        // get the list of allergies from the repo and set the nested DTO fields
+
+        // get the list of medications from the repo and set the nested DTO fields
+
+        // get the list of medical history from the repo and set the nested DTO fields
+
+        patientRecord.setDateOfBirth(user.getDateOfBirth());
+        patientRecord.setGender(user.getGender());
+        patientRecord.setEmail(user.getEmail());
+        patientRecord.setPhoneNumber(user.getPhoneNumber());
         
-
-
-
+        // return the patient Record
         return ResponseEntity.ok(patientRecord);
 
     }
