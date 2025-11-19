@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.PatientRecordUpdateDTO;
@@ -36,6 +37,14 @@ public class PatientRecordController {
 
         // updates the record using the service using the ID and the DTO
         return patientRecordService.updatePatientRecord(patientID, recordUpdateDTO);
+    }
+
+    // method for getting a patient record by full name
+    @GetMapping("/search")
+    public ResponseEntity<PatientRecordDTO> getPatientRecordByName(@RequestParam String fullName) {
+        
+        // gets the record using the service using the full name
+        return ResponseEntity.ok(patientRecordService.getPatientRecordByFullName(fullName));
     }
 
 }
