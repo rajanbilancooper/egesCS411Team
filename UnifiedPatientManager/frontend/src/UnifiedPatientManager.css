@@ -106,10 +106,9 @@ body {
 }
 
 .upm-tab--grid {
-  background-image: linear-gradient(#f97373 1px, transparent 1px),
-    linear-gradient(90deg, #f97373 1px, transparent 1px);
+  background-image:#ffffff;
   background-size: 8px 8px;
-  background-color: #fde4e4;
+  background-color: #ffffff;
 }
 
 /* Layout grid */
