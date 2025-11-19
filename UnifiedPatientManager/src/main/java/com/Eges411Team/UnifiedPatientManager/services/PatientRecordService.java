@@ -201,25 +201,85 @@ public class PatientRecordService {
                 }
             }
         }
-
         
         // ** MEDICATIONS **
         // check if DTO contains changes made to medications
         if (recordDTO.getMedicationActions() != null) {
+
+            // we should get the medications for the user similar to allergy
+            List<Medication> existingMedications = medicationRepository.findAllByPatientId(userID);
+
+            // then similarly create a hashmap with the ID's as keys and the medication as the value
+            HashMap<Long, Medication> medicationsMap = new HashMap<>();
+
+            // loop through and add them all to the map
+            for (Medication medication : existingMedications) {
+                medicationsMap.putIfAbsent(medication.getId(), medication);
+            }
+
             for (PatientRecordUpdateDTO.MedicationAction action : recordDTO.getMedicationActions()) {
                 switch (action.getAction()) {
                     case ADD:
-                    // logic for adding a medication
+                        // create a new medication objec
+                        Medication newMedication = new Medication();
+                        newMedication.setDose(action.getDosage());
+                        newMedication.setDuration(action.getDuration());
+                        newMedication.setId(action.getMedicationId());
+                        newMedication.setDrugName(action.getDrugName());
+                        newMedication.setFrequency(action.getFrequency());
+                        newMedication.setIsPerscription(action.getIsPrescription());
+
+                        // save it to the repository
+                        medicationRepository.save(newMedication);
                         break;
 
 
                     case UPDATE:
                     // logic for updating a medication
+                        
+                    // get the medication ID of the current thing we're updating
+                    Long currMedicationID = action.getMedicationId();
+
+                    // get it from the map if it exists, if not create a new object for it
+                    if (medicationsMap.containsKey(currMedicationID)) {
+                        Medication currMedication = medicationsMap.get(currMedicationID);
+
+                        // set the fields from the action
+                        currMedication.setDose(action.getDosage());
+                        currMedication.setDrugName(action.getDrugName());
+                        currMedication.setDuration(action.getDuration());
+                        currMedication.setFrequency(action.getFrequency());
+                        currMedication.setIsPerscription(action.getIsPrescription());
+                        currMedication.setId(action.getMedicationId());
+                        currMedication.setPatientId(userID);
+
+                        // save to database
+                        medicationRepository.save(currMedication);
+                    }
+                    else {
+                        // here we create a new medication object and populate it
+                        Medication anotherNewMedication = new Medication();
+                        
+                        // set fields from action
+                        anotherNewMedication.setDose(action.getDosage());
+                        anotherNewMedication.setDrugName(action.getDrugName());
+                        anotherNewMedication.setDuration(action.getDuration());
+                        anotherNewMedication.setFrequency(action.getFrequency());
+                        anotherNewMedication.setIsPerscription(action.getIsPrescription());
+                        anotherNewMedication.setId(action.getMedicationId());
+                        anotherNewMedication.setPatientId(userID);
+
+                        //save to database
+                        medicationRepository.save(anotherNewMedication);
+                    }
+
                         break;
 
 
                     case REMOVE:
                     // logic for removing a medication
+
+                        medicationRepository.deleteById(action.getMedicationId());
                         break;
 
 
@@ -254,11 +314,51 @@ public class PatientRecordService {
         patientRecord.setLastName(user.getLastName());
         patientRecord.setAddress(user.getAddress());
 
+        // populate patientRecord with empty arraylists to be populated
+        patientRecord.setAllergies(new ArrayList<>());
+        patientRecord.setMedications(new ArrayList<>());
+        patientRecord.setMedicalHistory(new ArrayList<>());
+
         // get the list of allergies from the repo and set the nested DTO fields
+        List<Allergy> allergies = allergyRepository.findAllByPatientId(userID);
+
+        // convert Allergy entities to AllergyDTOs in a loop (if list is empty won't execute)
+        for (Allergy allergy : allergies) {
+            PatientRecordDTO.AllergyDTO allergyDTO = new PatientRecordDTO.AllergyDTO();
+            allergyDTO.setAllergyId(allergy.getId());
+            allergyDTO.setSubstance(allergy.getSubstance());
+            allergyDTO.setReaction(allergy.getReaction());
+            allergyDTO.setSeverity(allergy.getSeverity());
+            patientRecord.getAllergies().add(allergyDTO);
+        }
 
         // get the list of medications from the repo and set the nested DTO fields
+        List<Medication> medications = medicationRepository.findAllByPatientId(userID);
+
+        // convert Medication entities to MedicationDTOs in the PatientRecordDTO
+        for (Medication medication : medications) {
+            PatientRecordDTO.MedicationDTO medicationDTO = new PatientRecordDTO.MedicationDTO();
+            medicationDTO.setMedicationId(medication.getId());
+            medicationDTO.setDrugName(medication.getDrugName());
+            medicationDTO.setDose(medication.getDose());
+            medicationDTO.setFrequency(medication.getFrequency());
+            patientRecord.getMedications().add(medicationDTO);
+        }
 
         // get the list of medical history from the repo and set the nested DTO fields
+        List<MedicalHistory> medicalHistories = medicalHistoryRepository.findAllByPatientId(userID);
+        
+        // convert MedicalHistory entities to MedicalHistoryDTOs
+        for (MedicalHistory history : medicalHistories) {
+            PatientRecordDTO.MedicalHistoryDTO historyDTO = new PatientRecordDTO.MedicalHistoryDTO();
+            historyDTO.setId(history.getId());
+            historyDTO.setDoctorId(history.getDoctorId());
+            historyDTO.setNotes(history.getDiagnosis());
+            if (history.getStartDate() != null) {
+                historyDTO.setStartDate(history.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+            }
+            patientRecord.getMedicalHistory().add(historyDTO);
+        }
 
         patientRecord.setDateOfBirth(user.getDateOfBirth());
         patientRecord.setGender(user.getGender());
