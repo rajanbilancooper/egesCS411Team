@@ -115,6 +115,25 @@ public class PatientRecordService {
 
     }
 
+    // New lookup by full name for unit testing not-found scenario
+    public PatientRecordDTO getPatientRecordByFullName(String fullName) {
+        if (fullName == null || fullName.trim().isEmpty()) {
+            throw new RuntimeException("Name must be provided");
+        }
+        String[] parts = fullName.trim().split(" ");
+        if (parts.length < 2) {
+            throw new RuntimeException("Full name must include first and last name");
+        }
+        String first = parts[0];
+        String last = parts[parts.length - 1]; // allow middle names ignored
+
+        User user = userRepository.findByFirstNameAndLastName(first, last)
+            .orElseThrow(() -> new RuntimeException("User not found with name: " + fullName));
+
+        // Reuse existing logic by ID (double fetch acceptable for simplicity)
+        return getPatientRecord(user.getId());
+    }
+
     public ResponseEntity<PatientRecordDTO> updatePatientRecord(Long userID, PatientRecordUpdateDTO recordDTO) {
         // Implementation to update patient record by userID
 
