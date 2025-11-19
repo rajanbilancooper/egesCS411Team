@@ -1,37 +1,72 @@
-import { useEffect, useState } from "react";
-import { NotesAPI } from "./api/note";
+// src/components/NotesPanel.jsx
+import React, { useEffect, useState } from "react";
+import { patientApi } from "../api/patientApi";
 
-export default function NotesPanel({ patientId = 3 }) {
-  const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState(null);
+export default function NotesPanel({ patientId }) {
+  const [text, setText] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-    setLoading(true);
-    setErr(null);
-    NotesAPI.list(patientId)
-      .then(res => { if (mounted) setNotes(Array.isArray(res.data) ? res.data : []); })
-      .catch(e => { console.error(e); if (mounted) setErr("Backend unavailable"); })
-      .finally(() => mounted && setLoading(false));
-    return () => (mounted = false);
+    const loadNotes = async () => {
+      const res = await patientApi.getNotes(patientId);
+      const notes = res.data;
+      if (notes && notes.length > 0) {
+        // assuming each note has a "content" field
+        setText(notes[notes.length - 1].content);
+      }
+    };
+    loadNotes();
   }, [patientId]);
 
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await patientApi.createNote(patientId, {
+        content: text, // must match your NoteRequestDTO field name
+      });
+      // you could show a "Saved!" toast
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpload = (e) => {
+    const files = Array.from(e.target.files);
+    console.log("Uploaded files:", files);
+    // later: send to backend endpoint for note attachments
+  };
+
   return (
-    <div className="upm-card" style={{marginTop:12}}>
-      <h3 className="upm-card-title">Notes</h3>
-      {loading && <div>Loading…</div>}
-      {err && <div style={{color:"#b91c1c"}}>{err}</div>}
-      {!loading && !err && notes.length === 0 && <div>No notes yet.</div>}
-      {!loading && !err && notes.length > 0 && (
-        <ul>
-          {notes.map(n => (
-            <li key={n.id}>
-              <b>{n.noteType ?? n.note_type}</b> — {n.content}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="card notes-panel">
+      <textarea
+        className="notes-textarea"
+        placeholder="Create Appointment Notes Here..."
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+
+      <div className="notes-footer">
+        <label className="btn-secondary">
+          Upload Files
+          <input
+            type="file"
+            multiple
+            style={{ display: "none" }}
+            onChange={handleUpload}
+          />
+        </label>
+
+        <div className="notes-actions">
+          <button className="btn-secondary">Record</button>
+          <button
+            className="btn-primary"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
