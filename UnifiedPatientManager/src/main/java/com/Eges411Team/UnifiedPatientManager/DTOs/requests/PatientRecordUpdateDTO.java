@@ -25,7 +25,7 @@ public class PatientRecordUpdateDTO {
         public enum ActionType { ADD, REMOVE, UPDATE }
         // what was done
         private ActionType action;
-        private Integer allergyId; // for REMOVE or UPDATE
+        private Long allergyId; // for REMOVE or UPDATE
         private String substance;    // for ADD or UPDATE
 
         // what did the doctor specify for the severity of the allergy
@@ -41,10 +41,10 @@ public class PatientRecordUpdateDTO {
         public void setAction(ActionType action) {
             this.action = action;
         }
-        public Integer getAllergyId() {
+        public Long getAllergyId() {
             return allergyId;
         }
-        public void setAllergyId(Integer allergyId) {
+        public void setAllergyId(Long allergyId) {
             this.allergyId = allergyId;
         }
         public String getSubstance() {
@@ -72,7 +72,7 @@ public class PatientRecordUpdateDTO {
         public enum ActionType { ADD, REMOVE, UPDATE }
         // what was done
         private ActionType action;
-        private Integer medicationId; // for REMOVE or UPDATE
+        private Long medicationId; // for REMOVE or UPDATE
         private String drugName;          // for ADD or UPDATE
         private String dosage;        // for ADD or UPDATE
         private String frequency;     // for ADD or UPDATE
@@ -85,10 +85,10 @@ public class PatientRecordUpdateDTO {
         public void setAction(ActionType action) {
             this.action = action;
         }
-        public Integer getMedicationId() {
+        public Long getMedicationId() {
             return medicationId;
         }
-        public void setMedicationId(Integer medicationId) {
+        public void setMedicationId(Long medicationId) {
             this.medicationId = medicationId;
         }
         public String getDrugName() {

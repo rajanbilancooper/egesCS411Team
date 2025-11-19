@@ -1,6 +1,7 @@
 package com.Eges411Team.UnifiedPatientManager.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,21 +138,66 @@ public class PatientRecordService {
         // ** ALLERGIES **
         // first see if the DTO contains allergy actions made
         if (recordDTO.getAllergyActions() != null) {
+            
+            // first we can get all of the patient's allergies from the repository
+            List<Allergy> existingAllergies = allergyRepository.findAllByPatientId(userID);
+
+            // make the list into a hashSet for O(1) lookups in the upcoming loop
+            HashMap<Long, Allergy> existingAllergiesMap = new HashMap<>();
+            for (Allergy allergy : existingAllergies) {
+                existingAllergiesMap.putIfAbsent(allergy.getId(), allergy);
+            }
+
             // loop through each action and determine what to do based on the action enum
             for (PatientRecordUpdateDTO.AllergyAction action : recordDTO.getAllergyActions()) {
                 switch (action.getAction()) {
                     case ADD:
-                        // logic for adding an allergy
+                        // create a new allergy object and populate it
+                        Allergy newAllergy = new Allergy();
+                        newAllergy.setPatientId(userID);
+                        newAllergy.setReaction(action.getReaction());
+                        newAllergy.setSeverity(action.getSeverity());
+                        newAllergy.setSubstance(action.getSubstance());
+
+                        // save it to the repository
+                        allergyRepository.save(newAllergy);
                         break;
 
                     case UPDATE:
-                        // logic for updating an allergy
+                        // get the current allergy from the map
+                        Long currAllergyId = action.getAllergyId();
+                        
+                        // get the current allergy using that allergyid if it exists
+                        if (existingAllergiesMap.get(currAllergyId) != null) {
+                            Allergy currentAllergy = existingAllergiesMap.get(currAllergyId);
+
+                            // then we can reset the fields in the current allergy and save it
+                            currentAllergy.setReaction(action.getReaction());
+                            currentAllergy.setSeverity(action.getSeverity());
+                            currentAllergy.setSubstance(action.getSubstance());
+
+                            // save
+                            allergyRepository.save(currentAllergy);
+                        }
+                        else {
+                            // this is the case where they're trying to update a non-existing allergy, which is just
+                            // adding a new allergy -- fix logic here and save
+                            Allergy anotherNewAllergy = new Allergy();
+                            anotherNewAllergy.setPatientId(userID);
+                            anotherNewAllergy.setId(currAllergyId);
+                            anotherNewAllergy.setReaction(action.getReaction());
+                            anotherNewAllergy.setSeverity(action.getSeverity());
+                            anotherNewAllergy.setSubstance(action.getSubstance());
+
+                            // save to repo
+                            allergyRepository.save(anotherNewAllergy);
+                        }
+                        
                         break;
 
                     case REMOVE:
-                        // logic for removing an allergy
-                        break;
-                    default:
+                        // remove the allergy by its ID
+                        allergyRepository.deleteById(action.getAllergyId());
                         break;
                 }
             }
