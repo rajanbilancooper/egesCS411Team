@@ -2,7 +2,6 @@ package com.Eges411Team.UnifiedPatientManager.DTOs.responses;
 // imports
 import java.util.List;
 import java.time.LocalDateTime;
-import java.time.LocalDate;
 
 // a patient record DTO to encapsulate all relevant patient record information
 // omits the need for a patientRecord entity
@@ -74,13 +73,13 @@ public class PatientRecordDTO {
     }
 
     // date of birth field
-    private LocalDate dateOfBirth;
+    private LocalDateTime dateOfBirth;
 
     // getter and setter for dateOfBirth
-    public LocalDate getDateOfBirth() {
+    public LocalDateTime getDateOfBirth() {
         return dateOfBirth;
     }
-    public void setDateOfBirth(LocalDate dateOfBirth) {
+    public void setDateOfBirth(LocalDateTime dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -190,50 +189,8 @@ public class PatientRecordDTO {
     public void setMedications(List<MedicationDTO> medications) {
         this.medications = medications;
     }
-
-    private List<PrescriptionDTO> prescriptions;
-
-    // nested PrescriptionDTO class
-    public static class PrescriptionDTO {
-        private Long id;           // identifies the prescription
-        private Long doctorId;     // which doctor issued it
-        private String medicationName;// the medication prescribed
-        private LocalDateTime dateIssued; // when it was issued
-
-        // getters and setters
-        public Long getId() {
-            return id;
-        }
-        public void setId(Long id) {
-            this.id = id;
-        }
-        public Long getDoctorId() {
-            return doctorId;
-        }
-        public void setDoctorId(Long doctorId) {
-            this.doctorId = doctorId;
-        }
-        public String getMedicationName() {
-            return medicationName;
-        }
-        public void setMedicationName(String medicationName) {
-            this.medicationName = medicationName;
-        }
-        public LocalDateTime getDateIssued() {
-            return dateIssued;
-        }
-        public void setDateIssued(LocalDateTime dateIssued) {
-            this.dateIssued = dateIssued;
-        }
-    }
-
-    // getter and setter for prescriptions
-    public List<PrescriptionDTO> getPrescriptions() {
-        return prescriptions;
-    }
-    public void setPrescriptions(List<PrescriptionDTO> prescriptions) {
-        this.prescriptions = prescriptions;
-    }
+    
+    // ommitted prescription DTO, not its own entity
 
     private List<MedicalHistoryDTO> medicalHistory;
 
