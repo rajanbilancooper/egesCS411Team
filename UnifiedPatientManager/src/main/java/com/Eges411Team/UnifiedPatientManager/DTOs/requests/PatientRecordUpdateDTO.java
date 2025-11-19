@@ -34,6 +34,8 @@ public class PatientRecordUpdateDTO {
         // what happenss when exposed to the allergen
         private String reaction;     // for ADD or UPDATE
 
+        private Boolean isPrescription;
+
         // getters and setters
         public ActionType getAction() {
             return action;
@@ -65,6 +67,15 @@ public class PatientRecordUpdateDTO {
         public void setReaction(String reaction) {
             this.reaction = reaction;
         }
+
+        public boolean getIsPrescription () {
+            return this.isPrescription;
+        }
+
+        public void setIsPrescription(boolean prescriptionStatus) {
+            this.isPrescription = prescriptionStatus;
+        }
+
     }
 
     // medication actions - create a nested class (sibling to AllergyAction, not nested inside it)
