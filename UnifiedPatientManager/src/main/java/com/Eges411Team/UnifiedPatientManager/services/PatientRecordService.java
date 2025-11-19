@@ -290,7 +290,6 @@ public class PatientRecordService {
         }
 
         // ** MEDICAL HISTORY ** 
-        // we have a 'medicalNote' as an attribute -- treat as a new Medical History -- TODO
         if (recordDTO.getMedicalNote() != null && !recordDTO.getMedicalNote().trim().isEmpty()) {
 
             // create a new medical history
