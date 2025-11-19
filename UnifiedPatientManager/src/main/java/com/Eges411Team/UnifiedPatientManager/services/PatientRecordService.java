@@ -20,12 +20,15 @@ import com.Eges411Team.UnifiedPatientManager.repositories.MedicalHistoryRepo;
 import com.Eges411Team.UnifiedPatientManager.repositories.MedicationRepository;
 import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 
 
 // service class for patient record related operations
 // going to call repositories for Allergy, Medication, Prescription, MedicalHistory
 // assemble a PatientRecordDTO to return to controllers
 @Service
+@Transactional
 public class PatientRecordService {
 
     // these tags allow us to get from each of the respective repositories
