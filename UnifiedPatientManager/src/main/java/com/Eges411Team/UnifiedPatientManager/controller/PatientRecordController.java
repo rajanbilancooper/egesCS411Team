@@ -1,16 +1,21 @@
 package com.Eges411Team.UnifiedPatientManager.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.PatientRecordUpdateDTO;
 import com.Eges411Team.UnifiedPatientManager.DTOs.responses.PatientRecordDTO;
+import com.Eges411Team.UnifiedPatientManager.entity.User;
+import com.Eges411Team.UnifiedPatientManager.entity.Allergy;
 import com.Eges411Team.UnifiedPatientManager.services.PatientRecordService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -45,6 +50,14 @@ public class PatientRecordController {
         
         // gets the record using the service using the full name
         return ResponseEntity.ok(patientRecordService.getPatientRecordByFullName(fullName));
+    }
+
+    // method to create a patient record
+    @PostMapping("/")
+    public ResponseEntity<PatientRecordDTO> createPatientRecord(@RequestBody User userTemplate, @RequestBody List<Allergy> allergiesInput) {
+        
+        // creates the record using the service
+        return ResponseEntity.ok(patientRecordService.createPatientRecord(userTemplate, allergiesInput));
     }
 
 }
