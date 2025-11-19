@@ -27,6 +27,8 @@ import jakarta.transaction.Transactional;
 // service class for patient record related operations
 // going to call repositories for Allergy, Medication, Prescription, MedicalHistory
 // assemble a PatientRecordDTO to return to controllers
+
+// TODO: find how to go about incorporating DoctorID into the medication entities
 @Service
 @Transactional
 public class PatientRecordService {
