@@ -39,6 +39,24 @@ public class AllergyService {
         return allergyRepository.saveAll(allergies);
     }
 
+    // POST single allergy (add without deleting existing)
+    public Allergy addSingleAllergy(Long patientId, Allergy allergy) {
+        // Check for duplicate (same substance, case-insensitive)
+        List<Allergy> existing = allergyRepository.findAllByPatientId(patientId);
+        for (Allergy ex : existing) {
+            if (ex.getSubstance() != null && allergy.getSubstance() != null
+                && ex.getSubstance().trim().equalsIgnoreCase(allergy.getSubstance().trim())) {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Allergy to '" + allergy.getSubstance() + "' already exists for this patient"
+                );
+            }
+        }
+
+        allergy.setPatientId(patientId);
+        return allergyRepository.save(allergy);
+    }
+
     // PUT /{patient_id}/allergies/{allergy_id}
     public Allergy updateAllergy(Long patientId, Long allergyId, Allergy updated) {
         Allergy existing = allergyRepository.findById(allergyId)

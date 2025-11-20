@@ -45,6 +45,14 @@ export const patientApi = {
   getAllergies: (patientId) =>
     client.get(`/api/patients/${patientId}/allergies`),
 
+  // POST /api/patients/{patientId}/allergies/add (single allergy without deleting existing)
+  createAllergy: (patientId, payload) =>
+    client.post(`/api/patients/${patientId}/allergies/add`, payload),
+
+  // DELETE /api/patients/{patientId}/allergies/{allergyId}
+  deleteAllergy: (patientId, allergyId) =>
+    client.delete(`/api/patients/${patientId}/allergies/${allergyId}`),
+
   // GET /api/patients/{patientId}/vaccines
   getVaccines: (patientId) =>
     client.get(`/api/patients/${patientId}/vaccines`),

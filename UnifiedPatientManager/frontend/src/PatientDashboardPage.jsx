@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { patientApi } from "./api/patientApi";
 import NotesPanel from "./NotesPanel";
 import PrescriptionPanel from "./PrescriptionPanel";
+import AllergyPanel from "./AllergyPanel";
 import ApiConnectivityBadge from "./ApiConnectivityBadge";
 
 export default function PatientDashboardPage() {
@@ -24,6 +25,16 @@ export default function PatientDashboardPage() {
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
+  };
+
+  const refreshPatientData = async () => {
+    if (!patientId || Number.isNaN(patientId)) return;
+    try {
+      const res = await patientApi.getPatientById(patientId);
+      setPatient(res.data);
+    } catch (err) {
+      console.error("Failed to refresh patient data", err);
+    }
   };
 
   useEffect(() => {
@@ -212,10 +223,10 @@ export default function PatientDashboardPage() {
           </button>
 
           <button
-            className={`upm-tab ${activeTab === "vaccines" ? "upm-tab-active" : ""}`}
-            onClick={() => handleTabClick("vaccines")}
+            className={`upm-tab ${activeTab === "allergies" ? "upm-tab-active" : ""}`}
+            onClick={() => handleTabClick("allergies")}
           >
-            Vaccine record
+            Allergies
           </button>
 
           <button
@@ -252,24 +263,28 @@ export default function PatientDashboardPage() {
         {/* BASIC INFO VIEW — use your existing two-card layout here */}
         {activeTab === "basic" && (
           <div className="upm-layout">
-             <section className="upm-card upm-card-left">
+            <section className="upm-card upm-card-left">
               <div className="upm-patient-top">
                 <div className="upm-avatar-circle" />
                 <div className="upm-patient-main">
                   <h2 className="upm-patient-name">
-                    {patient.fullName || "Rajan Bilan-Cooper"}
+                    {(patient.firstName || "").trim()} {(patient.lastName || "").trim()}
                   </h2>
                   <div className="upm-patient-meta">
                     <p>
                       <strong>DOB:</strong>{" "}
-                      {patient.dateOfBirth || "1/1/98"}
+                      {patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleDateString() : "—"}
                     </p>
                     <p>
-                      <strong>Gender:</strong> {patient.gender || "MALE"}
+                      <strong>Gender:</strong> {patient.gender || "—"}
                     </p>
                     <p>
                       <strong>Contact:</strong>{" "}
-                      {patient.contact || "408-382-3049"}
+                      {patient.phoneNumber || "—"}
+                    </p>
+                    <p>
+                      <strong>Address:</strong>{" "}
+                      {patient.address || "—"}
                     </p>
                   </div>
                 </div>
@@ -280,57 +295,40 @@ export default function PatientDashboardPage() {
                 <div className="upm-divider" />
                 <div className="upm-basic-grid">
                   <p>
-                    <strong>Height:</strong> {patient.height || "6'4"}
+                    <strong>Height:</strong> {patient.height || "—"}
                   </p>
                   <p>
-                    <strong>Weight:</strong> {patient.weight || "180 lbs"}
+                    <strong>Weight:</strong> {patient.weight || "—"}
                   </p>
                 </div>
                 <p>
-                  <strong>Insurance:</strong>{" "}
-                  {patient.insurance || "Cigna"}
-                </p>
-                <p>
                   <strong>Allergies:</strong>{" "}
-                  {patient.allergiesSummary ||
-                    "Peanuts, Penicillin, Grass"}
+                  {Array.isArray(patient.allergies) && patient.allergies.length > 0
+                    ? patient.allergies.map(a => a.substance).join(", ")
+                    : "None recorded"}
                 </p>
                 <p>
-                  <strong>Current medication:</strong>{" "}
-                  {patient.currentMedicationSummary || "N/A"}
+                  <strong>Current Medications:</strong>{" "}
+                  {Array.isArray(patient.medications) && patient.medications.length > 0
+                    ? patient.medications.map(m => m.drugName).join(", ")
+                    : "None recorded"}
                 </p>
               </div>
             </section>
 
             <section className="upm-card upm-card-right">
               <div className="upm-section-block">
-                <h3>
-                  Last Appointment (
-                  {patient.lastAppointmentDate || "09/22/25"})
-                </h3>
+                <h3>Overview</h3>
                 <div className="upm-divider" />
-                <p>
-                  <strong>Chief Complaint:</strong>{" "}
-                  {patient.lastChiefComplaint || "Knee pain after running"}
-                </p>
-                <p>
-                  <strong>Diagnosis/Assessment:</strong>{" "}
-                  {patient.lastDiagnosis || "Likely mild tendonitis"}
-                </p>
-                <p>
-                  <strong>Next-Steps:</strong>{" "}
-                  {patient.lastNextSteps ||
-                    "Rest, ice, avoid running for 1–2 weeks, consider physical therapy if not improved"}
+                <p style={{ whiteSpace: 'pre-line', opacity: 0.85 }}>
+                  This panel will later show appointment summaries and key history.
                 </p>
               </div>
-
               <div className="upm-section-block">
-                <h3>Important Medical History</h3>
+                <h3>Summary Counts</h3>
                 <div className="upm-divider" />
-                <p>
-                  {patient.importantHistory ||
-                    "Asthma (childhood, mild, controlled)\nFamily history of diabetes"}
-                </p>
+                <p><strong>Allergies:</strong> {Array.isArray(patient.allergies) ? patient.allergies.length : 0}</p>
+                <p><strong>Medications:</strong> {Array.isArray(patient.medications) ? patient.medications.length : 0}</p>
               </div>
             </section>
           </div>
@@ -375,10 +373,8 @@ export default function PatientDashboardPage() {
         {activeTab === "prescriptions" && (
           <PrescriptionPanel patientId={patient.id || patient.patientId || patientId || 1} />
         )}
-        {activeTab === "vaccines" && (
-          <div className="upm-card" style={{ marginTop: "16px" }}>
-            Vaccine Record coming soon…
-          </div>
+        {activeTab === "allergies" && (
+          <AllergyPanel patientId={patient.id || patient.patientId || patientId || 1} onAllergyChange={refreshPatientData} />
         )}
         {activeTab === "appointments" && (
           <div className="upm-card" style={{ marginTop: "16px" }}>
