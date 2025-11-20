@@ -46,7 +46,7 @@ public class PatientRecordController {
 
     // method for updating a patientRecord
     @PutMapping("/{id}")
-    public ResponseEntity<PatientRecordDTO> updatePatientRecord(@PathVariable Long patientID, @RequestBody PatientRecordUpdateDTO recordUpdateDTO) {
+    public ResponseEntity<PatientRecordDTO> updatePatientRecord(@PathVariable("id") Long patientID, @RequestBody PatientRecordUpdateDTO recordUpdateDTO) {
 
         // updates the record using the service using the ID and the DTO
         return patientRecordService.updatePatientRecord(patientID, recordUpdateDTO);

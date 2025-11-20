@@ -22,6 +22,10 @@ export default function PatientDashboardPage() {
   const [searchError, setSearchError] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [searchDebounceId, setSearchDebounceId] = useState(null);
+  const [isEditingRecord, setIsEditingRecord] = useState(false);
+  const [editedPatient, setEditedPatient] = useState(null);
+  const [saveError, setSaveError] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -119,6 +123,42 @@ export default function PatientDashboardPage() {
     navigate(`/patients/${id}`);
   };
 
+  const startEditRecord = () => {
+    setEditedPatient({ ...patient });
+    setIsEditingRecord(true);
+    setSaveError(null);
+  };
+
+  const cancelEditRecord = () => {
+    setEditedPatient(null);
+    setIsEditingRecord(false);
+    setSaveError(null);
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditedPatient((prev) => ({ ...(prev || {}), [field]: value }));
+  };
+
+  const saveEditedRecord = async () => {
+    if (!patientId) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      // call backend update
+      const payload = { ...editedPatient };
+      await patientApi.updatePatient(patientId, payload);
+      // refresh local patient data from server
+      await refreshPatientData();
+      setIsEditingRecord(false);
+      setEditedPatient(null);
+    } catch (err) {
+      console.error("Failed to save patient", err);
+      setSaveError(err?.response?.data?.message || err?.message || "Failed to save patient");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return <div style={{ padding: "2rem" }}>Loading patient...</div>;
   }
@@ -148,9 +188,7 @@ export default function PatientDashboardPage() {
         <div className="upm-logo" />
         <span className="upm-header-title">Unified Patient Manager</span>
         <ApiConnectivityBadge />
-        <div style={{ marginLeft: "auto" }}>
-          <button className="upm-tab" onClick={() => setActiveTab("record")}>View Patient Record</button>
-        </div>
+        
       </header>
 
       {/* 2. MAIN AREA */}
@@ -337,30 +375,122 @@ export default function PatientDashboardPage() {
         {/* RECORD VIEW — aggregated DTO details */}
         {activeTab === "record" && (
           <div className="upm-card" style={{ marginTop: 16 }}>
-            <h3>Patient Record</h3>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ margin: 0 }}>Patient Record</h3>
+              {!isEditingRecord ? (
+                <div>
+                  <button className="upm-tab" onClick={startEditRecord}>Edit</button>
+                </div>
+              ) : (
+                <div>
+                  <button className="upm-tab" onClick={saveEditedRecord} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
+                  <button className="upm-tab" onClick={cancelEditRecord} style={{ marginLeft: 8 }} disabled={saving}>Cancel</button>
+                </div>
+              )}
+            </div>
+
             <div className="upm-divider" />
-            <p><strong>Patient ID:</strong> {patient.patientId ?? patient.id}</p>
-            <p><strong>Name:</strong> {patient.firstName || patient.fullName} {patient.lastName}</p>
-            <p><strong>Email:</strong> {patient.email}</p>
-            <p><strong>Phone:</strong> {patient.phoneNumber}</p>
-            <p><strong>Address:</strong> {patient.address}</p>
-            <p><strong>Date of Birth:</strong> {patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleString() : ""}</p>
-            <p><strong>Gender:</strong> {patient.gender}</p>
-            <p><strong>Height:</strong> {patient.height || "—"}</p>
-            <p><strong>Weight:</strong> {patient.weight || "—"}</p>
-            <div className="upm-divider" />
-            <p><strong>Allergies:</strong></p>
-            <ul>
-              {(patient.allergies || []).map((a) => (
-                <li key={a.allergyId}>{a.substance} {a.severity ? `(${a.severity})` : ""}</li>
-              ))}
-            </ul>
-            <p><strong>Medications:</strong></p>
-            <ul>
-              {(patient.medications || []).map((m) => (
-                <li key={m.medicationId}>{m.drugName} {m.dose ? `– ${m.dose}` : ""} {m.frequency || ""}</li>
-              ))}
-            </ul>
+
+            <div style={{ marginTop: 8 }}>
+              <p><strong>Patient ID:</strong> {patient.patientId ?? patient.id}</p>
+
+              <p>
+                <strong>Name:</strong>{' '}
+                {!isEditingRecord ? (
+                  <>{patient.firstName || patient.fullName} {patient.lastName}</>
+                ) : (
+                  <span>
+                    <input type="text" value={editedPatient?.firstName || ''} onChange={(e) => handleEditChange('firstName', e.target.value)} placeholder="First name" />
+                    {' '}
+                    <input type="text" value={editedPatient?.lastName || ''} onChange={(e) => handleEditChange('lastName', e.target.value)} placeholder="Last name" />
+                  </span>
+                )}
+              </p>
+
+              <p>
+                <strong>Email:</strong>{' '}
+                {!isEditingRecord ? (
+                  patient.email
+                ) : (
+                  <input type="email" value={editedPatient?.email || ''} onChange={(e) => handleEditChange('email', e.target.value)} />
+                )}
+              </p>
+
+              <p>
+                <strong>Phone:</strong>{' '}
+                {!isEditingRecord ? (
+                  patient.phoneNumber
+                ) : (
+                  <input type="text" value={editedPatient?.phoneNumber || ''} onChange={(e) => handleEditChange('phoneNumber', e.target.value)} />
+                )}
+              </p>
+
+              <p>
+                <strong>Address:</strong>{' '}
+                {!isEditingRecord ? (
+                  patient.address
+                ) : (
+                  <input type="text" value={editedPatient?.address || ''} onChange={(e) => handleEditChange('address', e.target.value)} style={{ width: '60%' }} />
+                )}
+              </p>
+
+              <p>
+                <strong>Date of Birth:</strong>{' '}
+                {!isEditingRecord ? (
+                  (patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleString() : "")
+                ) : (
+                  <input type="date" value={editedPatient?.dateOfBirth ? new Date(editedPatient.dateOfBirth).toISOString().slice(0,10) : ''} onChange={(e) => handleEditChange('dateOfBirth', e.target.value)} />
+                )}
+              </p>
+
+              <p>
+                <strong>Gender:</strong>{' '}
+                {!isEditingRecord ? (
+                  patient.gender
+                ) : (
+                  <select value={editedPatient?.gender || ''} onChange={(e) => handleEditChange('gender', e.target.value)}>
+                    <option value="">--</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                )}
+              </p>
+
+              <p>
+                <strong>Height:</strong>{' '}
+                {!isEditingRecord ? (
+                  patient.height || '—'
+                ) : (
+                  <input type="text" value={editedPatient?.height || ''} onChange={(e) => handleEditChange('height', e.target.value)} />
+                )}
+              </p>
+
+              <p>
+                <strong>Weight:</strong>{' '}
+                {!isEditingRecord ? (
+                  patient.weight || '—'
+                ) : (
+                  <input type="text" value={editedPatient?.weight || ''} onChange={(e) => handleEditChange('weight', e.target.value)} />
+                )}
+              </p>
+
+              {saveError && <p style={{ color: '#c00' }}>{saveError}</p>}
+
+              <div className="upm-divider" />
+              <p><strong>Allergies:</strong></p>
+              <ul>
+                {(patient.allergies || []).map((a) => (
+                  <li key={a.allergyId}>{a.substance} {a.severity ? `(${a.severity})` : ""}</li>
+                ))}
+              </ul>
+              <p><strong>Medications:</strong></p>
+              <ul>
+                {(patient.medications || []).map((m) => (
+                  <li key={m.medicationId}>{m.drugName} {m.dose ? `– ${m.dose}` : ""} {m.frequency || ""}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 
