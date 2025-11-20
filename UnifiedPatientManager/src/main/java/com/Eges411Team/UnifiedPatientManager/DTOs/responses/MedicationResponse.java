@@ -34,6 +34,9 @@ public class MedicationResponse {
     @JsonProperty("notes")
     private String notes;
 
+    @JsonProperty("route")
+    private String route;
+
     @JsonProperty("timestamp")
     private LocalDateTime timestamp;
 
@@ -42,5 +45,14 @@ public class MedicationResponse {
 
     @JsonProperty("is_perscription")
     private Boolean isPerscription;
+
+    @JsonProperty("conflict_flag")
+    private Boolean conflictFlag;
+
+    @JsonProperty("conflict_details")
+    private String conflictDetails;
+
+    @JsonProperty("override_justification")
+    private String overrideJustification;
 }
 

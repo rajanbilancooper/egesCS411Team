@@ -1,48 +1,74 @@
 import React, { useEffect, useState } from "react";
-import client from "./api/axiosClient";
+import { useParams, useNavigate } from "react-router-dom";
 import { patientApi } from "./api/patientApi";
 import NotesPanel from "./NotesPanel";
-import { useParams } from "react-router-dom"; // <-- make sure this path is right
+import PrescriptionPanel from "./PrescriptionPanel";
+import ApiConnectivityBadge from "./ApiConnectivityBadge";
 
 export default function PatientDashboardPage() {
-  const { id: routeId } = useParams() || {};
-  const patientId = routeId ? Number(routeId) : 1;
+  const navigate = useNavigate();
+  const { id: routeId } = useParams();
+  const patientId = routeId ? Number(routeId) : null;
 
   const [patient, setPatient] = useState(null);
   const [activeTab, setActiveTab] = useState("basic");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const handleTabClick = (tab) => {
-    console.log("switch tab ->", tab);
-   setActiveTab(tab);
+    setActiveTab(tab);
   };
 
-   useEffect(() => {
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      // No token => force re-auth
+      navigate("/login", { replace: true });
+      return;
+    }
+    if (!patientId || Number.isNaN(patientId)) {
+      setError("No patient id supplied in route.");
+      setLoading(false);
+      return;
+    }
     const load = async () => {
-      // using real backend API; handle errors so the UI doesn't break
+      setLoading(true);
       try {
-        const res = await patientApi.getPatientById(1);
+        const res = await patientApi.getPatientById(patientId);
         setPatient(res.data);
+        setError(null);
       } catch (err) {
         console.error("Failed to load patient", err);
-        // show a simple fallback error instead of blank page
-        setPatient({ fullName: "(Error loading patient)", id: 1 });
+        const msg = err?.response?.data?.message || err?.message || "Failed to fetch patient";
+        setError(msg);
+      } finally {
+        setLoading(false);
       }
     };
     load();
-  }, [patientId]);
+  }, [patientId, navigate]);
 
   if (loading) {
-    return <div style={{ padding: "2rem" }}>Loading...</div>;
+    return <div style={{ padding: "2rem" }}>Loading patient...</div>;
   }
 
   if (error) {
-    return <div style={{ padding: "2rem", color: "red" }}>Error: {error}</div>;
+    return (
+      <div style={{ padding: "2rem" }}>
+        <h2 style={{ color: "#c00" }}>Unable to load patient</h2>
+        <p>{error}</p>
+        <button onClick={() => navigate("/login")}>Back to Login</button>
+      </div>
+    );
   }
 
   if (!patient) {
-    return <div style={{ padding: "2rem" }}>No patient data</div>;
+    return (
+      <div style={{ padding: "2rem" }}>
+        <p>No patient data returned.</p>
+        <button onClick={() => navigate(`/patients/${patientId || 1}`)}>Retry</button>
+      </div>
+    );
   }
 
   return (
@@ -51,6 +77,9 @@ export default function PatientDashboardPage() {
         <div className="upm-logo" />
         <span className="upm-header-title">Unified Patient Manager</span>
         <ApiConnectivityBadge />
+        <div style={{ marginLeft: "auto" }}>
+          <button className="upm-tab" onClick={() => setActiveTab("record")}>View Patient Record</button>
+        </div>
       </header>
 
       {/* 2. MAIN AREA */}
@@ -105,6 +134,13 @@ export default function PatientDashboardPage() {
             onClick={() => handleTabClick("history")}
           >
             Patient History
+          </button>
+
+          <button
+            className={`upm-tab ${activeTab === "record" ? "upm-tab-active" : ""}`}
+            onClick={() => handleTabClick("record")}
+          >
+            Patient Record
           </button>
         </div>
 
@@ -197,16 +233,44 @@ export default function PatientDashboardPage() {
           </div>
         )}
 
+        {/* RECORD VIEW — aggregated DTO details */}
+        {activeTab === "record" && (
+          <div className="upm-card" style={{ marginTop: 16 }}>
+            <h3>Patient Record</h3>
+            <div className="upm-divider" />
+            <p><strong>Patient ID:</strong> {patient.patientId ?? patient.id}</p>
+            <p><strong>Name:</strong> {patient.firstName || patient.fullName} {patient.lastName}</p>
+            <p><strong>Email:</strong> {patient.email}</p>
+            <p><strong>Phone:</strong> {patient.phoneNumber}</p>
+            <p><strong>Address:</strong> {patient.address}</p>
+            <p><strong>Date of Birth:</strong> {patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleString() : ""}</p>
+            <p><strong>Gender:</strong> {patient.gender}</p>
+            <p><strong>Height:</strong> {patient.height || "—"}</p>
+            <p><strong>Weight:</strong> {patient.weight || "—"}</p>
+            <div className="upm-divider" />
+            <p><strong>Allergies:</strong></p>
+            <ul>
+              {(patient.allergies || []).map((a) => (
+                <li key={a.allergyId}>{a.substance} {a.severity ? `(${a.severity})` : ""}</li>
+              ))}
+            </ul>
+            <p><strong>Medications:</strong></p>
+            <ul>
+              {(patient.medications || []).map((m) => (
+                <li key={m.medicationId}>{m.drugName} {m.dose ? `– ${m.dose}` : ""} {m.frequency || ""}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* NOTES VIEW — new two-column editor/history */}
         {activeTab === "notes" && (
-          <NotesPanel patientId={patient.id || 1} />
+            <NotesPanel patientId={patient.id || patient.patientId || patientId || 1} />
         )}
 
         {/* other tabs can be placeholders for now */}
         {activeTab === "prescriptions" && (
-          <div className="upm-card" style={{ marginTop: "16px" }}>
-            Prescription History coming soon…
-          </div>
+          <PrescriptionPanel patientId={patient.id || patient.patientId || patientId || 1} />
         )}
         {activeTab === "vaccines" && (
           <div className="upm-card" style={{ marginTop: "16px" }}>

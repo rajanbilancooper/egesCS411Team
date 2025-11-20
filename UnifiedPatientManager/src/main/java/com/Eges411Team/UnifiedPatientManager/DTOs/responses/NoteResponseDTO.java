@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Getter
@@ -16,16 +15,16 @@ import java.time.LocalDateTime;
 public class NoteResponseDTO {
 
     @Schema(example = "1", description = "Unique identifier for the note record")
-    private Integer id;
+    private Long id;
 
     @Schema(example = "3", description = "ID of the patient associated with this note")
-    private Integer patient_id;
+    private Long patientId;
 
     @Schema(example = "5", description = "ID of the doctor who authored the note")
-    private Integer doctor_id;
+    private Long doctorId;
 
     @Schema(example = "Progress", description = "Type of note (e.g., Progress, SOAP, Summary)")
-    private String note_type;
+    private String noteType;
 
     @Schema(example = "Patient reports improved mobility and reduced pain.", description = "Text content of the note")
     private String content;

@@ -10,6 +10,8 @@ public class PatientRecordUpdateDTO {
     // fields that the doctor will actually update
     private String phoneNumber;
     private String address;
+    private String height;   // optional update
+    private String weight;   // optional update
 
     // allergy updates
     private List<AllergyAction> allergyActions;
@@ -143,6 +145,10 @@ public class PatientRecordUpdateDTO {
     public void setAddress(String address) {
         this.address = address;
     }
+    public String getHeight() { return height; }
+    public void setHeight(String height) { this.height = height; }
+    public String getWeight() { return weight; }
+    public void setWeight(String weight) { this.weight = weight; }
     public List<AllergyAction> getAllergyActions() {
         return allergyActions;
     }

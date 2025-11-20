@@ -71,6 +71,13 @@ public class User {
     //every user has an email
     private String email;
 
+    // Optional anthropometrics
+    @Column(name = "height", length = 32)
+    private String height;   // e.g., 6'0" or 183 cm
+
+    @Column(name = "weight", length = 32)
+    private String weight;   // e.g., 180 lbs or 82 kg
+
     @Column(name = "creation_date", nullable = false)
     //every user has a creation date
     private LocalDateTime creationDate;
@@ -222,5 +229,21 @@ public class User {
     }   
     public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public void setHeight(String height) {
+        this.height = height;
+    }
+
+    public String getWeight() {
+        return weight;
+    }
+
+    public void setWeight(String weight) {
+        this.weight = weight;
     }
 }      

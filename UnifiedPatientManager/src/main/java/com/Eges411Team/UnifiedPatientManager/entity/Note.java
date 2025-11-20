@@ -12,9 +12,9 @@ import lombok.Setter;
 @Table(name = "note")
 @Getter
 @Setter
-
-public class Note{
+public class Note {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -24,14 +24,15 @@ public class Note{
     @Column(name = "doctor_id")
     private Long doctorId;
 
-    @Column (name = "note_type")
-    private Blob noteType;
+    @Lob
+    @Column(name = "note_type")
+    private String noteType;
 
     @Lob
     @Column (name = "content")
-    private Blob content;
+    private String content;
 
-    @Column (name = "timestamp")
+    @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
     @Column (name = "attachment_name")

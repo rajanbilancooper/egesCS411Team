@@ -4,11 +4,14 @@ import com.Eges411Team.UnifiedPatientManager.repositories.AllergyRepository;
 import com.Eges411Team.UnifiedPatientManager.entity.Allergy;
 import com.Eges411Team.UnifiedPatientManager.entity.Medication;
 import com.Eges411Team.UnifiedPatientManager.repositories.MedicationRepository;
+import com.Eges411Team.UnifiedPatientManager.DTOs.responses.PrescriptionResultResponse;
+import com.Eges411Team.UnifiedPatientManager.DTOs.mappers.MedicationMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +89,6 @@ public class MedicationService {
             if (!Boolean.TRUE.equals(med.getIsPerscription())) {
                 continue;
             }
-
             String drugName = med.getDrugName();
             if (drugName == null) continue;
 
@@ -95,13 +97,10 @@ public class MedicationService {
                 if (substance == null) continue;
 
                 List<String> badDrugs = ALLERGY_CONFLICTS.get(substance);
-                if (badDrugs != null && badDrugs.stream()
-                        .anyMatch(bad -> bad.equalsIgnoreCase(drugName))) {
-
+                if (badDrugs != null && badDrugs.stream().anyMatch(bad -> bad.equalsIgnoreCase(drugName))) {
                     throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
-                        "Medication '" + drugName +
-                        "' conflicts with allergy to '" + substance + "'"
+                        "Medication '" + drugName + "' conflicts with allergy to '" + substance + "'"
                     );
                 }
             }
@@ -112,35 +111,64 @@ public class MedicationService {
             Medication m1 = meds.get(i);
             String d1 = m1.getDrugName();
             if (d1 == null) continue;
-
             for (int j = i + 1; j < meds.size(); j++) {
                 Medication m2 = meds.get(j);
                 String d2 = m2.getDrugName();
                 if (d2 == null) continue;
-
                 if (isBadInteraction(d1, d2)) {
                     throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
-                        "Medication interaction detected between '" +
-                        d1 + "' and '" + d2 + "'"
+                        "Medication interaction detected between '" + d1 + "' and '" + d2 + "'"
                     );
                 }
             }
         }
     }
 
+    /**
+     * Collect conflicts for a single prospective prescription without throwing.
+     * Checks allergies and interactions with existing prescriptions.
+     */
+    private List<String> collectConflicts(Long patientId, Medication prospective) {
+        List<String> conflicts = new ArrayList<>();
+        if (!Boolean.TRUE.equals(prospective.getIsPerscription())) {
+            return conflicts; // Only guard prescriptions
+        }
+        String drugName = prospective.getDrugName();
+        if (drugName == null || drugName.isBlank()) {
+            return conflicts;
+        }
+
+        // Allergy conflicts
+        List<Allergy> allergies = allergyRepository.findAllByPatientId(patientId);
+        for (Allergy allergy : allergies) {
+            String substance = allergy.getSubstance();
+            if (substance == null) continue;
+            List<String> badDrugs = ALLERGY_CONFLICTS.get(substance);
+            if (badDrugs != null && badDrugs.stream().anyMatch(bad -> bad.equalsIgnoreCase(drugName))) {
+                conflicts.add("Allergy conflict: '" + drugName + "' vs allergy to '" + substance + "'");
+            }
+        }
+
+        // Drug-drug interactions with existing medications
+        List<Medication> existing = medicationRepository.findAllByPatientId(patientId);
+        for (Medication current : existing) {
+            String existingDrug = current.getDrugName();
+            if (existingDrug == null) continue;
+            if (isBadInteraction(drugName, existingDrug)) {
+                conflicts.add("Interaction: '" + drugName + "' with existing '" + existingDrug + "'");
+            }
+        }
+        return conflicts;
+    }
+
     // Helper: checks if two drug names form a "bad pair" (ignoring order & case)
     private boolean isBadInteraction(String d1, String d2) {
         for (List<String> pair : MED_INTERACTIONS) {
             if (pair.size() != 2) continue;
-
             String a = pair.get(0);
             String b = pair.get(1);
-
-            boolean match =
-                (a.equalsIgnoreCase(d1) && b.equalsIgnoreCase(d2)) ||
-                (a.equalsIgnoreCase(d2) && b.equalsIgnoreCase(d1));
-
+            boolean match = (a.equalsIgnoreCase(d1) && b.equalsIgnoreCase(d2)) || (a.equalsIgnoreCase(d2) && b.equalsIgnoreCase(d1));
             if (match) return true;
         }
         return false;
@@ -163,7 +191,6 @@ public class MedicationService {
             med.setPatientId(patientId);
             med.setDoctorId(providerId);
         }
-
         return medicationRepository.saveAll(medications);
     }
 
@@ -177,10 +204,7 @@ public class MedicationService {
 
         // Ensure medication belongs to this patient
         if (existing.getPatientId() == null || !existing.getPatientId().equals(patientId)) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Medication does not belong to the specified patient"
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medication does not belong to the specified patient");
         }
 
         //Check conflicts for this updated med (wrapped in a list)
@@ -197,8 +221,8 @@ public class MedicationService {
         existing.setNotes(updated.getNotes());
         existing.setTimestamp(updated.getTimestamp());
         existing.setStatus(updated.getStatus());
-    existing.setIsPerscription(updated.getIsPerscription());
-
+        existing.setIsPerscription(updated.getIsPerscription());
+        existing.setRoute(updated.getRoute());
         return medicationRepository.save(existing);
     }
 
@@ -210,19 +234,30 @@ public class MedicationService {
 
     // DELETE /{patient_id}/medications/{medication_id}
     public void deleteMedication(Long patientId, Long medicationId) {
-        Medication existing = medicationRepository.findById(medicationId)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "Medication not found with id: " + medicationId
-            ));
-
+        Medication existing = medicationRepository.findById(medicationId).orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, "Medication not found with id: " + medicationId));
         if (existing.getPatientId() == null || !existing.getPatientId().equals(patientId)) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Medication does not belong to the specified patient"
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medication does not belong to the specified patient");
         }
-
         medicationRepository.delete(existing);
+    }
+
+    /**
+     * Create a single prescription with conflict detection and optional override.
+     */
+    public PrescriptionResultResponse createSinglePrescription(Long patientId, Long providerId, Medication medication, boolean overrideRequested, String overrideJustification) {
+        medication.setPatientId(patientId);
+        medication.setDoctorId(providerId);
+        List<String> conflicts = collectConflicts(patientId, medication);
+        if (!conflicts.isEmpty() && !overrideRequested) {
+            return new PrescriptionResultResponse(true, conflicts, null);
+        }
+        if (!conflicts.isEmpty() && overrideRequested) {
+            medication.setConflictFlag(true);
+            medication.setConflictDetails(String.join("; ", conflicts));
+            medication.setOverrideJustification(overrideJustification);
+        }
+        Medication saved = medicationRepository.save(medication);
+        return new PrescriptionResultResponse(!conflicts.isEmpty(), conflicts, MedicationMapper.toResponseDto(saved));
     }
 }

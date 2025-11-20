@@ -3,6 +3,7 @@ package com.Eges411Team.UnifiedPatientManager.controller;
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.NoteRequestDTO;
 import com.Eges411Team.UnifiedPatientManager.entity.Note;
 import com.Eges411Team.UnifiedPatientManager.services.NoteService;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/default/patient")
+@RequestMapping({"/default/patient", "/api/patients"})
 public class NoteController {
 
     private final NoteService noteService;
@@ -63,21 +64,18 @@ public class NoteController {
     @PostMapping("/{patient_id}/notes")
     @Operation(summary = "Create a new note for a patient")
     public ResponseEntity<Note> createNote(
-        @PathVariable("patient_id") 
+        @PathVariable("patient_id")
         @Parameter(example = "3") Long patientId,
         @Valid @RequestPart("note") NoteRequestDTO noteRequestDTO,
         @RequestPart(value = "attachment", required = false) MultipartFile attachment
     ) throws IOException {
 
-    // Create a new Note entity 
-    Note note = new Note();
-
-    // Set entity fields from DTO
-    note.setPatientId(patientId);                   
-    note.setDoctorId(noteRequestDTO.getDoctor_id()); 
-    note.setNoteType(noteRequestDTO.getNote_type());
-    note.setContent(noteRequestDTO.getContent());
-    note.setTimestamp(noteRequestDTO.getTimestamp());
+        Note note = new Note();
+        note.setPatientId(patientId);
+        note.setDoctorId(noteRequestDTO.getDoctorId());
+        note.setNoteType(noteRequestDTO.getNoteType());
+        note.setContent(noteRequestDTO.getContent());
+        note.setTimestamp(noteRequestDTO.getTimestamp() != null ? noteRequestDTO.getTimestamp() : LocalDateTime.now());
 
     if (attachment != null && !attachment.isEmpty()) {
         note.setAttachmentName(attachment.getOriginalFilename());
