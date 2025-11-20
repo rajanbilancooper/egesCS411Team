@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import client from "./api/axiosClient";
 import { patientApi } from "./api/patientApi";
 import NotesPanel from "./NotesPanel";
-import { useParams } from "react-router-dom"; // <-- make sure this path is right
+import ApiConnectivityBadge from "./ApiConnectivityBadge";
 
 export default function PatientDashboardPage() {
   const { id: routeId } = useParams() || {};
