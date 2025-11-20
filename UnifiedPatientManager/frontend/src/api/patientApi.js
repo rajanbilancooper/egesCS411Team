@@ -3,7 +3,7 @@ import client from "./axiosClient";
 
 /**
  * patientApi
- * Wrapper around all backend endpoints under /default/patient/...
+ * Wrapper around all backend endpoints under /api/patients/...
  *
  * Usage example (from a React component):
  *   import { patientApi } from "./api/patientApi";
@@ -18,51 +18,51 @@ export const patientApi = {
       params: { name },
     }),
 
-  // GET /default/patient/{id}
+  // GET /api/patients/{id}
   getPatientById: (id) =>
-    client.get(`/default/patient/${id}`),
+    client.get(`/api/patients/${id}`),
 
-  // POST /default/patient
+  // POST /api/patients/
   createPatient: (payload) =>
-    client.post("/default/patient", payload),
+    client.post("/api/patients/", payload),
 
-  // PUT /default/patient/{id}
+  // PUT /api/patients/{id}
   updatePatient: (id, payload) =>
-    client.put(`/default/patient/${id}`, payload),
+    client.put(`/api/patients/${id}`, payload),
 
-  // DELETE /default/patient/{id}
+  // DELETE /api/patients/{id}
   deletePatient: (id) =>
-    client.delete(`/default/patient/${id}`),
+    client.delete(`/api/patients/${id}`),
 
   // ---- Medical history, allergies, vaccines ----
 
-  // GET /default/patient/{patientId}/medicalhistory
+  // GET /api/patients/{patientId}/medicalhistory
   getMedicalHistory: (patientId) =>
-    client.get(`/default/patient/${patientId}/medicalhistory`),
+    client.get(`/api/patients/${patientId}/medicalhistory`),
 
-  // GET /default/patient/{patientId}/allergies
+  // GET /api/patients/{patientId}/allergies
   getAllergies: (patientId) =>
-    client.get(`/default/patient/${patientId}/allergies`),
+    client.get(`/api/patients/${patientId}/allergies`),
 
-  // GET /default/patient/{patientId}/vaccines
+  // GET /api/patients/{patientId}/vaccines
   getVaccines: (patientId) =>
-    client.get(`/default/patient/${patientId}/vaccines`),
+    client.get(`/api/patients/${patientId}/vaccines`),
 
   // ---- Notes ----
 
-  // GET /default/patient/{patientId}/notes
+  // GET /api/patients/{patientId}/notes
   getNotes: (patientId) =>
-    client.get(`/default/patient/${patientId}/notes`),
+    client.get(`/api/patients/${patientId}/notes`),
 
-  // POST /default/patient/{patientId}/notes
+  // POST /api/patients/{patientId}/notes
   createNote: (patientId, payload) =>
-    client.post(`/default/patient/${patientId}/notes`, payload),
+    client.post(`/api/patients/${patientId}/notes`, payload),
 
-  // PUT /default/patient/{patientId}/notes/{noteId}
+  // PUT /api/patients/{patientId}/notes/{noteId}
   updateNote: (patientId, noteId, payload) =>
-    client.put(`/default/patient/${patientId}/notes/${noteId}`, payload),
+    client.put(`/api/patients/${patientId}/notes/${noteId}`, payload),
 
-  // DELETE /default/patient/{patientId}/notes/{noteId}
+  // DELETE /api/patients/{patientId}/notes/{noteId}
   deleteNote: (patientId, noteId) =>
-    client.delete(`/default/patient/${patientId}/notes/${noteId}`),
+    client.delete(`/api/patients/${patientId}/notes/${noteId}`),
 };

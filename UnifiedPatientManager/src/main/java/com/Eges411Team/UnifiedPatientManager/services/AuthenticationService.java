@@ -8,6 +8,8 @@ import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
 import com.Eges411Team.UnifiedPatientManager.repositories.UserSessionRepository;
 import com.Eges411Team.UnifiedPatientManager.services.JwtTokenProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,6 +23,8 @@ import java.time.LocalDateTime;
 @Service
 //ASK RHEA IF NEED TRANSACTIONAL
 public class AuthenticationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     //Dependencies
     private final UserRepository userRepository;
@@ -47,6 +51,7 @@ public class AuthenticationService {
     //IF THEY EXIST, AN OTP IS SENT FOR VERIFICATION WOOP WOOP 
 
     public LoginResponse authenticate(LoginRequest request, String ipAddress) {
+        logger.info("Authenticating user: {}", request.getUsername());
         
         // Step 1: Find user by username
         User user = userRepository.findByUsername(request.getUsername())
@@ -70,7 +75,14 @@ public class AuthenticationService {
         userRepository.save(user);
 
         // Step 4: Generate OTP and send to user
-        otpService.generateAndSendOtp(user);
+        try {
+            logger.info("User {} password verified, generating OTP", user.getUsername());
+            otpService.generateAndSendOtp(user);
+        } catch (Exception e) {
+            // Log and rethrow so GlobalExceptionHandler handles it
+            logger.error("Failed to generate/send OTP for user {}: {}", user.getUsername(), e.getMessage());
+            throw e;
+        }
 
         LoginResponse response = new LoginResponse();
         response.setUserId(user.getId());

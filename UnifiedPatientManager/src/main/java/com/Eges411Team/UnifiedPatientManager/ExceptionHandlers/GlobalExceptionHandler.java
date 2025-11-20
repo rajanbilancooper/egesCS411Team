@@ -9,10 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
-import org.springframework.security.core.AuthenticationException;
+// removed unused import AuthenticationException
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 //Lets us log errrors 
@@ -20,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //Lets us use lists
-import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -86,6 +87,36 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)  // 400
             .body(new ErrorResponse("OTP has expired. Please request a new one."));
+    }
+
+    // Handle generic IllegalArgumentException (e.g. missing email)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        logger.warn("Illegal argument: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    // Handle email sending errors gracefully (e.g. SMTP misconfigured during dev/test)
+    @ExceptionHandler(MailException.class)
+    public ResponseEntity<ErrorResponse> handleMailException(MailException ex) {
+        logger.error("Mail error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+            .body(new ErrorResponse("Failed to send OTP email. Please check server email configuration or delivery logs."));
+    }
+
+    // Handle bean validation failures (@Valid annotated DTOs)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        logger.warn("Validation failed: {}", ex.getMessage());
+        String combined = ex.getBindingResult().getFieldErrors().stream()
+            .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+            .collect(Collectors.joining("; "));
+        if (combined.isBlank()) {
+            combined = "Validation error";
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse(combined));
     }
 
 }

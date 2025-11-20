@@ -16,9 +16,14 @@ import com.Eges411Team.UnifiedPatientManager.DTOs.requests.PatientRecordUpdateDT
 import com.Eges411Team.UnifiedPatientManager.DTOs.responses.PatientRecordDTO;
 import com.Eges411Team.UnifiedPatientManager.entity.User;
 import com.Eges411Team.UnifiedPatientManager.entity.Allergy;
+import com.Eges411Team.UnifiedPatientManager.DTOs.requests.PatientRegistrationRequest;
+import com.Eges411Team.UnifiedPatientManager.DTOs.requests.AllergyRequest;
+import com.Eges411Team.UnifiedPatientManager.entity.Role;
 import com.Eges411Team.UnifiedPatientManager.services.PatientRecordService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 // controller for patient record related endpoints
 @RestController
@@ -28,9 +33,12 @@ public class PatientRecordController {
     @Autowired
     PatientRecordService patientRecordService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     // need a method for getting the patientRecord
     @GetMapping("/{id}")
-    public ResponseEntity<PatientRecordDTO> getPatientRecord(@PathVariable Long patientID) {
+    public ResponseEntity<PatientRecordDTO> getPatientRecord(@PathVariable("id") Long patientID) {
         
         // gets the record using the service using the User ID
         return ResponseEntity.ok(patientRecordService.getPatientRecord(patientID));
@@ -52,12 +60,46 @@ public class PatientRecordController {
         return ResponseEntity.ok(patientRecordService.getPatientRecordByFullName(fullName));
     }
 
-    // method to create a patient record
+    // method to create a patient record (patient user + optional allergies)
     @PostMapping("/")
-    public ResponseEntity<PatientRecordDTO> createPatientRecord(@RequestBody User userTemplate, @RequestBody List<Allergy> allergiesInput) {
-        
-        // creates the record using the service
-        return ResponseEntity.ok(patientRecordService.createPatientRecord(userTemplate, allergiesInput));
+    public ResponseEntity<PatientRecordDTO> createPatientRecord(@Valid @RequestBody PatientRegistrationRequest request) {
+
+        // Build User entity
+        User userTemplate = new User();
+        userTemplate.setUsername(request.getUsername());
+        String rawPassword = (request.getPassword() == null || request.getPassword().isBlank()) ? "tempPass123" : request.getPassword();
+        userTemplate.setPassword(passwordEncoder.encode(rawPassword));
+        userTemplate.setRole(Role.PATIENT); // registering a patient
+        userTemplate.setFirstName(request.getFirstName());
+        userTemplate.setLastName(request.getLastName());
+        userTemplate.setEmail(request.getEmail());
+        userTemplate.setPhoneNumber(request.getPhoneNumber());
+        userTemplate.setAddress(request.getAddress() == null ? "" : request.getAddress());
+        userTemplate.setGender(request.getGender() == null ? "OTHER" : request.getGender());
+        // Parse date string (YYYY-MM-DD) to LocalDateTime at start of day
+        try {
+            java.time.LocalDate dateOnly = java.time.LocalDate.parse(request.getDateOfBirth());
+            userTemplate.setDateOfBirth(dateOnly.atStartOfDay());
+        } catch (Exception ex) {
+            throw new RuntimeException("Invalid date format; expected YYYY-MM-DD");
+        }
+        userTemplate.setCreationDate(java.time.LocalDateTime.now());
+        userTemplate.setUpdateDate(java.time.LocalDateTime.now());
+        userTemplate.setLastLoginTime(java.time.LocalDateTime.now());
+
+        // Convert allergy requests to entity list
+        List<Allergy> allergyEntities = new java.util.ArrayList<>();
+        if (request.getAllergies() != null) {
+            for (AllergyRequest ar : request.getAllergies()) {
+                Allergy a = new Allergy();
+                a.setSubstance(ar.getSubstance());
+                a.setReaction(ar.getReaction());
+                a.setSeverity(ar.getSeverity());
+                allergyEntities.add(a);
+            }
+        }
+
+        return ResponseEntity.ok(patientRecordService.createPatientRecord(userTemplate, allergyEntities));
     }
 
 }

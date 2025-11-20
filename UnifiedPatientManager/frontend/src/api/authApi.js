@@ -1,24 +1,25 @@
-// import client from "./axiosClient";
+import client from "./axiosClient";
 
-// export const authApi = {
-//   login: (payload) =>
-//     client.post("/auth/login", payload),
-
-//   register: (payload) =>
-//     client.post("/auth/register", payload),
-
-//   sendOtp: (payload) =>
-//     client.post("/auth/send-otp", payload),
-
-//   verifyOtp: (payload) =>
-//     client.post("/auth/verify-otp", payload),
-// };
-
+// Wrapper around backend authentication endpoints
+// Backend has a two-step login: POST /auth/login (username + password -> OTP sent)
+// then POST /auth/verify (username + otpCode -> token returned)
 export const authApi = {
-  login: async ({ username, password }) => {
-    // fake success response
-    return Promise.resolve({
-      token: "mock-token",
-    });
+  // Step 1: Send username+password -> triggers OTP send
+  login: (payload) => client.post("/auth/login", payload),
+
+  // Step 2: Verify the OTP -> returns LoginResponse with token
+  verify: (payload) => client.post("/auth/verify", payload),
+
+  // Resend OTP for username
+  resendOtp: (payload) => client.post("/auth/resend-otp", payload),
+
+  // Logout (requires Authorization header)
+  logout: () => client.post("/auth/logout"),
+
+  // Convenience helper for integration tests: login then verify with given OTP
+  loginAndVerify: async ({ username, password, otpCode }) => {
+    await client.post("/auth/login", { username, password });
+    const res = await client.post("/auth/verify", { username, otpCode });
+    return res;
   },
 };

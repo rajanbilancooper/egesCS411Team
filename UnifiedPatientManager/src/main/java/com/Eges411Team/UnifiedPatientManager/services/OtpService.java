@@ -9,7 +9,6 @@ import com.Eges411Team.UnifiedPatientManager.ExceptionHandlers.OtpExpiredExcepti
 import com.Eges411Team.UnifiedPatientManager.repositories.OtpTokenRepository;
 import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
 import com.Eges411Team.UnifiedPatientManager.repositories.UserSessionRepository;
-import com.Eges411Team.UnifiedPatientManager.services.JwtTokenProvider;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,9 +17,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.security.SecureRandom;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.mail.MailException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class OtpService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
 
     private final OtpTokenRepository otpTokenRepository;
     private final UserRepository userRepository;
@@ -46,7 +50,8 @@ public class OtpService {
     }
 
     //LETS CREATE A METHOD TO GENERATE AND SEND OTP
-    @Transactional
+    // Ensure OTP save is not rolled back if email sending fails; this helps local testing
+    @Transactional(noRollbackFor = MailException.class)
     public void generateAndSendOtp(User user) {
         // Step 1: Invalidate any existing unused OTPs for this user/type
         // This ensures only ONE valid OTP exists at a time
@@ -75,8 +80,15 @@ public class OtpService {
             throw new IllegalStateException("User does not have an email address configured");
         }
 
-        // Actually send the OTP via Email (EmailService logs and throws on failure)
-        EmailService.sendOtpEmail(user.getEmail(), otpCode);
+        // Log OTP for local development/testing (remove or lower log level in production)
+        logger.info("Generated OTP for user {}: {}", user.getUsername(), otpCode);
+        // Actually attempt to send the OTP via Email but do not roll back the db save on failure
+        try {
+            EmailService.sendOtpEmail(user.getEmail(), otpCode);
+        } catch (MailException me) {
+            // Log but do not rethrow so that the OTP stays persisted and can be used for testing
+            logger.error("Failed to send OTP email to {}: {}", user.getEmail(), me.getMessage());
+        }
 
     }
     //Now they have the OTP, they inpyt it... so need to verify its legit 
