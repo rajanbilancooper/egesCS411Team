@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 //Lets us use lists
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -86,6 +87,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)  // 400
             .body(new ErrorResponse("OTP has expired. Please request a new one."));
+    }
+
+    // Handle bean validation failures (@Valid annotated DTOs)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        logger.warn("Validation failed: {}", ex.getMessage());
+        String combined = ex.getBindingResult().getFieldErrors().stream()
+            .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+            .collect(Collectors.joining("; "));
+        if (combined.isBlank()) {
+            combined = "Validation error";
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse(combined));
     }
 
 }
