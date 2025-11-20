@@ -153,6 +153,14 @@ public class PatientRecordService {
         if (userTemplate.getDateOfBirth() == null) {
             throw new RuntimeException("Date of birth is required");
         }
+        if (userTemplate.getPhoneNumber() == null || userTemplate.getPhoneNumber().isBlank()) {
+            throw new RuntimeException("Phone number is required");
+        }
+        // Validate phone number format: must be exactly 10 digits (or 12 with dashes like XXX-XXX-XXXX)
+        String phoneDigitsOnly = userTemplate.getPhoneNumber().replaceAll("[^0-9]", "");
+        if (phoneDigitsOnly.length() != 10) {
+            throw new RuntimeException("Phone number must be 10 digits");
+        }
 
         // Duplicate check: same first name, last name, and date of birth
         boolean duplicateExists = userRepository
