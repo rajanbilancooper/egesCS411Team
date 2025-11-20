@@ -14,6 +14,13 @@ export default function PatientDashboardPage() {
   const [activeTab, setActiveTab] = useState("basic");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Search state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState(null);
+  const [showResults, setShowResults] = useState(false);
+  const [searchDebounceId, setSearchDebounceId] = useState(null);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -47,6 +54,59 @@ export default function PatientDashboardPage() {
     };
     load();
   }, [patientId, navigate]);
+
+  // Perform debounced search when searchTerm changes
+  useEffect(() => {
+    if (!searchTerm || searchTerm.trim().length < 2) {
+      setSearchResults([]);
+      setShowResults(false);
+      setSearchError(null);
+      return;
+    }
+    if (searchDebounceId) {
+      clearTimeout(searchDebounceId);
+    }
+    const id = setTimeout(async () => {
+      setSearchLoading(true);
+      setSearchError(null);
+      try {
+        const res = await patientApi.searchByName(searchTerm.trim());
+        const data = res.data;
+        let list = [];
+        if (Array.isArray(data)) {
+          list = data.map(p => ({
+            id: p.patientId ?? p.id,
+            name: p.fullName || (p.firstName ? `${p.firstName} ${p.lastName || ""}`.trim() : (p.username || "Unknown"))
+          }));
+        } else if (data && typeof data === 'object') {
+          list = [{
+            id: data.patientId ?? data.id,
+            name: data.fullName || (data.firstName ? `${data.firstName} ${data.lastName || ""}`.trim() : (data.username || "Unknown"))
+          }];
+        }
+        setSearchResults(list);
+        setShowResults(true);
+      } catch (err) {
+        console.error("Search failed", err);
+        setSearchError(err?.response?.data?.message || err?.message || "Search failed");
+        setSearchResults([]);
+        setShowResults(true);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300); // 300ms debounce
+    setSearchDebounceId(id);
+  }, [searchTerm]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSelectPatient = (id) => {
+    setShowResults(false);
+    setSearchTerm("");
+    navigate(`/patients/${id}`);
+  };
 
   if (loading) {
     return <div style={{ padding: "2rem" }}>Loading patient...</div>;
@@ -85,11 +145,54 @@ export default function PatientDashboardPage() {
       {/* 2. MAIN AREA */}
       <main className="upm-main">
         {/* SEARCH BAR */}
-        <div className="upm-search-row">
+        <div className="upm-search-row" style={{ position: "relative" }}>
           <input
             className="upm-search-input"
             placeholder="Search or Enter Patient Name"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if (searchResults.length > 0) {
+                  e.preventDefault();
+                  handleSelectPatient(searchResults[0].id);
+                }
+              }
+            }}
+            onFocus={() => { if (searchResults.length > 0) setShowResults(true); }}
+            onBlur={() => {
+              // slight delay so click can register
+              setTimeout(() => setShowResults(false), 150);
+            }}
           />
+          {showResults && (
+            <div className="upm-search-results" style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#fff", border: "1px solid #ddd", borderRadius: 4, zIndex: 20, maxHeight: 240, overflowY: "auto" }}>
+              {searchLoading && <div style={{ padding: "0.5rem" }}>Searching...</div>}
+              {!searchLoading && searchError && <div style={{ padding: "0.5rem", color: "#c00" }}>{searchError}</div>}
+              {!searchLoading && !searchError && searchResults.length === 0 && (
+                <div style={{ padding: "0.5rem" }}>No matches</div>
+              )}
+              {!searchLoading && !searchError && searchResults.map(r => (
+                <button
+                  key={r.id}
+                  onMouseDown={(e) => { e.preventDefault(); handleSelectPatient(r.id); }}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    textAlign: "left",
+                    padding: "0.5rem 0.75rem",
+                    border: "none",
+                    background: "#fff",
+                    cursor: "pointer",
+                    borderBottom: "1px solid #eee"
+                  }}
+                  className="upm-search-result-item"
+                >
+                  {r.name} <span style={{ opacity: 0.6 }}>#{r.id}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 2b. TABS ROW */}

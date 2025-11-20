@@ -12,10 +12,11 @@ import client from "./axiosClient";
  *   console.log(res.data);
  */
 export const patientApi = {
-  // GET /default/patient/search?name=...
-  searchByName: (name) =>
-    client.get("/default/patient/search", {
-      params: { name },
+  // GET /api/patients/search?fullName=...
+  // Backend currently returns a single PatientRecordDTO for an exact match
+  searchByName: (fullName) =>
+    client.get("/api/patients/search", {
+      params: { fullName },
     }),
 
   // GET /api/patients/{id}
