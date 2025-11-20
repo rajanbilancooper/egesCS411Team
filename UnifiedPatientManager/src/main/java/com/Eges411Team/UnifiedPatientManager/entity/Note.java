@@ -1,9 +1,6 @@
 package com.Eges411Team.UnifiedPatientManager.entity;
 
-import java.sql.Blob;
 import java.time.LocalDateTime;
-
-// this will be a class for users in the system
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +11,9 @@ import lombok.Setter;
 @Table(name = "note")
 @Getter
 @Setter
-
-public class Note{
+public class Note {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -26,12 +23,14 @@ public class Note{
     @Column(name = "doctor_id")
     private Long doctorId;
 
-    @Column (name = "note_type")
-    private Blob noteType;
+    @Lob
+    @Column(name = "note_type")
+    private String noteType;
 
-    @Column (name = "content")
-    private Blob content;
+    @Lob
+    @Column(name = "content")
+    private String content;
 
-    @Column (name = "timestamp")
+    @Column(name = "timestamp")
     private LocalDateTime timestamp;
 }

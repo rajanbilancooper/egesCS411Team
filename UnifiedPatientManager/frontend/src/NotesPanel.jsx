@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { patientApi } from "./api/patientApi"; // adjust path if needed
+import { patientApi } from "./api/patientApi"; // API wrapper
 
 export default function NotesPanel({ patientId }) {
   const [notes, setNotes] = useState([]);
@@ -42,13 +42,13 @@ export default function NotesPanel({ patientId }) {
     try {
       const payload = {
         content: newNote,
-        createdAt: new Date().toISOString(),
+        noteType: "GENERAL",
+        doctorId: 1, // TODO: replace with real logged-in doctor/user id when available
+        timestamp: new Date().toISOString(),
       };
 
       const res = await patientApi.createNote(patientId, payload);
-
-      // backend likely returns the saved note in res.data
-      const saved = res?.data ?? payload;
+      const saved = res?.data ?? { ...payload, id: Math.random() };
       setNotes((prev) => [saved, ...prev]);
       setNewNote("");
     } catch (e) {
@@ -114,11 +114,11 @@ export default function NotesPanel({ patientId }) {
           )}
 
           {notes.map((note) => (
-            <article key={note.id || note.createdAt} className="upm-notes-item">
+            <article key={note.id || note.timestamp || Math.random()} className="upm-notes-item">
               <div className="upm-notes-item-meta">
                 <span className="upm-notes-item-date">
-                  {note.createdAt
-                    ? new Date(note.createdAt).toLocaleString()
+                  {note.timestamp
+                    ? new Date(note.timestamp).toLocaleString()
                     : "New note"}
                 </span>
               </div>
