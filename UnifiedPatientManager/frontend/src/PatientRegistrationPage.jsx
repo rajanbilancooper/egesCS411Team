@@ -20,6 +20,8 @@ export default function PatientRegistrationPage() {
     address: "",
     dateOfBirth: "",
     gender: "MALE",
+    height: "",
+    weight: "",
   });
   const [allergies, setAllergies] = useState([]);
   const [allergyDraft, setAllergyDraft] = useState({ substance: "", reaction: "", severity: "" });
@@ -125,6 +127,14 @@ export default function PatientRegistrationPage() {
                 <option value="FEMALE">Female</option>
                 <option value="OTHER">Other</option>
               </select>
+            </label>
+            <label className="reg-field">
+              <span>Height</span>
+              <input name="height" value={form.height} onChange={updateField} placeholder="e.g., 5'10&quot; or 178cm" />
+            </label>
+            <label className="reg-field">
+              <span>Weight</span>
+              <input name="weight" value={form.weight} onChange={updateField} placeholder="e.g., 180 lbs or 82 kg" />
             </label>
           </div>
 
