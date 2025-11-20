@@ -1,72 +1,102 @@
-// src/components/NotesPanel.jsx
+// src/NotesPanel.jsx
 import React, { useEffect, useState } from "react";
-import { patientApi } from "../api/patientApi";
+import { patientApi } from "./api/patientApi"; // adjust path if needed
 
 export default function NotesPanel({ patientId }) {
-  const [text, setText] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [notes, setNotes] = useState([]);
+  const [newNote, setNewNote] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  // load existing notes (mocked API for now)
   useEffect(() => {
-    const loadNotes = async () => {
-      const res = await patientApi.getNotes(patientId);
-      const notes = res.data;
-      if (notes && notes.length > 0) {
-        // assuming each note has a "content" field
-        setText(notes[notes.length - 1].content);
+    const load = async () => {
+      try {
+        const res = await patientApi.getNotes(patientId);
+        setNotes(res.data || []);
+      } catch (e) {
+        console.error("Failed to load notes", e);
       }
     };
-    loadNotes();
+    load();
   }, [patientId]);
 
   const handleSave = async () => {
-    setSaving(true);
+    if (!newNote.trim()) return;
+
+    setLoading(true);
     try {
-      await patientApi.createNote(patientId, {
-        content: text, // must match your NoteRequestDTO field name
+      const res = await patientApi.createNote(patientId, {
+        content: newNote,
+        createdAt: new Date().toISOString(),
       });
-      // you could show a "Saved!" toast
+
+      // append to history
+      setNotes((prev) => [res.data, ...prev]);
+      setNewNote("");
+    } catch (e) {
+      console.error("Failed to save note", e);
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
-  const handleUpload = (e) => {
-    const files = Array.from(e.target.files);
-    console.log("Uploaded files:", files);
-    // later: send to backend endpoint for note attachments
-  };
-
   return (
-    <div className="card notes-panel">
-      <textarea
-        className="notes-textarea"
-        placeholder="Create Appointment Notes Here..."
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
+    <div className="upm-notes-layout">
+      {/* LEFT: create note */}
+      <section className="upm-card upm-notes-editor">
+        <div className="upm-notes-editor-header">
+          <span>Create Appointment Notes Here…</span>
+        </div>
 
-      <div className="notes-footer">
-        <label className="btn-secondary">
-          Upload Files
-          <input
-            type="file"
-            multiple
-            style={{ display: "none" }}
-            onChange={handleUpload}
-          />
-        </label>
+        <textarea
+          className="upm-notes-textarea"
+          value={newNote}
+          onChange={(e) => setNewNote(e.target.value)}
+          placeholder="Create Appointment Notes Here…"
+        />
 
-        <div className="notes-actions">
-          <button className="btn-secondary">Record</button>
+        <div className="upm-notes-buttons">
+          <button className="upm-notes-btn-secondary" type="button">
+            Upload Files
+          </button>
+          <button className="upm-notes-btn-outline" type="button">
+            Record
+          </button>
           <button
-            className="btn-primary"
+            className="upm-notes-btn-primary"
+            type="button"
             onClick={handleSave}
-            disabled={saving}
+            disabled={loading}
           >
-            {saving ? "Saving..." : "Save"}
+            {loading ? "Saving…" : "Save"}
           </button>
         </div>
-      </div>
+      </section>
+
+      {/* RIGHT: note history */}
+      <section className="upm-card upm-notes-history">
+        <h3 className="upm-notes-history-title">Note History</h3>
+        <div className="upm-divider" />
+
+        <div className="upm-notes-history-list">
+          {notes.length === 0 && (
+            <p className="upm-notes-empty">No notes yet for this patient.</p>
+          )}
+
+          {notes.map((note) => (
+            <article key={note.id || note.createdAt} className="upm-notes-item">
+              <div className="upm-notes-item-meta">
+                <span className="upm-notes-item-date">
+                  {note.createdAt
+                    ? new Date(note.createdAt).toLocaleString()
+                    : "New note"}
+                </span>
+              </div>
+              <p className="upm-notes-item-content">{note.content}</p>
+            </article>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
