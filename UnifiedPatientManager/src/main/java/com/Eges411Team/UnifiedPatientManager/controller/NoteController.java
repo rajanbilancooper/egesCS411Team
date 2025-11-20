@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -64,7 +66,9 @@ public class NoteController {
     public ResponseEntity<Note> createNote(
         @PathVariable("patient_id")
         @Parameter(example = "3") Long patientId,
-        @Valid @RequestBody NoteRequestDTO noteRequestDTO) {
+        @Valid @RequestPart("note") NoteRequestDTO noteRequestDTO,
+        @RequestPart(value = "attachment", required = false) MultipartFile attachment
+    ) throws IOException {
 
         Note note = new Note();
         note.setPatientId(patientId);
@@ -73,9 +77,15 @@ public class NoteController {
         note.setContent(noteRequestDTO.getContent());
         note.setTimestamp(noteRequestDTO.getTimestamp() != null ? noteRequestDTO.getTimestamp() : LocalDateTime.now());
 
-        Note saved = noteService.saveSingleNote(note);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    if (attachment != null && !attachment.isEmpty()) {
+        note.setAttachmentName(attachment.getOriginalFilename());
+        note.setAttachmentData(attachment.getBytes());
     }
+
+    // Save using the service
+    Note saved = noteService.saveSingleNote(note);
+    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+}
 
     // Update a specific note
     @PutMapping("/{patient_id}/notes/{note_id}")
@@ -87,10 +97,24 @@ public class NoteController {
         Long patientId,
         @PathVariable("note_id")
         @Parameter(example = "1")
-        Long noteId
-    ) {
-        Note updated = noteService.updateNote(patientId, noteId, note);
-        return ResponseEntity.ok(updated);
+        Long noteId,
+        @Valid @RequestPart("note") NoteRequestDTO noteRequestDTO,
+        @RequestPart(value = "attachment", required = false) MultipartFile attachment
+        ) throws IOException {
+
+        Note updated = new Note();
+        updated.setDoctorId(noteRequestDTO.getDoctor_id());
+        updated.setNoteType(noteRequestDTO.getNote_type());
+        updated.setContent(noteRequestDTO.getContent());
+        updated.setTimestamp(noteRequestDTO.getTimestamp());
+
+        if (attachment != null && !attachment.isEmpty()) {
+            updated.setAttachmentName(attachment.getOriginalFilename());
+            updated.setAttachmentData(attachment.getBytes());
+        }
+
+    Note saved = noteService.updateNote(patientId, noteId, updated);
+    return ResponseEntity.ok(saved);
     }
 
     // Refresh patient notes

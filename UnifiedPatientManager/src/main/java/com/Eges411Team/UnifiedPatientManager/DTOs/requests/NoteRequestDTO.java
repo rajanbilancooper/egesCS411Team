@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
+import java.sql.Blob;
 
 @Getter
 @Setter
@@ -15,6 +17,11 @@ import java.time.LocalDateTime;
 @Schema(description = "Request DTO for creating or updating a patient's note")
 public class NoteRequestDTO {
 
+    // @NotNull(message = "Patient ID is required")
+    // @Schema(example = "3", description = "ID of the patient associated with this note")
+    // private Long patient_id;
+
+    @NotNull(message = "Doctor ID is required")
     @Schema(example = "5", description = "ID of the doctor who wrote the note")
     private Long doctorId;
 

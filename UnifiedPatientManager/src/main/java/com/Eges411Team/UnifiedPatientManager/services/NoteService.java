@@ -60,6 +60,8 @@ public class NoteService {
         existing.setNoteType(updated.getNoteType());
         existing.setContent(updated.getContent());
         existing.setTimestamp(updated.getTimestamp());
+        existing.setAttachmentName(updated.getAttachmentName());
+        existing.setAttachmentData(updated.getAttachmentData());
 
         return noteRepository.save(existing);
     }
