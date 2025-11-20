@@ -94,6 +94,23 @@ public class PatientRecordDTO {
         this.gender = gender;
     }
 
+    // height and weight fields
+    private String height;
+    private String weight;
+
+    public String getHeight() {
+        return height;
+    }
+    public void setHeight(String height) {
+        this.height = height;
+    }
+    public String getWeight() {
+        return weight;
+    }
+    public void setWeight(String weight) {
+        this.weight = weight;
+    }
+
     // we need individual nested DTOs for allergies, medications, prescriptions
     private List<AllergyDTO> allergies;
 

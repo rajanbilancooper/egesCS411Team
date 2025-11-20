@@ -61,4 +61,10 @@ public class PatientRegistrationRequest {
 
     @JsonProperty("allergies")
     private List<AllergyRequest> allergies; // optional
+
+    @JsonProperty("height")
+    private String height; // optional
+
+    @JsonProperty("weight")
+    private String weight; // optional
 }

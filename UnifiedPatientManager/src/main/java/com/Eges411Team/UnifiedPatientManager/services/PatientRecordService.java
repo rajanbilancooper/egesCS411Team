@@ -62,6 +62,8 @@ public class PatientRecordService {
         patientRecord.setAddress(user.getAddress());
         patientRecord.setDateOfBirth(user.getDateOfBirth());
         patientRecord.setGender(user.getGender());
+        patientRecord.setHeight(user.getHeight());
+        patientRecord.setWeight(user.getWeight());
 
 
         // populate patientRecord with empty arraylists to be populated
@@ -229,6 +231,12 @@ public class PatientRecordService {
         }
         if (recordDTO.getAddress() != null) {
             user.setAddress(recordDTO.getAddress());
+        }
+        if (recordDTO.getHeight() != null) {
+            user.setHeight(recordDTO.getHeight());
+        }
+        if (recordDTO.getWeight() != null) {
+            user.setWeight(recordDTO.getWeight());
         }
         // save the user at this point
         userRepository.save(user);
@@ -464,6 +472,8 @@ public class PatientRecordService {
         patientRecord.setGender(user.getGender());
         patientRecord.setEmail(user.getEmail());
         patientRecord.setPhoneNumber(user.getPhoneNumber());
+        patientRecord.setHeight(user.getHeight());
+        patientRecord.setWeight(user.getWeight());
         
         // return the patient Record
         return ResponseEntity.ok(patientRecord);

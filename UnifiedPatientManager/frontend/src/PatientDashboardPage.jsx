@@ -76,6 +76,9 @@ export default function PatientDashboardPage() {
         <div className="upm-logo" />
         <span className="upm-header-title">Unified Patient Manager</span>
         <ApiConnectivityBadge />
+        <div style={{ marginLeft: "auto" }}>
+          <button className="upm-tab" onClick={() => setActiveTab("record")}>View Patient Record</button>
+        </div>
       </header>
 
       {/* 2. MAIN AREA */}
@@ -130,6 +133,13 @@ export default function PatientDashboardPage() {
             onClick={() => handleTabClick("history")}
           >
             Patient History
+          </button>
+
+          <button
+            className={`upm-tab ${activeTab === "record" ? "upm-tab-active" : ""}`}
+            onClick={() => handleTabClick("record")}
+          >
+            Patient Record
           </button>
         </div>
 
@@ -222,9 +232,39 @@ export default function PatientDashboardPage() {
           </div>
         )}
 
+        {/* RECORD VIEW — aggregated DTO details */}
+        {activeTab === "record" && (
+          <div className="upm-card" style={{ marginTop: 16 }}>
+            <h3>Patient Record</h3>
+            <div className="upm-divider" />
+            <p><strong>Patient ID:</strong> {patient.patientId ?? patient.id}</p>
+            <p><strong>Name:</strong> {patient.firstName || patient.fullName} {patient.lastName}</p>
+            <p><strong>Email:</strong> {patient.email}</p>
+            <p><strong>Phone:</strong> {patient.phoneNumber}</p>
+            <p><strong>Address:</strong> {patient.address}</p>
+            <p><strong>Date of Birth:</strong> {patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleString() : ""}</p>
+            <p><strong>Gender:</strong> {patient.gender}</p>
+            <p><strong>Height:</strong> {patient.height || "—"}</p>
+            <p><strong>Weight:</strong> {patient.weight || "—"}</p>
+            <div className="upm-divider" />
+            <p><strong>Allergies:</strong></p>
+            <ul>
+              {(patient.allergies || []).map((a) => (
+                <li key={a.allergyId}>{a.substance} {a.severity ? `(${a.severity})` : ""}</li>
+              ))}
+            </ul>
+            <p><strong>Medications:</strong></p>
+            <ul>
+              {(patient.medications || []).map((m) => (
+                <li key={m.medicationId}>{m.drugName} {m.dose ? `– ${m.dose}` : ""} {m.frequency || ""}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* NOTES VIEW — new two-column editor/history */}
         {activeTab === "notes" && (
-            <NotesPanel patientId={patient.id || patientId || 1} />
+            <NotesPanel patientId={patient.id || patient.patientId || patientId || 1} />
         )}
 
         {/* other tabs can be placeholders for now */}

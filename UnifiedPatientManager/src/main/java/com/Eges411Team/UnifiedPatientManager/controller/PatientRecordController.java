@@ -76,6 +76,8 @@ public class PatientRecordController {
         userTemplate.setPhoneNumber(request.getPhoneNumber());
         userTemplate.setAddress(request.getAddress() == null ? "" : request.getAddress());
         userTemplate.setGender(request.getGender() == null ? "OTHER" : request.getGender());
+        userTemplate.setHeight(request.getHeight());
+        userTemplate.setWeight(request.getWeight());
         // Parse date string (YYYY-MM-DD) to LocalDateTime at start of day
         try {
             java.time.LocalDate dateOnly = java.time.LocalDate.parse(request.getDateOfBirth());
