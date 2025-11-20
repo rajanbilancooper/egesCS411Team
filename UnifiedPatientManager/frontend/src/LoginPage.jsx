@@ -75,7 +75,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 className="upm-login-btn-secondary"
-                onClick={() => alert("Register flow not wired yet")}
+                onClick={() => navigate("/register")}
               >
                 Register
               </button>

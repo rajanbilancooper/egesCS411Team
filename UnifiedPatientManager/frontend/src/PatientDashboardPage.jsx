@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { patientApi } from "./api/patientApi";
 import NotesPanel from "./NotesPanel"; // <-- make sure this path is right
+import ApiConnectivityBadge from "./ApiConnectivityBadge";
 
 export default function PatientDashboardPage() {
   const [patient, setPatient] = useState(null);
@@ -24,6 +25,7 @@ export default function PatientDashboardPage() {
       <header className="upm-header">
         <div className="upm-logo" />
         <span className="upm-header-title">Unified Patient Manager</span>
+        <ApiConnectivityBadge />
       </header>
 
       {/* 2. MAIN AREA */}

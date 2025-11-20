@@ -1,0 +1,28 @@
+.reg-root { font-family: system-ui, Arial, sans-serif; min-height: 100vh; background: #f5f9fc; }
+.reg-header { display:flex; align-items:center; gap:12px; padding:12px 20px; background:#0d5aa7; color:#fff; }
+.reg-logo-circle { width:40px; height:40px; background:#fff; border-radius:50%; }
+.reg-title { font-size:20px; font-weight:600; letter-spacing:.5px; }
+.reg-header-login { margin-left:auto; background:#fff; color:#0d5aa7; border:none; padding:6px 14px; font-weight:600; border-radius:6px; cursor:pointer; }
+.reg-main { display:flex; justify-content:center; padding:32px 16px; }
+.reg-card { width:100%; max-width:860px; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.08); border-radius:12px; padding:28px 32px; }
+.reg-card-title { margin:0 0 20px; font-size:26px; font-weight:600; color:#0d3d63; }
+.reg-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
+.reg-field { display:flex; flex-direction:column; gap:6px; font-size:13px; }
+.reg-field input, .reg-field select { border:1px solid #c9d6e2; border-radius:6px; padding:8px 10px; font-size:14px; background:#fafcfe; }
+.reg-field input:focus, .reg-field select:focus { outline:2px solid #0d5aa7; }
+.reg-section { margin-top:32px; }
+.reg-section h3 { margin:0 0 12px; font-size:18px; color:#0d3d63; }
+.reg-allergy-row { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.reg-allergy-row input { border:1px solid #c9d6e2; border-radius:6px; padding:8px 10px; font-size:13px; }
+.reg-add-btn { background:#0d5aa7; color:#fff; border:none; border-radius:6px; font-size:13px; cursor:pointer; }
+.reg-allergy-list { list-style:none; margin:12px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.reg-allergy-list li { display:flex; justify-content:space-between; align-items:center; background:#f0f6fb; padding:6px 10px; border-radius:6px; font-size:13px; }
+.reg-allergy-list button { background:none; border:none; color:#c62828; cursor:pointer; font-size:16px; }
+.reg-error { background:#ffe6e6; color:#b00020; padding:10px 14px; border-radius:8px; font-size:14px; margin-top:20px; }
+.reg-success { background:#e6f6e6; color:#256029; padding:10px 14px; border-radius:8px; font-size:14px; margin-top:20px; display:flex; align-items:center; gap:8px; }
+.reg-actions { margin-top:28px; display:flex; gap:12px; }
+.reg-submit { background:#0d5aa7; color:#fff; border:none; padding:10px 22px; font-weight:600; border-radius:8px; cursor:pointer; }
+.reg-submit:disabled { opacity:.6; cursor:progress; }
+.reg-cancel { background:#eef3f7; color:#0d3d63; border:none; padding:10px 20px; font-weight:500; border-radius:8px; cursor:pointer; }
+.reg-hint { margin-top:12px; font-size:12px; color:#4b5f6f; }
+@media (max-width:700px){ .reg-allergy-row { grid-template-columns:1fr; } }
