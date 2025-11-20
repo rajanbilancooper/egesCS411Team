@@ -1,0 +1,162 @@
+/* overall page */
+.upm-login-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif;
+}
+
+/* top blue header */
+.upm-login-header {
+  height: 64px;
+  background-color: #4169e1; /* blue bar */
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  color: #ffffff;
+}
+
+.upm-login-logo-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  margin-right: 12px;
+}
+
+.upm-login-header-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* center card */
+.upm-login-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.upm-login-card {
+  width: 360px;
+  max-width: 90vw;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background-color: #f5f5f7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 32px 36px 28px;
+}
+
+.upm-login-title {
+  text-align: center;
+  margin: 0 0 24px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #3355c8;
+  letter-spacing: 0.12em;
+}
+
+/* form */
+.upm-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.upm-login-label span {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #111827;
+}
+
+.upm-login-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-size: 14px;
+}
+
+.upm-login-input:focus {
+  outline: none;
+  border-color: #4169e1;
+  box-shadow: 0 0 0 1px rgba(65, 105, 225, 0.25);
+}
+
+.upm-login-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.upm-login-remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #4b5563;
+}
+
+.upm-login-error {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+/* buttons */
+.upm-login-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.upm-login-btn-primary,
+.upm-login-btn-secondary {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.upm-login-btn-primary {
+  border: none;
+  background-color: #3355c8;
+  color: white;
+}
+
+.upm-login-btn-primary:hover {
+  background-color: #2847aa;
+}
+
+.upm-login-btn-secondary {
+  border: 1px solid #9ca3af;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.upm-login-btn-secondary:hover {
+  background-color: #f3f4f6;
+}
+
+/* forgot password */
+.upm-login-forgot {
+  margin-top: 8px;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 11px;
+  color: #6b7280;
+  cursor: pointer;
+  text-align: left;
+}
+
+.upm-login-forgot:hover {
+  text-decoration: underline;
+}

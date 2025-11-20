@@ -1,8 +1,7 @@
-// src/App.jsx
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import PatientDashboardPage from "./pages/PatientDashboardPage";
+import LoginPage from "./loginPage";
+import PatientDashboardPage from "./PatientDashboardPage";
 
 const RequireAuth = ({ children }) => {
   const token = localStorage.getItem("accessToken");
@@ -24,6 +23,7 @@ export default function App() {
         }
       />
 
+      {/* when you go to "/", send to login */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
