@@ -12,6 +12,7 @@ export default function PatientRegistrationPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     username: "",
+    password: "", // allow password creation now that DTO supports it
     firstName: "",
     lastName: "",
     email: "",
@@ -44,6 +45,7 @@ export default function PatientRegistrationPage() {
 
   const validate = () => {
     if (!form.username.trim()) return "Username required";
+    if (!form.password.trim() || form.password.length < 6) return "Password (min 6 chars) required";
     if (!form.firstName.trim() || !form.lastName.trim()) return "First and last name required";
     if (!form.email.match(/^[^@]+@[^@]+\.[^@]+$/)) return "Valid email required";
     if (!form.phoneNumber.replace(/[^0-9]/g, "").match(/^\d{10}$/)) return "Phone must be 10 digits";
@@ -59,23 +61,13 @@ export default function PatientRegistrationPage() {
     if (v) { setError(v); return; }
     setSubmitting(true);
     try {
-      // Attempt sending just user first (most likely to work with current controller)
-      const payload = { ...form };
+      const payload = { ...form, allergies: allergies };
       const res = await client.post("/api/patients/", payload);
-      // Expect PatientRecordDTO back; capture patientId
       setSuccessId(res.data.patientId);
     } catch (err) {
-      // Retry with composite structure if first attempt fails (e.g., expecting both)
-      try {
-        const composite = { user: { ...form }, allergies: allergies };
-        const res2 = await client.post("/api/patients/", composite);
-        setSuccessId(res2.data.patientId);
-      } catch (inner) {
-        setError(inner.response?.data?.message || inner.message || "Registration failed");
-      }
-    } finally {
-      setSubmitting(false);
+      setError(err.response?.data?.message || err.message || "Registration failed");
     }
+    setSubmitting(false);
   };
 
   return (
@@ -92,6 +84,10 @@ export default function PatientRegistrationPage() {
             <label className="reg-field">
               <span>Username *</span>
               <input name="username" value={form.username} onChange={updateField} />
+            </label>
+            <label className="reg-field">
+              <span>Password *</span>
+              <input name="password" type="password" value={form.password} onChange={updateField} />
             </label>
             <label className="reg-field">
               <span>First Name *</span>

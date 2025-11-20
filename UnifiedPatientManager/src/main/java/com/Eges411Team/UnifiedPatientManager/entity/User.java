@@ -19,12 +19,12 @@ public class User {
     // fields common to all users
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "id")
     // will be used as primary key
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    // every user must have a unique username
+    @Column(name = "user_name", nullable = false, unique = true)
+    // maps to existing DB column user_name
     private String username;
 
     @JsonIgnore
