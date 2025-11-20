@@ -1,60 +1,68 @@
-// import client from "./axiosClient";
+// src/api/patientApi.js
+import client from "./axiosClient";
 
-// export const patientApi = {
-//   // /default/patient/search?name=...
-//   searchByName: (name) =>
-//     client.get("/default/patient/search", { params: { name } }),
-
-//   // /default/patient/{id}
-//   getById: (id) =>
-//     client.get(`/default/patient/${id}`),
-
-//   create: (payload) =>
-//     client.post("/default/patient", payload),
-
-//   update: (id, payload) =>
-//     client.put(`/default/patient/${id}`, payload),
-
-//   delete: (id) =>
-//     client.delete(`/default/patient/${id}`),
-// };
-
+/**
+ * patientApi
+ * Wrapper around all backend endpoints under /default/patient/...
+ *
+ * Usage example (from a React component):
+ *   import { patientApi } from "./api/patientApi";
+ *
+ *   const res = await patientApi.getPatientById(1);
+ *   console.log(res.data);
+ */
 export const patientApi = {
-  getPatientById: async (id) =>
-    Promise.resolve({
-      data: {
-        id,
-        fullName: "Mock Patient",
-        dateOfBirth: "2000-01-01",
-        gender: "Female",
-        allergiesSummary: "Peanuts, Dust",
-        currentMedicationSummary: "Ibuprofen 200mg",
-      },
+  // GET /default/patient/search?name=...
+  searchByName: (name) =>
+    client.get("/default/patient/search", {
+      params: { name },
     }),
 
-  getNotes: async (patientId) =>
-    Promise.resolve({
-      data: [
-        { id: 1, content: "This is a mock note (no DB connected)." },
-      ],
-    }),
+  // GET /default/patient/{id}
+  getPatientById: (id) =>
+    client.get(`/default/patient/${id}`),
 
-  createNote: async (patientId, payload) =>
-    Promise.resolve({
-      data: { id: 2, ...payload },
-    }),
+  // POST /default/patient
+  createPatient: (payload) =>
+    client.post("/default/patient", payload),
 
-  getVaccines: async (patientId) =>
-    Promise.resolve({
-      data: [
-        {
-          id: 1,
-          name: "COVID-19",
-          date: "2024-01-01",
-          monthsUntilInvalid: 12,
-        },
-      ],
-    }),
+  // PUT /default/patient/{id}
+  updatePatient: (id, payload) =>
+    client.put(`/default/patient/${id}`, payload),
 
-  // same idea for medical history, allergies...
+  // DELETE /default/patient/{id}
+  deletePatient: (id) =>
+    client.delete(`/default/patient/${id}`),
+
+  // ---- Medical history, allergies, vaccines ----
+
+  // GET /default/patient/{patientId}/medicalhistory
+  getMedicalHistory: (patientId) =>
+    client.get(`/default/patient/${patientId}/medicalhistory`),
+
+  // GET /default/patient/{patientId}/allergies
+  getAllergies: (patientId) =>
+    client.get(`/default/patient/${patientId}/allergies`),
+
+  // GET /default/patient/{patientId}/vaccines
+  getVaccines: (patientId) =>
+    client.get(`/default/patient/${patientId}/vaccines`),
+
+  // ---- Notes ----
+
+  // GET /default/patient/{patientId}/notes
+  getNotes: (patientId) =>
+    client.get(`/default/patient/${patientId}/notes`),
+
+  // POST /default/patient/{patientId}/notes
+  createNote: (patientId, payload) =>
+    client.post(`/default/patient/${patientId}/notes`, payload),
+
+  // PUT /default/patient/{patientId}/notes/{noteId}
+  updateNote: (patientId, noteId, payload) =>
+    client.put(`/default/patient/${patientId}/notes/${noteId}`, payload),
+
+  // DELETE /default/patient/{patientId}/notes/{noteId}
+  deleteNote: (patientId, noteId) =>
+    client.delete(`/default/patient/${patientId}/notes/${noteId}`),
 };
