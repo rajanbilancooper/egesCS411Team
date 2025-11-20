@@ -22,6 +22,8 @@ import com.Eges411Team.UnifiedPatientManager.entity.Role;
 import com.Eges411Team.UnifiedPatientManager.services.PatientRecordService;
 
 import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 // controller for patient record related endpoints
 @RestController
@@ -31,9 +33,12 @@ public class PatientRecordController {
     @Autowired
     PatientRecordService patientRecordService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     // need a method for getting the patientRecord
     @GetMapping("/{id}")
-    public ResponseEntity<PatientRecordDTO> getPatientRecord(@PathVariable Long patientID) {
+    public ResponseEntity<PatientRecordDTO> getPatientRecord(@PathVariable("id") Long patientID) {
         
         // gets the record using the service using the User ID
         return ResponseEntity.ok(patientRecordService.getPatientRecord(patientID));
@@ -57,29 +62,13 @@ public class PatientRecordController {
 
     // method to create a patient record (patient user + optional allergies)
     @PostMapping("/")
-    public ResponseEntity<PatientRecordDTO> createPatientRecord(@RequestBody PatientRegistrationRequest request) {
-
-        if (request.getUsername() == null || request.getUsername().isBlank()) {
-            throw new RuntimeException("Username required");
-        }
-        if (request.getFirstName() == null || request.getLastName() == null) {
-            throw new RuntimeException("First and last name required");
-        }
-        if (request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new RuntimeException("Email required");
-        }
-        if (request.getPhoneNumber() == null || request.getPhoneNumber().isBlank()) {
-            throw new RuntimeException("Phone number required");
-        }
-        if (request.getDateOfBirth() == null || request.getDateOfBirth().isBlank()) {
-            throw new RuntimeException("Date of birth required");
-        }
+    public ResponseEntity<PatientRecordDTO> createPatientRecord(@Valid @RequestBody PatientRegistrationRequest request) {
 
         // Build User entity
         User userTemplate = new User();
         userTemplate.setUsername(request.getUsername());
-        // password hashing not yet implemented; store plain via setPassword (sets passwordHash internally)
-        userTemplate.setPassword(request.getPassword() == null ? "tempPass123" : request.getPassword());
+        String rawPassword = (request.getPassword() == null || request.getPassword().isBlank()) ? "tempPass123" : request.getPassword();
+        userTemplate.setPassword(passwordEncoder.encode(rawPassword));
         userTemplate.setRole(Role.PATIENT); // registering a patient
         userTemplate.setFirstName(request.getFirstName());
         userTemplate.setLastName(request.getLastName());

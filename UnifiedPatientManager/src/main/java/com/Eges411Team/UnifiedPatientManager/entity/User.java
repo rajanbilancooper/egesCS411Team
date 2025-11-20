@@ -67,7 +67,7 @@ public class User {
     //every user has an address
     private String address;
 
-    @Column(name = "email", length = 50, nullable = false)
+    @Column(name = "email", length = 50, nullable = false, unique = true)
     //every user has an email
     private String email;
 

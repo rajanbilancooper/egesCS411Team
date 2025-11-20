@@ -63,7 +63,12 @@ export default function PatientRegistrationPage() {
     try {
       const payload = { ...form, allergies: allergies };
       const res = await client.post("/api/patients/", payload);
-      setSuccessId(res.data.patientId);
+      const pid = res.data.patientId;
+      setSuccessId(pid);
+      // immediate redirect after short delay for user feedback
+      setTimeout(() => {
+        navigate(`/patients/${pid}`);
+      }, 600);
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Registration failed");
     }
