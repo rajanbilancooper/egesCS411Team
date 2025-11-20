@@ -2,6 +2,7 @@ package com.Eges411Team.UnifiedPatientManager.entity;
 
 import java.sql.Blob;
 import java.time.LocalDateTime;
+import
 
 // this will be a class for users in the system
 import jakarta.persistence.*;
