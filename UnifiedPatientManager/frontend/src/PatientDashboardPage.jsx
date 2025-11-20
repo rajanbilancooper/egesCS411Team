@@ -9,9 +9,15 @@ export default function PatientDashboardPage() {
 
   useEffect(() => {
     const load = async () => {
-      // using mocked API for now
-      const res = await patientApi.getPatientById(1);
-      setPatient(res.data);
+      // using real backend API; handle errors so the UI doesn't break
+      try {
+        const res = await patientApi.getPatientById(1);
+        setPatient(res.data);
+      } catch (err) {
+        console.error("Failed to load patient", err);
+        // show a simple fallback error instead of blank page
+        setPatient({ fullName: "(Error loading patient)", id: 1 });
+      }
     };
     load();
   }, []);

@@ -1,26 +1,64 @@
 // src/pages/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "./api/authApi"; // you already made this
+import { authApi } from "./api/authApi";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+    const [info, setInfo] = useState("");
   const navigate = useNavigate();
+  const [step, setStep] = useState("login"); // 'login' or 'verify'
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      const res = await authApi.login({ username, password });
-      // adjust to whatever your backend returns
-      localStorage.setItem("accessToken", res.token);
-      // temp: just go to patient with id 1 (you can make this dynamic later)
-      navigate("/patients/1");
+      setError("");
+      console.log("Submitting login", { username, password });
+      const res = await authApi.login({ username, password, rememberMe: false });
+      console.log("Login response", res);
+      // backend sends OTP to user email, and returns some user info (no token yet)
+      setStep("verify");
+      setInfo("OTP sent to your email. Please check your inbox.");
     } catch (err) {
-      setError("Invalid username or password");
+      const msg = err?.response?.data?.message || err?.response?.data || err.message || "Invalid username or password";
+      setError(msg);
+      setInfo("");
+    }
+    setLoading(false);
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+      setInfo("");
+    try {
+      console.log("Verifying OTP", { username, otp });
+      const res = await authApi.verify({ username, otpCode: otp });
+      console.log("Verify response", res);
+      localStorage.setItem("accessToken", res.data.token);
+      // set token in axios interceptor already, so next requests include it
+      navigate(`/patients/${res.data.userId || 1}`);
+    } catch (err) {
+      const msg = err?.response?.data?.message || err?.response?.data || err.message || "Invalid OTP or verification failed";
+      setError(msg);
+    }
+    setLoading(false);
+  };
+
+  const handleResend = async () => {
+    setError("");
+    try {
+      await authApi.resendOtp({ username });
+    } catch (err) {
+      setError(err.response?.data || "Failed to resend OTP");
     }
   };
 
@@ -65,21 +103,55 @@ export default function LoginPage() {
                 <span>Remember Me</span>
               </label>
             </div>
-
+            {info && <p className="upm-login-info">{info}</p>}
             {error && <p className="upm-login-error">{error}</p>}
 
-            <div className="upm-login-buttons">
-              <button type="submit" className="upm-login-btn-primary">
-                Log In
-              </button>
-              <button
-                type="button"
-                className="upm-login-btn-secondary"
-                onClick={() => navigate("/register")}
-              >
-                Register
-              </button>
-            </div>
+            {step === "login" && (
+                <div className="upm-login-buttons">
+                  <button type="submit" className="upm-login-btn-primary" disabled={loading}>
+                  Continue (send OTP)
+                </button>
+                <button
+                  type="button"
+                  className="upm-login-btn-secondary"
+                  onClick={() => navigate("/register")}
+                >
+                  Register
+                </button>
+              </div>
+            )}
+
+            {step === "verify" && (
+              <>
+                <label className="upm-login-label">
+                  <span>OTP Code</span>
+                  <input
+                    className="upm-login-input"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="123456"
+                    autoComplete="one-time-code"
+                  />
+                </label>
+                <div className="upm-login-buttons">
+                  <button type="button" onClick={handleVerify} className="upm-login-btn-primary">
+                    Verify OTP
+                  </button>
+                  <button
+                    onClick={() => setStep("login")}
+                    type="button"
+                    className="upm-login-btn-secondary"
+                  >
+                    Back
+                  </button>
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <button className="upm-login-forgot" onClick={handleResend}>
+                    Resend OTP
+                  </button>
+                </div>
+              </>
+            )}
 
             <button
               type="button"
