@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { patientApi } from "./api/patientApi";
 import NotesPanel from "./NotesPanel";
+import PrescriptionPanel from "./PrescriptionPanel";
 import ApiConnectivityBadge from "./ApiConnectivityBadge";
 
 export default function PatientDashboardPage() {
@@ -269,9 +270,7 @@ export default function PatientDashboardPage() {
 
         {/* other tabs can be placeholders for now */}
         {activeTab === "prescriptions" && (
-          <div className="upm-card" style={{ marginTop: "16px" }}>
-            Prescription History coming soon…
-          </div>
+          <PrescriptionPanel patientId={patient.id || patient.patientId || patientId || 1} />
         )}
         {activeTab === "vaccines" && (
           <div className="upm-card" style={{ marginTop: "16px" }}>

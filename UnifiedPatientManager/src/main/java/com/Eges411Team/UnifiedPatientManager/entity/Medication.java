@@ -40,6 +40,10 @@ public class Medication{
     @Column (name = "notes")
     private String notes;
 
+    // Route of administration (oral, IV, IM, topical, etc.)
+    @Column(name = "route", length = 40)
+    private String route;
+
     @Column (name = "timestamp")
     private LocalDateTime timestamp;
 
@@ -48,4 +52,16 @@ public class Medication{
 
     @Column (name = "is_perscription")
     private Boolean isPerscription;
+
+    // Conflict tracking (simple audit of prescription decision)
+    @Column(name = "conflict_flag")
+    private Boolean conflictFlag; // true if conflicts were detected when added
+
+    @Lob
+    @Column(name = "conflict_details")
+    private String conflictDetails; // concatenated conflict messages
+
+    @Lob
+    @Column(name = "override_justification")
+    private String overrideJustification; // doctor's reason for override
 }

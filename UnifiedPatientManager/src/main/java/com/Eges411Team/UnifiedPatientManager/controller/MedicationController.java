@@ -2,6 +2,7 @@ package com.Eges411Team.UnifiedPatientManager.controller;
 
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.MedicationRequest;
 import com.Eges411Team.UnifiedPatientManager.DTOs.responses.MedicationResponse;
+import com.Eges411Team.UnifiedPatientManager.DTOs.responses.PrescriptionResultResponse;
 import com.Eges411Team.UnifiedPatientManager.entity.Medication;
 import com.Eges411Team.UnifiedPatientManager.DTOs.mappers.MedicationMapper;
 import com.Eges411Team.UnifiedPatientManager.services.MedicationService;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/default/patient")
+@RequestMapping({"/default/patient", "/api/patients"})
 public class MedicationController {
 
     private final MedicationService medicationService;
@@ -56,11 +57,9 @@ public class MedicationController {
         Long patientId
     ) {
         List<Medication> medications = medicationService.getMedicationsByPatientId(patientId);
-
         List<MedicationResponse> response = medications.stream()
             .map(MedicationMapper::toResponseDto)
             .collect(Collectors.toList());
-
         return ResponseEntity.ok(response);
     }
 
@@ -87,63 +86,59 @@ public class MedicationController {
         List<MedicationResponse> response = saved.stream()
             .map(MedicationMapper::toResponseDto)
             .collect(Collectors.toList());
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/{patient_id}/providers/{provider_id}/prescriptions")
+    @Operation(summary = "Create a single prescription with conflict check and optional override")
+    public ResponseEntity<PrescriptionResultResponse> createPrescription(
+        @RequestBody MedicationRequest medicationDto,
+        @PathVariable("patient_id") @Parameter(example = "3") Long patientId,
+        @PathVariable("provider_id") @Parameter(example = "10") Long providerId
+    ) {
+        Medication entity = MedicationMapper.toEntity(medicationDto);
+        PrescriptionResultResponse result = medicationService.createSinglePrescription(
+            patientId,
+            providerId,
+            entity,
+            Boolean.TRUE.equals(medicationDto.getOverride()),
+            medicationDto.getOverrideJustification()
+        );
+        HttpStatus status = result.getPrescription() == null ? HttpStatus.OK : HttpStatus.CREATED;
+        return ResponseEntity.status(status).body(result);
     }
 
     @PutMapping("/{patient_id}/providers/{provider_id}/medications/{medication_id}")
     @Operation(summary = "Update a specific medication for a patient and provider")
     public ResponseEntity<MedicationResponse> update(
         @RequestBody MedicationRequest medicationDto,
-        @PathVariable("patient_id")
-        @Parameter(example = "3")
-        Long patientId,
-        @PathVariable("provider_id")
-        @Parameter(example = "10")
-        Long providerId,
-        @PathVariable("medication_id")
-        @Parameter(example = "1")
-        Long medicationId
+        @PathVariable("patient_id") @Parameter(example = "3") Long patientId,
+        @PathVariable("provider_id") @Parameter(example = "10") Long providerId,
+        @PathVariable("medication_id") @Parameter(example = "1") Long medicationId
     ) {
         Medication updatedEntity = MedicationMapper.toEntity(medicationDto);
-
-        Medication updated = medicationService.updateMedication(
-            patientId,
-            providerId,
-            medicationId,
-            updatedEntity
-        );
-
+        Medication updated = medicationService.updateMedication(patientId, providerId, medicationId, updatedEntity);
         MedicationResponse response = MedicationMapper.toResponseDto(updated);
-
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{patient_id}/medications/refresh")
     @Operation(summary = "Refresh a patient's medication list")
     public ResponseEntity<List<MedicationResponse>> refresh(
-        @PathVariable("patient_id")
-        @Parameter(example = "3")
-        Long patientId
+        @PathVariable("patient_id") @Parameter(example = "3") Long patientId
     ) {
         List<Medication> refreshed = medicationService.refreshMedications(patientId);
-
         List<MedicationResponse> response = refreshed.stream()
             .map(MedicationMapper::toResponseDto)
             .collect(Collectors.toList());
-
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{patient_id}/medications/{medication_id}")
     @Operation(summary = "Delete a specific medication for a patient")
     public ResponseEntity<HttpStatus> delete(
-        @PathVariable("patient_id")
-        @Parameter(example = "3")
-        Long patientId,
-        @PathVariable("medication_id")
-        @Parameter(example = "1")
-        Long medicationId
+        @PathVariable("patient_id") @Parameter(example = "3") Long patientId,
+        @PathVariable("medication_id") @Parameter(example = "1") Long medicationId
     ) {
         medicationService.deleteMedication(patientId, medicationId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

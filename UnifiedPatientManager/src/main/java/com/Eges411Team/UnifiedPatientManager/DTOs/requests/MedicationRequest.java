@@ -34,6 +34,9 @@ public class MedicationRequest {
     @JsonProperty("notes")
     private String notes;
 
+    @JsonProperty("route")
+    private String route;
+
     @JsonProperty("timestamp")
     private LocalDateTime timestamp;
 
@@ -42,5 +45,11 @@ public class MedicationRequest {
 
     @JsonProperty("is_perscription")
     private Boolean isPerscription;
+
+    @JsonProperty("override")
+    private Boolean override; // request override if conflicts
+
+    @JsonProperty("override_justification")
+    private String overrideJustification; // reason provided by doctor
 }
 

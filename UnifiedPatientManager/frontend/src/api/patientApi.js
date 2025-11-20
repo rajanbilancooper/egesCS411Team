@@ -65,4 +65,24 @@ export const patientApi = {
   // DELETE /api/patients/{patientId}/notes/{noteId}
   deleteNote: (patientId, noteId) =>
     client.delete(`/api/patients/${patientId}/notes/${noteId}`),
+
+  // ---- Medications / Prescriptions ----
+
+  // GET /api/patients/{patientId}/medications
+  getMedications: (patientId) =>
+    client.get(`/api/patients/${patientId}/medications`),
+
+  // POST /api/patients/{patientId}/providers/{providerId}/prescriptions
+  // Creates a single prescription with conflict check
+  // payload: { drug_name, dose, frequency, duration, route, notes, override?, override_justification? }
+  createPrescription: (patientId, providerId, payload) =>
+    client.post(`/api/patients/${patientId}/providers/${providerId}/prescriptions`, payload),
+
+  // PUT /api/patients/{patientId}/providers/{providerId}/medications/{medicationId}
+  updateMedication: (patientId, providerId, medicationId, payload) =>
+    client.put(`/api/patients/${patientId}/providers/${providerId}/medications/${medicationId}`, payload),
+
+  // DELETE /api/patients/{patientId}/medications/{medicationId}
+  deleteMedication: (patientId, medicationId) =>
+    client.delete(`/api/patients/${patientId}/medications/${medicationId}`),
 };
