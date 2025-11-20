@@ -4,6 +4,7 @@ import { patientApi } from "./api/patientApi";
 import NotesPanel from "./NotesPanel";
 import PrescriptionPanel from "./PrescriptionPanel";
 import AllergyPanel from "./AllergyPanel";
+import MedicalHistoryPanel from "./MedicalHistoryPanel";
 import ApiConnectivityBadge from "./ApiConnectivityBadge";
 
 export default function PatientDashboardPage() {
@@ -289,6 +290,13 @@ export default function PatientDashboardPage() {
           </button>
 
           <button
+            className={`upm-tab ${activeTab === "diagnoses" ? "upm-tab-active" : ""}`}
+            onClick={() => handleTabClick("diagnoses")}
+          >
+            Diagnoses
+          </button>
+
+          <button
             className={`upm-tab ${activeTab === "record" ? "upm-tab-active" : ""}`}
             onClick={() => handleTabClick("record")}
           >
@@ -515,6 +523,9 @@ export default function PatientDashboardPage() {
           <div className="upm-card" style={{ marginTop: "16px" }}>
             Patient History coming soon…
           </div>
+        )}
+        {activeTab === "diagnoses" && (
+          <MedicalHistoryPanel patientId={patient.id || patient.patientId || patientId || 1} onChange={refreshPatientData} />
         )}
       </main>
     </div>

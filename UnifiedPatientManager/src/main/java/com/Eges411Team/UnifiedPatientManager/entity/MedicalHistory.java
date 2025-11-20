@@ -15,7 +15,7 @@ import lombok.Setter;
 public class MedicalHistory {
 
     @Id
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/default/patient")
+@RequestMapping({"/default/patient", "/api/patients"})
 public class MedicalHistoryController {
 
     private final MedicalHistoryService medicalHistoryService;
@@ -86,14 +86,13 @@ public class MedicalHistoryController {
 
     // Convert the saved entity to a Response DTO
     MedicalHistoryResponseDTO responseDTO = new MedicalHistoryResponseDTO();
-
-            saved.getId();
-            saved.getPatientId();
-            saved.getDoctorId();
-            saved.getDiagnosis();
-            saved.getFrequency();
-            saved.getStartDate();
-            saved.getEndDate();
+    responseDTO.setId(saved.getId() == null ? null : saved.getId().intValue());
+    responseDTO.setPatient_id(saved.getPatientId() == null ? null : saved.getPatientId().intValue());
+    responseDTO.setDoctor_id(saved.getDoctorId() == null ? null : saved.getDoctorId().intValue());
+    responseDTO.setDiagnosis(saved.getDiagnosis());
+    responseDTO.setFrequency(saved.getFrequency());
+    responseDTO.setStart_date(saved.getStartDate());
+    responseDTO.setEnd_date(saved.getEndDate());
 
     // Return a created response with the saved record
     return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);

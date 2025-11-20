@@ -40,6 +40,10 @@ export const patientApi = {
   // GET /api/patients/{patientId}/medicalhistory
   getMedicalHistory: (patientId) =>
     client.get(`/api/patients/${patientId}/medicalhistory`),
+  
+  // POST /api/patients/{patientId}/medicalhistory
+  createMedicalHistory: (patientId, payload) =>
+    client.post(`/api/patients/${patientId}/medicalhistory`, payload),
 
   // GET /api/patients/{patientId}/allergies
   getAllergies: (patientId) =>

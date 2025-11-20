@@ -2,7 +2,6 @@ package com.Eges411Team.UnifiedPatientManager.DTOs.requests;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +16,10 @@ import java.util.Date;
 @Schema(description = "Request DTO for creating or updating a patient's medical history record")
 public class MedicalHistoryRequestDTO {
 
-    @NotNull(message = "Patient ID is required")
-    @Schema(example = "3", description = "ID of the patient associated with this medical record")
+    @Schema(example = "3", description = "ID of the patient associated with this medical record (optional when provided in the URL)")
     private Long patient_id;
 
-    @NotNull(message = "Doctor ID is required")
-    @Schema(example = "5", description = "ID of the doctor who created or managed this record")
+    @Schema(example = "5", description = "ID of the doctor who created or managed this record (optional)")
     private Long doctor_id;
 
     @NotBlank(message = "Diagnosis cannot be blank")
