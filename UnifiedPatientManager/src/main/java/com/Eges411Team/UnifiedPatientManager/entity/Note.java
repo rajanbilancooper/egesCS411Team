@@ -1,16 +1,13 @@
 package com.Eges411Team.UnifiedPatientManager.entity;
 
-import java.sql.Blob;
 import java.time.LocalDateTime;
-import
+import java.sql.Blob;
 
 // this will be a class for users in the system
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-
-/** @author emilygoyal */
 @Entity
 @Table(name = "note")
 @Getter
@@ -30,9 +27,18 @@ public class Note{
     @Column (name = "note_type")
     private Blob noteType;
 
+    @Lob
     @Column (name = "content")
     private Blob content;
 
     @Column (name = "timestamp")
     private LocalDateTime timestamp;
+
+    @Column (name = "attachment_name")
+    private String attachmentName;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "attachment_data")
+    private byte[] attachmentData;
 }
