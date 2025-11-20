@@ -1,4 +1,3 @@
-// src/NotesPanel.jsx
 import React, { useEffect, useState } from "react";
 import { patientApi } from "./api/patientApi"; // adjust path if needed
 
@@ -6,35 +5,60 @@ export default function NotesPanel({ patientId }) {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [error, setError] = useState(null);
 
-  // load existing notes (mocked API for now)
+  // load existing notes from real backend
   useEffect(() => {
     const load = async () => {
+      setFetching(true);
+      setError(null);
       try {
         const res = await patientApi.getNotes(patientId);
-        setNotes(res.data || []);
+        console.log("NOTES FROM API:", res.data);
+        // axios returns data under res.data
+        setNotes(Array.isArray(res.data) ? res.data : []);
       } catch (e) {
         console.error("Failed to load notes", e);
+        setError(
+          e?.response?.data?.message ||
+            e?.response?.statusText ||
+            e?.message ||
+            "Failed to load notes"
+        );
+      } finally {
+        setFetching(false);
       }
     };
-    load();
+
+    if (patientId != null) load();
   }, [patientId]);
 
   const handleSave = async () => {
     if (!newNote.trim()) return;
 
     setLoading(true);
+    setError(null);
     try {
-      const res = await patientApi.createNote(patientId, {
+      const payload = {
         content: newNote,
         createdAt: new Date().toISOString(),
-      });
+      };
 
-      // append to history
-      setNotes((prev) => [res.data, ...prev]);
+      const res = await patientApi.createNote(patientId, payload);
+
+      // backend likely returns the saved note in res.data
+      const saved = res?.data ?? payload;
+      setNotes((prev) => [saved, ...prev]);
       setNewNote("");
     } catch (e) {
       console.error("Failed to save note", e);
+      setError(
+        e?.response?.data?.message ||
+          e?.response?.statusText ||
+          e?.message ||
+          "Failed to save note"
+      );
     } finally {
       setLoading(false);
     }
@@ -54,6 +78,10 @@ export default function NotesPanel({ patientId }) {
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Create Appointment Notes Here…"
         />
+        {error && (
+          <div style={{ color: "red", marginTop: 8 }}>Error: {error}</div>
+        )}
+
 
         <div className="upm-notes-buttons">
           <button className="upm-notes-btn-secondary" type="button">
@@ -79,7 +107,9 @@ export default function NotesPanel({ patientId }) {
         <div className="upm-divider" />
 
         <div className="upm-notes-history-list">
-          {notes.length === 0 && (
+          {fetching && <p>Loading notes…</p>}
+
+          {!fetching && notes.length === 0 && (
             <p className="upm-notes-empty">No notes yet for this patient.</p>
           )}
 

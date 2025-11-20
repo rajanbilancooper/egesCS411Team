@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from "react";
+import client from "./api/axiosClient";
 import { patientApi } from "./api/patientApi";
-import NotesPanel from "./NotesPanel"; // <-- make sure this path is right
-import ApiConnectivityBadge from "./ApiConnectivityBadge";
+import NotesPanel from "./NotesPanel";
+import { useParams } from "react-router-dom"; // <-- make sure this path is right
 
 export default function PatientDashboardPage() {
+  const { id: routeId } = useParams() || {};
+  const patientId = routeId ? Number(routeId) : 1;
+
   const [patient, setPatient] = useState(null);
   const [activeTab, setActiveTab] = useState("basic");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const handleTabClick = (tab) => {
+    console.log("switch tab ->", tab);
+   setActiveTab(tab);
+  };
 
-  useEffect(() => {
+   useEffect(() => {
     const load = async () => {
       // using real backend API; handle errors so the UI doesn't break
       try {
@@ -20,10 +31,18 @@ export default function PatientDashboardPage() {
       }
     };
     load();
-  }, []);
+  }, [patientId]);
+
+  if (loading) {
+    return <div style={{ padding: "2rem" }}>Loading...</div>;
+  }
+
+  if (error) {
+    return <div style={{ padding: "2rem", color: "red" }}>Error: {error}</div>;
+  }
 
   if (!patient) {
-    return <div style={{ padding: "2rem" }}>Loading...</div>;
+    return <div style={{ padding: "2rem" }}>No patient data</div>;
   }
 
   return (
@@ -48,42 +67,42 @@ export default function PatientDashboardPage() {
         <div className="upm-tabs">
           <button
             className={`upm-tab ${activeTab === "basic" ? "upm-tab-active" : ""}`}
-            onClick={() => setActiveTab("basic")}
+            onClick={() => handleTabClick("basic")}
           >
             Basic Information
           </button>
 
           <button
             className={`upm-tab ${activeTab === "prescriptions" ? "upm-tab-active" : ""}`}
-            onClick={() => setActiveTab("prescriptions")}
+            onClick={() => handleTabClick("prescriptions")}
           >
             Prescription History
           </button>
 
           <button
             className={`upm-tab ${activeTab === "vaccines" ? "upm-tab-active" : ""}`}
-            onClick={() => setActiveTab("vaccines")}
+            onClick={() => handleTabClick("vaccines")}
           >
             Vaccine record
           </button>
 
           <button
             className={`upm-tab ${activeTab === "appointments" ? "upm-tab-active" : ""}`}
-            onClick={() => setActiveTab("appointments")}
+            onClick={() => handleTabClick("appointments")}
           >
             Appointment history
           </button>
 
           <button
             className={`upm-tab ${activeTab === "notes" ? "upm-tab-active" : ""}`}
-            onClick={() => setActiveTab("notes")}
+            onClick={() => { console.log("switch tab -> notes"); handleTabClick("notes"); }}
           >
             Notes
           </button>
 
           <button
             className={`upm-tab ${activeTab === "history" ? "upm-tab-active" : ""}`}
-            onClick={() => setActiveTab("history")}
+            onClick={() => handleTabClick("history")}
           >
             Patient History
           </button>
