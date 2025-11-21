@@ -12,10 +12,16 @@ import client from "./axiosClient";
  *   console.log(res.data);
  */
 export const patientApi = {
-  // GET /default/patient/search?name=...
-  searchByName: (name) =>
-    client.get("/default/patient/search", {
-      params: { name },
+  // GET /api/patients/searchMany?query=... (partial matches on first or last name)
+  searchByName: (query) =>
+    client.get("/api/patients/searchMany", {
+      params: { query },
+    }),
+
+  // GET /api/patients/search?fullName=... (exact full name match: first + last)
+  searchByFullName: (fullName) =>
+    client.get("/api/patients/search", {
+      params: { fullName },
     }),
 
   // GET /api/patients/{id}
@@ -39,10 +45,22 @@ export const patientApi = {
   // GET /api/patients/{patientId}/medicalhistory
   getMedicalHistory: (patientId) =>
     client.get(`/api/patients/${patientId}/medicalhistory`),
+  
+  // POST /api/patients/{patientId}/medicalhistory
+  createMedicalHistory: (patientId, payload) =>
+    client.post(`/api/patients/${patientId}/medicalhistory`, payload),
 
   // GET /api/patients/{patientId}/allergies
   getAllergies: (patientId) =>
     client.get(`/api/patients/${patientId}/allergies`),
+
+  // POST /api/patients/{patientId}/allergies/add (single allergy without deleting existing)
+  createAllergy: (patientId, payload) =>
+    client.post(`/api/patients/${patientId}/allergies/add`, payload),
+
+  // DELETE /api/patients/{patientId}/allergies/{allergyId}
+  deleteAllergy: (patientId, allergyId) =>
+    client.delete(`/api/patients/${patientId}/allergies/${allergyId}`),
 
   // GET /api/patients/{patientId}/vaccines
   getVaccines: (patientId) =>

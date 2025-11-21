@@ -15,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 //Lets us log errrors 
 import org.slf4j.Logger;
@@ -117,6 +118,33 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse(combined));
+    }
+
+    // Handle ResponseStatusException (propagate its message cleanly instead of generic fallback)
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatus(ResponseStatusException ex) {
+        logger.warn("ResponseStatusException: status={}, reason={}", ex.getStatusCode(), ex.getReason());
+        String msg = ex.getReason();
+        if (msg == null || msg.isBlank()) {
+            msg = ex.getMessage();
+        }
+        return ResponseEntity.status(ex.getStatusCode())
+            .body(new ErrorResponse(msg));
+    }
+
+    // Fallback: any uncaught exception -> 500 with its message (if present)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
+        // Log the full exception class and stack trace for diagnostics
+        logger.error("Unhandled exception occurred: {} - {}", ex.getClass().getName(), ex.getMessage(), ex);
+
+        // Prefer the exception message, but if it's null/blank return the exception class name so frontend sees something actionable
+        String msg = ex.getMessage();
+        if (msg == null || msg.isBlank()) {
+            msg = ex.getClass().getSimpleName();
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(new ErrorResponse(msg));
     }
 
 }

@@ -15,7 +15,7 @@ import lombok.Setter;
 public class MedicalHistory {
 
     @Id
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -38,5 +38,17 @@ public class MedicalHistory {
     @Column(name = "end_date")
     @Temporal(TemporalType.DATE)
     private Date endDate;
+
+    @Column(name = "prescribe_medication")
+    private Boolean prescribeMedication;
+
+    // Null-safe getter to protect older rows that may still have NULL before migration
+    public Boolean getPrescribeMedication() {
+        return prescribeMedication != null ? prescribeMedication : Boolean.FALSE;
+    }
+
+    public void setPrescribeMedication(Boolean prescribeMedication) {
+        this.prescribeMedication = (prescribeMedication == null ? Boolean.FALSE : prescribeMedication);
+    }
 
 }

@@ -46,7 +46,7 @@ public class PatientRecordController {
 
     // method for updating a patientRecord
     @PutMapping("/{id}")
-    public ResponseEntity<PatientRecordDTO> updatePatientRecord(@PathVariable Long patientID, @RequestBody PatientRecordUpdateDTO recordUpdateDTO) {
+    public ResponseEntity<PatientRecordDTO> updatePatientRecord(@PathVariable("id") Long patientID, @RequestBody PatientRecordUpdateDTO recordUpdateDTO) {
 
         // updates the record using the service using the ID and the DTO
         return patientRecordService.updatePatientRecord(patientID, recordUpdateDTO);
@@ -58,6 +58,13 @@ public class PatientRecordController {
         
         // gets the record using the service using the full name
         return ResponseEntity.ok(patientRecordService.getPatientRecordByFullName(fullName));
+    }
+
+    // partial search returning list of patient records (basic info)
+    @GetMapping("/searchMany")
+    public ResponseEntity<List<PatientRecordDTO>> searchPatients(@RequestParam("query") String query) {
+        List<PatientRecordDTO> list = patientRecordService.searchPatients(query);
+        return ResponseEntity.ok(list);
     }
 
     // method to create a patient record (patient user + optional allergies)

@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/default/patient")
+@RequestMapping({"/default/patient", "/api/patients"})
 public class MedicalHistoryController {
 
     private final MedicalHistoryService medicalHistoryService;
@@ -80,20 +80,26 @@ public class MedicalHistoryController {
     medicalHistory.setFrequency(MHrequestDTO.getFrequency());
     medicalHistory.setStartDate(MHrequestDTO.getStart_date());
     medicalHistory.setEndDate(MHrequestDTO.getEnd_date());
+    // optional flag: whether to prompt for prescribing medication
+    if (MHrequestDTO.getPrescribe_medication() != null) {
+        medicalHistory.setPrescribeMedication(MHrequestDTO.getPrescribe_medication());
+    } else {
+        medicalHistory.setPrescribeMedication(false);
+    }
 
     // Save the entity using your service
     MedicalHistory saved = medicalHistoryService.saveMedicalHistory(medicalHistory);
 
     // Convert the saved entity to a Response DTO
     MedicalHistoryResponseDTO responseDTO = new MedicalHistoryResponseDTO();
-
-            saved.getId();
-            saved.getPatientId();
-            saved.getDoctorId();
-            saved.getDiagnosis();
-            saved.getFrequency();
-            saved.getStartDate();
-            saved.getEndDate();
+    responseDTO.setId(saved.getId() == null ? null : saved.getId().intValue());
+    responseDTO.setPatient_id(saved.getPatientId() == null ? null : saved.getPatientId().intValue());
+    responseDTO.setDoctor_id(saved.getDoctorId() == null ? null : saved.getDoctorId().intValue());
+    responseDTO.setDiagnosis(saved.getDiagnosis());
+    responseDTO.setFrequency(saved.getFrequency());
+    responseDTO.setStart_date(saved.getStartDate());
+    responseDTO.setEnd_date(saved.getEndDate());
+    responseDTO.setPrescribe_medication(saved.getPrescribeMedication());
 
     // Return a created response with the saved record
     return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);

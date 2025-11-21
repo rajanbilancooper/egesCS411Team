@@ -35,4 +35,7 @@ public class MedicalHistoryResponseDTO {
 
     @Schema(example = "2024-02-15", description = "End date of the medical condition or treatment (if applicable)")
     private Date end_date;
+
+    @Schema(example = "false", description = "Indicates whether a medication should be prescribed after this diagnosis")
+    private Boolean prescribe_medication;
 }

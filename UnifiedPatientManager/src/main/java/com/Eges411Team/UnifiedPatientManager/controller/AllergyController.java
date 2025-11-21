@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/default/patient")
+@RequestMapping({"/default/patient", "/api/patients"})
 public class AllergyController {
 
     private final AllergyService allergyService;
@@ -85,6 +85,20 @@ public class AllergyController {
             .map(AllergyMapper::toResponseDto)
             .collect(Collectors.toList());
 
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/{patient_id}/allergies/add")
+    @Operation(summary = "Add a single allergy to a patient (without deleting existing)")
+    public ResponseEntity<AllergyResponse> addSingle(
+        @RequestBody AllergyRequest allergyDto,
+        @PathVariable("patient_id")
+        @Parameter(example = "3")
+        Long patientId
+    ) {
+        Allergy entity = AllergyMapper.toEntity(allergyDto);
+        Allergy saved = allergyService.addSingleAllergy(patientId, entity);
+        AllergyResponse response = AllergyMapper.toResponseDto(saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,8 @@ public class PatientRecordService {
     private AllergyRepository allergyRepository;
     @Autowired
     private MedicationRepository medicationRepository;
+    
+    private static final Logger log = LoggerFactory.getLogger(PatientRecordService.class);
     @Autowired
     private MedicalHistoryRepo medicalHistoryRepository;
     @Autowired
@@ -109,9 +113,14 @@ public class PatientRecordService {
             historyDTO.setId(history.getId());
             historyDTO.setDoctorId(history.getDoctorId());
             historyDTO.setNotes(history.getDiagnosis());
-            if (history.getStartDate() != null) {
-                historyDTO.setStartDate(history.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
-            }
+                if (history.getStartDate() != null) {
+                    try {
+                        historyDTO.setStartDate(history.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+                    } catch (UnsupportedOperationException uoe) {
+                        // fallback for java.sql.Date implementations that don't support toInstant()
+                        historyDTO.setStartDate(java.time.Instant.ofEpochMilli(history.getStartDate().getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+                    }
+                }
             patientRecord.getMedicalHistory().add(historyDTO);
         }
 
@@ -136,6 +145,26 @@ public class PatientRecordService {
 
         // Reuse existing logic by ID (double fetch acceptable for simplicity)
         return getPatientRecord(user.getId());
+    }
+
+    // Search for patients by partial first or last name (case-insensitive)
+    public List<PatientRecordDTO> searchPatients(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        String q = query.trim();
+        List<User> users = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(q, q);
+        List<PatientRecordDTO> results = new ArrayList<>();
+        for (User u : users) {
+            PatientRecordDTO dto = new PatientRecordDTO();
+            dto.setPatientId(u.getId());
+            dto.setFirstName(u.getFirstName());
+            dto.setLastName(u.getLastName());
+            dto.setEmail(u.getEmail());
+            dto.setPhoneNumber(u.getPhoneNumber());
+            results.add(dto);
+        }
+        return results;
     }
 
     // Creation method to support patient record creation
@@ -462,9 +491,13 @@ public class PatientRecordService {
             historyDTO.setId(history.getId());
             historyDTO.setDoctorId(history.getDoctorId());
             historyDTO.setNotes(history.getDiagnosis());
-            if (history.getStartDate() != null) {
-                historyDTO.setStartDate(history.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
-            }
+                if (history.getStartDate() != null) {
+                    try {
+                        historyDTO.setStartDate(history.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+                    } catch (UnsupportedOperationException uoe) {
+                        historyDTO.setStartDate(java.time.Instant.ofEpochMilli(history.getStartDate().getTime()).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+                    }
+                }
             patientRecord.getMedicalHistory().add(historyDTO);
         }
 
