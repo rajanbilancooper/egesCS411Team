@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { patientApi } from "./api/patientApi";
+import { PRESCRIPTION_MEDICATIONS } from "./constants/medicalOptions";
 
 export default function PrescriptionPanel({ patientId }) {
   const [medications, setMedications] = useState([]);
@@ -177,13 +178,17 @@ export default function PrescriptionPanel({ patientId }) {
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: "0.5rem" }}>
               <label style={{ display: "block", fontWeight: "bold" }}>Drug Name *</label>
-              <input
-                type="text"
+              <select
                 value={drugName}
                 onChange={(e) => setDrugName(e.target.value)}
                 required
                 style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-              />
+              >
+                <option value="">-- Select medication --</option>
+                {PRESCRIPTION_MEDICATIONS.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
             </div>
             <div style={{ marginBottom: "0.5rem" }}>
               <label style={{ display: "block", fontWeight: "bold" }}>Dose *</label>

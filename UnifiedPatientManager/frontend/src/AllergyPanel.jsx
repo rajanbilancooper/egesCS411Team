@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { patientApi } from "./api/patientApi";
+import { ALLERGY_SUBSTANCES } from "./constants/medicalOptions";
 
 export default function AllergyPanel({ patientId, onAllergyChange }) {
   const [allergies, setAllergies] = useState([]);
@@ -9,6 +10,7 @@ export default function AllergyPanel({ patientId, onAllergyChange }) {
   // Form state
   const [showForm, setShowForm] = useState(false);
   const [substance, setSubstance] = useState("");
+  const [otherSubstance, setOtherSubstance] = useState("");
   const [reaction, setReaction] = useState("");
   const [severity, setSeverity] = useState("Low");
 
@@ -32,6 +34,7 @@ export default function AllergyPanel({ patientId, onAllergyChange }) {
 
   const resetForm = () => {
     setSubstance("");
+    setOtherSubstance("");
     setReaction("");
     setSeverity("Low");
     setShowForm(false);
@@ -40,8 +43,15 @@ export default function AllergyPanel({ patientId, onAllergyChange }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // If user selected "Other", require the otherSubstance text
+    const finalSubstance = substance === "Other" ? otherSubstance : substance;
+    if (!finalSubstance || finalSubstance.trim() === "") {
+      alert("Please select or enter an allergy substance.");
+      return;
+    }
+
     const payload = {
-      substance,
+      substance: finalSubstance,
       reaction,
       severity,
     };
@@ -113,14 +123,27 @@ export default function AllergyPanel({ patientId, onAllergyChange }) {
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: "0.5rem" }}>
               <label style={{ display: "block", fontWeight: "bold" }}>Substance *</label>
-              <input
-                type="text"
+              <select
                 value={substance}
                 onChange={(e) => setSubstance(e.target.value)}
                 required
-                placeholder="e.g., Penicillin, Peanuts"
                 style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-              />
+              >
+                <option value="">-- Select substance --</option>
+                {ALLERGY_SUBSTANCES.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+                <option value="Other">Other (specify)</option>
+              </select>
+              {substance === "Other" && (
+                <input
+                  type="text"
+                  value={otherSubstance}
+                  onChange={(e) => setOtherSubstance(e.target.value)}
+                  placeholder="Specify other substance, e.g., Peanuts"
+                  style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc", marginTop: "0.5rem" }}
+                />
+              )}
             </div>
             <div style={{ marginBottom: "0.5rem" }}>
               <label style={{ display: "block", fontWeight: "bold" }}>Reaction</label>

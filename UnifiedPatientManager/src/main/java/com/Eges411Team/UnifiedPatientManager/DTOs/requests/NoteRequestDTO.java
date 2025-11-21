@@ -21,7 +21,7 @@ public class NoteRequestDTO {
     // @Schema(example = "3", description = "ID of the patient associated with this note")
     // private Long patient_id;
 
-    @NotNull(message = "Doctor ID is required")
+    @NotBlank(message = "Doctor ID is required")
     @Schema(example = "5", description = "ID of the doctor who wrote the note")
     private Long doctorId;
 
