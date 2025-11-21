@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { patientApi } from "./api/patientApi";
+import { PRESCRIPTION_MEDICATIONS } from "./constants/medicalOptions";
 
 export default function PrescriptionPanel({ patientId }) {
   const [medications, setMedications] = useState([]);
@@ -57,7 +58,24 @@ export default function PrescriptionPanel({ patientId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    // Prevent adding an obvious duplicate prescription: same drug, dose, and frequency
+    try {
+      const normalizedDrug = (drugName || "").toString().trim().toLowerCase();
+
+      const isDuplicate = medications.some((m) => {
+        const mDrug = (m.drug_name || "").toString().trim().toLowerCase();
+        return mDrug === normalizedDrug;
+      });
+
+      if (isDuplicate) {
+        alert("A prescription for this drug already exists.\nIf you meant to add a different dosage/frequency, please edit or delete the existing prescription first.");
+        return;
+      }
+    } catch (dupCheckErr) {
+      // Non-fatal: if duplicate check fails for any reason, allow submission to proceed
+      console.warn("Duplicate check failed, proceeding:", dupCheckErr);
+    }
+
     const payload = {
       drug_name: drugName,
       dose,
@@ -177,13 +195,17 @@ export default function PrescriptionPanel({ patientId }) {
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: "0.5rem" }}>
               <label style={{ display: "block", fontWeight: "bold" }}>Drug Name *</label>
-              <input
-                type="text"
+              <select
                 value={drugName}
                 onChange={(e) => setDrugName(e.target.value)}
                 required
                 style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-              />
+              >
+                <option value="">-- Select medication --</option>
+                {PRESCRIPTION_MEDICATIONS.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
             </div>
             <div style={{ marginBottom: "0.5rem" }}>
               <label style={{ display: "block", fontWeight: "bold" }}>Dose *</label>
