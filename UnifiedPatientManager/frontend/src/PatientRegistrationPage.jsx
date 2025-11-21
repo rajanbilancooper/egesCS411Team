@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from "./api/axiosClient";
+import { ALLERGY_SUBSTANCES } from "./constants/medicalOptions";
 import "./PatientRegistrationPage.css";
 
 // NOTE: Backend create endpoint currently defined at @PostMapping("/api/patients/")
@@ -24,7 +25,8 @@ export default function PatientRegistrationPage() {
     weight: "",
   });
   const [allergies, setAllergies] = useState([]);
-  const [allergyDraft, setAllergyDraft] = useState({ substance: "", reaction: "", severity: "" });
+  const [allergyDraft, setAllergyDraft] = useState({ substance: "", reaction: "", severity: "Low" });
+  const [otherAllergy, setOtherAllergy] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [successId, setSuccessId] = useState(null);
@@ -36,9 +38,13 @@ export default function PatientRegistrationPage() {
 
   const addAllergy = (e) => {
     e.preventDefault();
-    if (!allergyDraft.substance) return;
-    setAllergies((list) => [...list, { ...allergyDraft }]);
-    setAllergyDraft({ substance: "", reaction: "", severity: "" });
+    const finalSubstance = allergyDraft.substance === "Other" ? otherAllergy : allergyDraft.substance;
+    if (!finalSubstance || finalSubstance.trim() === "") {
+      return;
+    }
+    setAllergies((list) => [...list, { substance: finalSubstance, reaction: allergyDraft.reaction, severity: allergyDraft.severity || "Low" }]);
+    setAllergyDraft({ substance: "", reaction: "", severity: "Low" });
+    setOtherAllergy("");
   };
 
   const removeAllergy = (idx) => {
@@ -141,9 +147,23 @@ export default function PatientRegistrationPage() {
           <div className="reg-section">
             <h3>Allergies (optional)</h3>
             <div className="reg-allergy-row">
-              <input placeholder="Substance" value={allergyDraft.substance} onChange={(e)=>setAllergyDraft(a=>({...a, substance:e.target.value}))} />
+              <select value={allergyDraft.substance} onChange={(e)=>setAllergyDraft(a=>({...a, substance:e.target.value}))}>
+                <option value="">-- Select substance --</option>
+                {ALLERGY_SUBSTANCES.map(s=> (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+                <option value="Other">Other (specify)</option>
+              </select>
+              {allergyDraft.substance === "Other" && (
+                <input placeholder="Specify other substance" value={otherAllergy} onChange={(e)=>setOtherAllergy(e.target.value)} />
+              )}
               <input placeholder="Reaction" value={allergyDraft.reaction} onChange={(e)=>setAllergyDraft(a=>({...a, reaction:e.target.value}))} />
-              <input placeholder="Severity" value={allergyDraft.severity} onChange={(e)=>setAllergyDraft(a=>({...a, severity:e.target.value}))} />
+              <select value={allergyDraft.severity} onChange={(e)=>setAllergyDraft(a=>({...a, severity:e.target.value}))}>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
               <button type="button" className="reg-add-btn" onClick={addAllergy}>Add</button>
             </div>
             {allergies.length > 0 && (
