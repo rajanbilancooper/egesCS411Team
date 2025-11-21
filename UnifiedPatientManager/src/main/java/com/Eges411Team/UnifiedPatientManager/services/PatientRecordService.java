@@ -3,6 +3,7 @@ package com.Eges411Team.UnifiedPatientManager.services;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
@@ -183,6 +184,10 @@ public class PatientRecordService {
         }
         if (userTemplate.getDateOfBirth() == null) {
             throw new RuntimeException("Date of birth is required");
+        }
+        // Validate date of birth is not in the future
+        if (userTemplate.getDateOfBirth().isAfter(LocalDateTime.now())) {
+            throw new RuntimeException("Date of birth cannot be in the future");
         }
         if (userTemplate.getPhoneNumber() == null || userTemplate.getPhoneNumber().isBlank()) {
             throw new RuntimeException("Phone number is required");
