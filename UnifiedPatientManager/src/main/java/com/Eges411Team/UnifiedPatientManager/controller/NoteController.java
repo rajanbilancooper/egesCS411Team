@@ -103,8 +103,8 @@ public class NoteController {
         ) throws IOException {
 
         Note updated = new Note();
-        updated.setDoctorId(noteRequestDTO.getDoctor_id());
-        updated.setNoteType(noteRequestDTO.getNote_type());
+        updated.setDoctorId(noteRequestDTO.getDoctorId());
+        updated.setNoteType(noteRequestDTO.getNoteType());
         updated.setContent(noteRequestDTO.getContent());
         updated.setTimestamp(noteRequestDTO.getTimestamp());
 
