@@ -58,7 +58,24 @@ export default function PrescriptionPanel({ patientId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    // Prevent adding an obvious duplicate prescription: same drug, dose, and frequency
+    try {
+      const normalizedDrug = (drugName || "").toString().trim().toLowerCase();
+
+      const isDuplicate = medications.some((m) => {
+        const mDrug = (m.drug_name || "").toString().trim().toLowerCase();
+        return mDrug === normalizedDrug;
+      });
+
+      if (isDuplicate) {
+        alert("A prescription for this drug already exists.\nIf you meant to add a different dosage/frequency, please edit or delete the existing prescription first.");
+        return;
+      }
+    } catch (dupCheckErr) {
+      // Non-fatal: if duplicate check fails for any reason, allow submission to proceed
+      console.warn("Duplicate check failed, proceeding:", dupCheckErr);
+    }
+
     const payload = {
       drug_name: drugName,
       dose,
