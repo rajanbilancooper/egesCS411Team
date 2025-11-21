@@ -133,6 +133,62 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+			<!-- JaCoCo code coverage plugin: prepares agent before tests and generates report at verify -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.10</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<!-- check execution prints coverage percentages to the console; configured with 0 minimum so it won't fail the build -->
+					<execution>
+						<id>check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<haltOnFailure>false</haltOnFailure>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<!-- LINE is the closest metric to statement coverage -->
+										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.00</minimum>
+										</limit>
+										<!-- also report instruction and branch percentages -->
+										<limit>
+											<counter>INSTRUCTION</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.00</minimum>
+										</limit>
+										<limit>
+											<counter>BRANCH</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.00</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -144,6 +200,28 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<!-- Print a compact coverage summary to the console after reports are generated -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>print-coverage-summary</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>bash</executable>
+							<arguments>
+								<argument>-lc</argument>
+								<argument>if [ -f target/site/jacoco/jacoco.csv ]; then awk -F, 'NR&gt;1 {i_m+=$4; i_c+=$5; b_m+=$6; b_c+=$7; l_m+=$8; l_c+=$9} END {if(i_m+i_c&gt;0) printf "INSTR: %.2f%% (%d/%d)\n", i_c*100/(i_m+i_c), i_c, i_m+i_c; if(b_m+b_c&gt;0) printf "BR:    %.2f%% (%d/%d)\n", b_c*100/(b_m+b_c), b_c, b_m+b_c; if(l_m+l_c&gt;0) printf "LINE:  %.2f%% (%d/%d)\n", l_c*100/(l_m+l_c), l_c, l_m+l_c }' target/site/jacoco/jacoco.csv; else echo "No jacoco.csv found"; fi</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
