@@ -248,6 +248,26 @@ public class MedicationService {
     public PrescriptionResultResponse createSinglePrescription(Long patientId, Long providerId, Medication medication, boolean overrideRequested, String overrideJustification) {
         medication.setPatientId(patientId);
         medication.setDoctorId(providerId);
+        // Duplicate medication check: if the same drug name already exists in patient's history,
+        // treat it as a conflict that can be overridden with justification.
+        List<Medication> existingMeds = medicationRepository.findAllByPatientId(patientId);
+        String drugName = medication.getDrugName();
+        if (drugName != null) {
+            for (Medication e : existingMeds) {
+                if (e.getDrugName() != null && e.getDrugName().equalsIgnoreCase(drugName)) {
+                    String dupMsg = "Duplicate medication exists: '" + drugName + "' already in patient history";
+                    if (!overrideRequested) {
+                        return new PrescriptionResultResponse(true, List.of(dupMsg), null);
+                    } else {
+                        medication.setConflictFlag(true);
+                        medication.setConflictDetails(dupMsg);
+                        medication.setOverrideJustification(overrideJustification);
+                        break;
+                    }
+                }
+            }
+        }
+
         List<String> conflicts = collectConflicts(patientId, medication);
         if (!conflicts.isEmpty() && !overrideRequested) {
             return new PrescriptionResultResponse(true, conflicts, null);
