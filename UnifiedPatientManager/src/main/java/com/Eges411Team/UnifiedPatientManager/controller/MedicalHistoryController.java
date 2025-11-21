@@ -80,6 +80,12 @@ public class MedicalHistoryController {
     medicalHistory.setFrequency(MHrequestDTO.getFrequency());
     medicalHistory.setStartDate(MHrequestDTO.getStart_date());
     medicalHistory.setEndDate(MHrequestDTO.getEnd_date());
+    // optional flag: whether to prompt for prescribing medication
+    if (MHrequestDTO.getPrescribe_medication() != null) {
+        medicalHistory.setPrescribeMedication(MHrequestDTO.getPrescribe_medication());
+    } else {
+        medicalHistory.setPrescribeMedication(false);
+    }
 
     // Save the entity using your service
     MedicalHistory saved = medicalHistoryService.saveMedicalHistory(medicalHistory);
@@ -93,6 +99,7 @@ public class MedicalHistoryController {
     responseDTO.setFrequency(saved.getFrequency());
     responseDTO.setStart_date(saved.getStartDate());
     responseDTO.setEnd_date(saved.getEndDate());
+    responseDTO.setPrescribe_medication(saved.getPrescribeMedication());
 
     // Return a created response with the saved record
     return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { patientApi } from "./api/patientApi";
 
-export default function MedicalHistoryPanel({ patientId, onChange }) {
+export default function MedicalHistoryPanel({ patientId, onChange, onPrescribeRequested }) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -12,6 +12,7 @@ export default function MedicalHistoryPanel({ patientId, onChange }) {
   const [frequency, setFrequency] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [prescribeMedication, setPrescribeMedication] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
@@ -44,6 +45,7 @@ export default function MedicalHistoryPanel({ patientId, onChange }) {
         frequency,
         start_date: startDate || null,
         end_date: endDate || null,
+        prescribe_medication: prescribeMedication === true,
       };
       const res = await patientApi.createMedicalHistory(patientId, payload);
       // reload list
@@ -56,6 +58,10 @@ export default function MedicalHistoryPanel({ patientId, onChange }) {
       setEndDate("");
       // notify parent if provided
       if (onChange) onChange();
+      // if user requested prescribing a medication, inform parent to switch to prescriptions
+      if (prescribeMedication && typeof onPrescribeRequested === 'function') {
+        onPrescribeRequested();
+      }
     } catch (err) {
       console.error("Failed to create medical history", err);
       setSaveError(err?.response?.data?.message || err?.message || "Failed to save record");
@@ -72,7 +78,7 @@ export default function MedicalHistoryPanel({ patientId, onChange }) {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <input placeholder="Doctor ID (optional)" value={doctorId} onChange={(e) => setDoctorId(e.target.value)} style={{ width: 120 }} />
           <input placeholder="Diagnosis (required)" value={diagnosis} onChange={(e) => setDiagnosis(e.target.value)} style={{ width: 240 }} required />
-          <input placeholder="Frequency" value={frequency} onChange={(e) => setFrequency(e.target.value)} style={{ width: 140 }} />
+          <input placeholder="Frequency (required)" value={frequency} onChange={(e) => setFrequency(e.target.value)} style={{ width: 140 }} required />
           <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             Start
             <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
@@ -80,6 +86,10 @@ export default function MedicalHistoryPanel({ patientId, onChange }) {
           <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             End
             <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8 }}>
+            <input type="checkbox" checked={prescribeMedication} onChange={(e) => setPrescribeMedication(e.target.checked)} />
+            <span style={{ fontSize: 13 }}>Also prescribe a medication?</span>
           </label>
           <button className="upm-tab" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Add Diagnosis'}</button>
         </div>

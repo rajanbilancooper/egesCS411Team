@@ -73,45 +73,64 @@ export default function PatientDashboardPage() {
 
   // Perform debounced search when searchTerm changes
   useEffect(() => {
-    if (!searchTerm || searchTerm.trim().length < 2) {
+    if (!searchTerm || searchTerm.trim().length < 1) {
       setSearchResults([]);
       setShowResults(false);
       setSearchError(null);
       return;
     }
-    if (searchDebounceId) {
-      clearTimeout(searchDebounceId);
-    }
-    const id = setTimeout(async () => {
+
+    let timer = setTimeout(async () => {
       setSearchLoading(true);
       setSearchError(null);
+      const term = searchTerm.trim();
       try {
-        const res = await patientApi.searchByName(searchTerm.trim());
-        const data = res.data;
-        let list = [];
-        if (Array.isArray(data)) {
-          list = data.map(p => ({
-            id: p.patientId ?? p.id,
-            name: p.fullName || (p.firstName ? `${p.firstName} ${p.lastName || ""}`.trim() : (p.username || "Unknown"))
-          }));
-        } else if (data && typeof data === 'object') {
-          list = [{
-            id: data.patientId ?? data.id,
-            name: data.fullName || (data.firstName ? `${data.firstName} ${data.lastName || ""}`.trim() : (data.username || "Unknown"))
-          }];
+        const tasks = [];
+        tasks.push(patientApi.searchByName(term));
+        const wantFull = term.includes(" ");
+        if (wantFull) tasks.push(patientApi.searchByFullName(term));
+
+        const settled = await Promise.allSettled(tasks);
+        const partialRes = settled[0].status === 'fulfilled' ? settled[0].value : null;
+        const fullRes = (wantFull && settled[1] && settled[1].status === 'fulfilled') ? settled[1].value : null;
+        const fullErr = (wantFull && settled[1] && settled[1].status === 'rejected') ? settled[1].reason : null;
+
+        const partialData = partialRes && Array.isArray(partialRes.data) ? partialRes.data : [];
+        let fullData = [];
+        if (fullRes) {
+          if (Array.isArray(fullRes.data)) fullData = fullRes.data; else if (fullRes.data) fullData = [fullRes.data];
         }
+
+        const mergedMap = new Map();
+        [...partialData, ...fullData].forEach(p => {
+            const pid = p.patientId ?? p.id;
+            if (!mergedMap.has(pid)) mergedMap.set(pid, p);
+        });
+        const list = Array.from(mergedMap.values()).map(p => ({
+          id: p.patientId ?? p.id,
+          name: (p.firstName ? `${p.firstName} ${p.lastName || ""}`.trim() : (p.username || "Unknown")),
+          exact: fullData.some(fd => (fd.patientId ?? fd.id) === (p.patientId ?? p.id))
+        }));
+        list.sort((a,b) => (a.exact === b.exact ? a.name.localeCompare(b.name) : a.exact ? -1 : 1));
+
         setSearchResults(list);
-        setShowResults(true);
-      } catch (err) {
-        console.error("Search failed", err);
-        setSearchError(err?.response?.data?.message || err?.message || "Search failed");
+        // Show results if we have any or if exact search errored while partial gave none (so we can display hint)
+        setShowResults(list.length > 0 || !!fullErr);
+        if (fullErr && list.length === 0) {
+          // Specific message for no exact match
+          setSearchError('No exact full-name match');
+        }
+      } catch (outer) {
+        console.error('Search failed (outer)', outer);
+        setSearchError(outer?.response?.data?.message || outer?.message || 'Search failed');
         setSearchResults([]);
         setShowResults(true);
       } finally {
         setSearchLoading(false);
       }
-    }, 300); // 300ms debounce
-    setSearchDebounceId(id);
+    }, 300); // allow both requests to settle
+
+    return () => clearTimeout(timer);
   }, [searchTerm]);
 
   const handleSearchChange = (e) => {
@@ -119,9 +138,14 @@ export default function PatientDashboardPage() {
   };
 
   const handleSelectPatient = (id) => {
+    const numericId = Number(id);
+    if (Number.isNaN(numericId)) {
+      console.warn("Selected patient id is not numeric", id);
+      return;
+    }
     setShowResults(false);
     setSearchTerm("");
-    navigate(`/patients/${id}`);
+    navigate(`/patients/${numericId}`);
   };
 
   const startEditRecord = () => {
@@ -232,13 +256,14 @@ export default function PatientDashboardPage() {
                     textAlign: "left",
                     padding: "0.5rem 0.75rem",
                     border: "none",
-                    background: "#fff",
+                    background: r.exact ? "#eef" : "#fff",
                     cursor: "pointer",
                     borderBottom: "1px solid #eee"
                   }}
                   className="upm-search-result-item"
                 >
-                  {r.name} <span style={{ opacity: 0.6 }}>#{r.id}</span>
+                  {r.name} <span style={{ opacity: 0.6 }}>#{r.id}</span>{" "}
+                  {r.exact && <span style={{ color: "#336", fontSize: 12 }}> (exact)</span>}
                 </button>
               ))}
             </div>
@@ -525,7 +550,11 @@ export default function PatientDashboardPage() {
           </div>
         )}
         {activeTab === "diagnoses" && (
-          <MedicalHistoryPanel patientId={patient.id || patient.patientId || patientId || 1} onChange={refreshPatientData} />
+          <MedicalHistoryPanel
+            patientId={patient.id || patient.patientId || patientId || 1}
+            onChange={refreshPatientData}
+            onPrescribeRequested={() => setActiveTab('prescriptions')}
+          />
         )}
       </main>
     </div>

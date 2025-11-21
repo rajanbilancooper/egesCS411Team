@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 //Imports Optional class from Java Util package for handling nullable return values
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -19,6 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     Optional<User> findByFirstNameAndLastName(String firstName, String lastName);
     Optional<User> findByFirstNameAndLastNameAndDateOfBirth(String firstName, String lastName, java.time.LocalDateTime dateOfBirth);
+    List<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String firstNamePart, String lastNamePart);
+    Optional<User> findByFirstNameIgnoreCaseAndLastNameIgnoreCase(String firstName, String lastName);
     
     
 }

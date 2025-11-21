@@ -39,4 +39,16 @@ public class MedicalHistory {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
+    @Column(name = "prescribe_medication")
+    private Boolean prescribeMedication;
+
+    // Null-safe getter to protect older rows that may still have NULL before migration
+    public Boolean getPrescribeMedication() {
+        return prescribeMedication != null ? prescribeMedication : Boolean.FALSE;
+    }
+
+    public void setPrescribeMedication(Boolean prescribeMedication) {
+        this.prescribeMedication = (prescribeMedication == null ? Boolean.FALSE : prescribeMedication);
+    }
+
 }

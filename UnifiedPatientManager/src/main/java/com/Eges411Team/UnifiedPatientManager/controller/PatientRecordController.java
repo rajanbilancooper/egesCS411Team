@@ -60,6 +60,13 @@ public class PatientRecordController {
         return ResponseEntity.ok(patientRecordService.getPatientRecordByFullName(fullName));
     }
 
+    // partial search returning list of patient records (basic info)
+    @GetMapping("/searchMany")
+    public ResponseEntity<List<PatientRecordDTO>> searchPatients(@RequestParam("query") String query) {
+        List<PatientRecordDTO> list = patientRecordService.searchPatients(query);
+        return ResponseEntity.ok(list);
+    }
+
     // method to create a patient record (patient user + optional allergies)
     @PostMapping("/")
     public ResponseEntity<PatientRecordDTO> createPatientRecord(@Valid @RequestBody PatientRegistrationRequest request) {

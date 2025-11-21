@@ -12,9 +12,14 @@ import client from "./axiosClient";
  *   console.log(res.data);
  */
 export const patientApi = {
-  // GET /api/patients/search?fullName=...
-  // Backend currently returns a single PatientRecordDTO for an exact match
-  searchByName: (fullName) =>
+  // GET /api/patients/searchMany?query=... (partial matches on first or last name)
+  searchByName: (query) =>
+    client.get("/api/patients/searchMany", {
+      params: { query },
+    }),
+
+  // GET /api/patients/search?fullName=... (exact full name match: first + last)
+  searchByFullName: (fullName) =>
     client.get("/api/patients/search", {
       params: { fullName },
     }),
