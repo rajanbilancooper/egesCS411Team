@@ -58,6 +58,17 @@ export default function PatientRegistrationPage() {
     if (!form.email.match(/^[^@]+@[^@]+\.[^@]+$/)) return "Valid email required";
     if (!form.phoneNumber.replace(/[^0-9]/g, "").match(/^\d{10}$/)) return "Phone must be 10 digits";
     if (!form.dateOfBirth) return "Date of birth required";
+    // Ensure date of birth is not in the future
+    try {
+      const picked = new Date(form.dateOfBirth);
+      const now = new Date();
+      // Normalize times so only date portion matters
+      picked.setHours(0,0,0,0);
+      now.setHours(0,0,0,0);
+      if (picked > now) return "Date of birth cannot be in the future";
+    } catch (e) {
+      return "Invalid date of birth";
+    }
     return null;
   };
 
@@ -124,7 +135,8 @@ export default function PatientRegistrationPage() {
             </label>
             <label className="reg-field">
               <span>Date of Birth *</span>
-              <input name="dateOfBirth" type="date" value={form.dateOfBirth} onChange={updateField} />
+              {/* Prevent users from picking a future date by setting max to today's date */}
+              <input name="dateOfBirth" type="date" value={form.dateOfBirth} onChange={updateField} max={new Date().toISOString().split('T')[0]} />
             </label>
             <label className="reg-field">
               <span>Gender</span>
