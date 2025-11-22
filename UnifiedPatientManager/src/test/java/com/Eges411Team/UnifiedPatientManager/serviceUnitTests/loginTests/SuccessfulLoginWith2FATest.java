@@ -1,4 +1,4 @@
-package loginTests;
+package com.Eges411Team.UnifiedPatientManager.serviceUnitTests.loginTests;
 
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.LoginRequest;
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.OtpVerificationRequest;
