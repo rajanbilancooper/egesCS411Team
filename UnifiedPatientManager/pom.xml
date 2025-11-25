@@ -147,7 +147,7 @@
 					</execution>
 					<execution>
 						<id>report</id>
-						<phase>verify</phase>
+						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
@@ -155,7 +155,7 @@
 					<!-- check execution prints coverage percentages to the console; configured with 0 minimum so it won't fail the build -->
 					<execution>
 						<id>check</id>
-						<phase>verify</phase>
+						<phase>test</phase>
 						<goals>
 							<goal>check</goal>
 						</goals>
@@ -209,7 +209,7 @@
 				<executions>
 					<execution>
 						<id>print-coverage-summary</id>
-						<phase>verify</phase>
+						<phase>test</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
