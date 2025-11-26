@@ -7,6 +7,8 @@ import com.Eges411Team.UnifiedPatientManager.repositories.UserSessionRepository;
 import com.Eges411Team.UnifiedPatientManager.services.AuthenticationService;
 import com.Eges411Team.UnifiedPatientManager.services.JwtTokenProvider;
 import com.Eges411Team.UnifiedPatientManager.services.OtpService;
+import com.Eges411Team.UnifiedPatientManager.repositories.OtpTokenRepository;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -33,6 +35,8 @@ public class LoginAttemptWindowTest {
         OtpService otpService = Mockito.mock(OtpService.class);
         JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
         PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
+            OtpTokenRepository otpTokenRepository = Mockito.mock(OtpTokenRepository.class);
+
 
         AuthenticationService auth = new AuthenticationService(
                 userRepository,
@@ -40,6 +44,7 @@ public class LoginAttemptWindowTest {
                 otpService,
                 jwtTokenProvider,
                 passwordEncoder
+                ,otpTokenRepository
         );
 
         // Create a registered user fixture

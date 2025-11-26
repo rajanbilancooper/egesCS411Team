@@ -33,6 +33,7 @@ public class SuccessfulLoginWith2FATest {
         OtpService otpServiceMock = Mockito.mock(OtpService.class);
         JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
         PasswordEncoder authPasswordEncoder = Mockito.mock(PasswordEncoder.class);
+        OtpTokenRepository otpTokenRepository = Mockito.mock(OtpTokenRepository.class);
 
         AuthenticationService authService = new AuthenticationService(
                 userRepository,
@@ -40,6 +41,7 @@ public class SuccessfulLoginWith2FATest {
                 otpServiceMock,
                 jwtTokenProvider,
                 authPasswordEncoder
+                ,otpTokenRepository
         );
 
         // Fixture user in DB
@@ -70,7 +72,7 @@ public class SuccessfulLoginWith2FATest {
         assertEquals(user.getUsername(), preOtpResponse.getUsername());
 
         // Now prepare OtpService (real instance) to verify OTP
-        OtpTokenRepository otpTokenRepository = Mockito.mock(OtpTokenRepository.class);
+        otpTokenRepository = Mockito.mock(OtpTokenRepository.class);
         PasswordEncoder otpPasswordEncoder = Mockito.mock(PasswordEncoder.class);
         JwtTokenProvider jwtProviderForOtp = Mockito.mock(JwtTokenProvider.class);
 
