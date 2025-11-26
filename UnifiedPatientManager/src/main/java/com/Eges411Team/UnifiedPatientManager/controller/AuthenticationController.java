@@ -3,6 +3,8 @@ package com.Eges411Team.UnifiedPatientManager.controller;
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.LoginRequest;
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.OtpVerificationRequest;
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.ResendOtpRequest;
+import com.Eges411Team.UnifiedPatientManager.DTOs.requests.ForgotPasswordRequest;
+import com.Eges411Team.UnifiedPatientManager.DTOs.requests.PasswordResetRequest;
 import com.Eges411Team.UnifiedPatientManager.DTOs.responses.LoginResponse;
 import com.Eges411Team.UnifiedPatientManager.entity.User;
 import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
@@ -82,7 +84,26 @@ public class AuthenticationController {
         return ResponseEntity.ok().body("Logged out");
     }
 
+    // Forgot password - Step 1: Send OTP to user's email
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authenticationService.initiateForgotPassword(request.getUsername());
+        return ResponseEntity.ok().body("Password reset OTP sent to your email");
+    }
+
+    // Password reset - Step 2: Verify OTP and set new password
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetRequest request) {
+        authenticationService.resetPassword(
+            request.getUsername(),
+            request.getOtpCode(),
+            request.getNewPassword()
+        );
+        return ResponseEntity.ok().body("Password reset successful");
+    }
+
     
 
 }
+
 

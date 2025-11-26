@@ -16,6 +16,12 @@ export const authApi = {
   // Logout (requires Authorization header)
   logout: () => client.post("/auth/logout"),
 
+  // Forgot password - Step 1: Send OTP to user's email
+  forgotPassword: (payload) => client.post("/auth/forgot-password", payload),
+
+  // Reset password - Step 2: Verify OTP and set new password
+  resetPassword: (payload) => client.post("/auth/reset-password", payload),
+
   // Convenience helper for integration tests: login then verify with given OTP
   loginAndVerify: async ({ username, password, otpCode }) => {
     await client.post("/auth/login", { username, password });

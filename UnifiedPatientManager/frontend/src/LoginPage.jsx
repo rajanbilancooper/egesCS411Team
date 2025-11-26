@@ -9,8 +9,10 @@ export default function LoginPage() {
   const [error, setError] = useState("");
     const [info, setInfo] = useState("");
   const navigate = useNavigate();
-  const [step, setStep] = useState("login"); // 'login' or 'verify'
+  const [step, setStep] = useState("login"); // 'login', 'verify', 'forgot', or 'reset'
   const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -57,9 +59,60 @@ export default function LoginPage() {
     setError("");
     try {
       await authApi.resendOtp({ username });
+      setInfo("OTP resent to your email");
     } catch (err) {
       setError(err.response?.data || "Failed to resend OTP");
     }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!username || username.trim() === "") {
+      setError("Please enter your username first");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      await authApi.forgotPassword({ username });
+      setStep("reset");
+      setInfo("Password reset OTP sent to your email. Please check your inbox.");
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.message || "Failed to send password reset OTP");
+    }
+    setLoading(false);
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setError("");
+    
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await authApi.resetPassword({
+        username,
+        otpCode: otp,
+        newPassword
+      });
+      setInfo("Password reset successful! Please login with your new password.");
+      setStep("login");
+      setOtp("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPassword("");
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.message || "Failed to reset password");
+    }
+    setLoading(false);
   };
 
  return (
@@ -153,13 +206,66 @@ export default function LoginPage() {
               </>
             )}
 
-            <button
-              type="button"
-              className="upm-login-forgot"
-              onClick={() => alert("Forgot password flow not wired yet")}
-            >
-              Forgot Password?
-            </button>
+            {step === "reset" && (
+              <>
+                <label className="upm-login-label">
+                  <span>OTP Code</span>
+                  <input
+                    className="upm-login-input"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="123456"
+                    autoComplete="one-time-code"
+                  />
+                </label>
+                <label className="upm-login-label">
+                  <span>New Password</span>
+                  <input
+                    className="upm-login-input"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="At least 6 characters"
+                    autoComplete="new-password"
+                  />
+                </label>
+                <label className="upm-login-label">
+                  <span>Confirm Password</span>
+                  <input
+                    className="upm-login-input"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter password"
+                    autoComplete="new-password"
+                  />
+                </label>
+                <div className="upm-login-buttons">
+                  <button type="button" onClick={handleResetPassword} className="upm-login-btn-primary" disabled={loading}>
+                    {loading ? "Resetting..." : "Reset Password"}
+                  </button>
+                  <button
+                    onClick={() => { setStep("login"); setOtp(""); setNewPassword(""); setConfirmPassword(""); }}
+                    type="button"
+                    className="upm-login-btn-secondary"
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
+
+            {step === "login" && (
+              <button
+                type="button"
+                className="upm-login-forgot"
+                onClick={handleForgotPassword}
+                disabled={loading}
+              >
+                Forgot Password?
+              </button>
+            )}
           </form>
         </div>
       </main>
