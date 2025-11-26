@@ -3,6 +3,7 @@ package com.Eges411Team.UnifiedPatientManager.services;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,14 +199,15 @@ public class PatientRecordService {
             throw new RuntimeException("Phone number must be 10 digits");
         }
 
-        // Duplicate check: prevent same full name (case-insensitive)
-        List<User> duplicateName = userRepository
-            .findAllByFirstNameIgnoreCaseAndLastNameIgnoreCase(
+        // Duplicate check: prevent same full name + date of birth combination
+        Optional<User> duplicatePatient = userRepository
+            .findByFirstNameAndLastNameAndDateOfBirth(
                 userTemplate.getFirstName(),
-                userTemplate.getLastName()
+                userTemplate.getLastName(),
+                userTemplate.getDateOfBirth()
             );
-        if (!duplicateName.isEmpty()) {
-            throw new RuntimeException("A user with this name already exists. Please use a different name.");
+        if (duplicatePatient.isPresent()) {
+            throw new RuntimeException("A patient with this name and date of birth already exists. Please verify the information.");
         }
         
         // Duplicate check: prevent same email
@@ -263,18 +265,22 @@ public class PatientRecordService {
         
         // we want to save the information from the  PatientRecordUpdateDTO that maps to the user being updated
         
-        // ** VALIDATION: Check for duplicate name if firstName or lastName is being changed **
-        if ((recordDTO.getFirstName() != null && !recordDTO.getFirstName().equals(user.getFirstName())) ||
-            (recordDTO.getLastName() != null && !recordDTO.getLastName().equals(user.getLastName()))) {
-            
+        // ** VALIDATION: Check for duplicate name + DOB if firstName, lastName, or DOB is being changed **
+        boolean nameChanged = (recordDTO.getFirstName() != null && !recordDTO.getFirstName().equals(user.getFirstName())) ||
+                              (recordDTO.getLastName() != null && !recordDTO.getLastName().equals(user.getLastName()));
+        
+        if (nameChanged) {
             String newFirstName = recordDTO.getFirstName() != null ? recordDTO.getFirstName() : user.getFirstName();
             String newLastName = recordDTO.getLastName() != null ? recordDTO.getLastName() : user.getLastName();
             
-            List<User> existingUsers = userRepository.findAllByFirstNameIgnoreCaseAndLastNameIgnoreCase(newFirstName, newLastName);
-            // Check if any of the found users is NOT the current user
-            boolean isDuplicate = existingUsers.stream().anyMatch(u -> !u.getId().equals(userID));
-            if (isDuplicate) {
-                throw new RuntimeException("A user with this name already exists. Please use a different name.");
+            // Check if another patient has this name + same DOB
+            Optional<User> duplicatePatient = userRepository.findByFirstNameAndLastNameAndDateOfBirth(
+                newFirstName, 
+                newLastName, 
+                user.getDateOfBirth()
+            );
+            if (duplicatePatient.isPresent() && !duplicatePatient.get().getId().equals(userID)) {
+                throw new RuntimeException("A patient with this name and date of birth already exists. Please verify the information.");
             }
         }
         
