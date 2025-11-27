@@ -661,7 +661,10 @@ export default function PatientDashboardPage() {
 
         {/* other tabs can be placeholders for now */}
         {activeTab === "prescriptions" && (
-          <PrescriptionPanel patientId={patient.id || patient.patientId || patientId || 1} />
+          <PrescriptionPanel
+            patientId={patient.id || patient.patientId || patientId || 1}
+            onMedicationsChanged={refreshPatientData}
+          />
         )}
         {activeTab === "allergies" && (
           <AllergyPanel patientId={patient.id || patient.patientId || patientId || 1} onAllergyChange={refreshPatientData} />
