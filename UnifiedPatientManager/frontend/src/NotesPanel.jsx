@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { patientApi } from "./api/patientApi"; // API wrapper
 
-export default function NotesPanel({ patientId }) {
+export default function NotesPanel({ patientId, onNotesChanged }) {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [noteType, setNoteType] = useState("TEXT"); // TEXT or FILE
@@ -78,6 +78,9 @@ export default function NotesPanel({ patientId }) {
       setFile(null);
       setAttachmentName("");
       setNoteType("TEXT");
+      if (typeof onNotesChanged === 'function') {
+        onNotesChanged();
+      }
     } catch (e) {
       console.error("Failed to save note", e);
       setError(
@@ -127,6 +130,9 @@ export default function NotesPanel({ patientId }) {
     try {
       await patientApi.deleteNote(patientId, n.id);
       setNotes((prev) => prev.filter((x) => x.id !== n.id));
+      if (typeof onNotesChanged === 'function') {
+        onNotesChanged();
+      }
     } catch (e) {
       setError(e?.response?.data?.message || e?.message || "Failed to delete note");
     }
