@@ -73,7 +73,7 @@ public class PatientRecordController {
 
         // Build User entity
         User userTemplate = new User();
-        userTemplate.setUsername(request.getUsername());
+        userTemplate.setUsername(request.getUsername() == null ? null : request.getUsername().trim());
         String rawPassword = (request.getPassword() == null || request.getPassword().isBlank()) ? "tempPass123" : request.getPassword();
         userTemplate.setPassword(passwordEncoder.encode(rawPassword));
         userTemplate.setRole(Role.PATIENT); // registering a patient

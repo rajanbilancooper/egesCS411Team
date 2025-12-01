@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { patientApi } from "./api/patientApi";
 import { PRESCRIPTION_MEDICATIONS } from "./constants/medicalOptions";
 
-export default function PrescriptionPanel({ patientId }) {
+export default function PrescriptionPanel({ patientId, onMedicationsChanged }) {
   const [medications, setMedications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -103,6 +103,9 @@ export default function PrescriptionPanel({ patientId }) {
         alert("Prescription added successfully!");
         resetForm();
         loadMedications();
+        if (typeof onMedicationsChanged === 'function') {
+          onMedicationsChanged();
+        }
       } else {
         // Unexpected response
         alert("Unexpected response from server");
@@ -133,6 +136,9 @@ export default function PrescriptionPanel({ patientId }) {
         alert("Prescription added with override!");
         resetForm();
         loadMedications();
+        if (typeof onMedicationsChanged === 'function') {
+          onMedicationsChanged();
+        }
       } else {
         alert("Failed to override conflicts");
       }
@@ -148,6 +154,9 @@ export default function PrescriptionPanel({ patientId }) {
       await patientApi.deleteMedication(patientId, medicationId);
       alert("Medication deleted");
       loadMedications();
+      if (typeof onMedicationsChanged === 'function') {
+        onMedicationsChanged();
+      }
     } catch (err) {
       console.error("Failed to delete medication", err);
       alert(err?.response?.data?.message || "Failed to delete medication");

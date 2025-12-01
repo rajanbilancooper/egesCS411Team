@@ -24,9 +24,9 @@ public class Note {
     @Column(name = "doctor_id")
     private Long doctorId;
 
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "note_type")
-    private String noteType;
+    private NoteType noteType;
 
     @Lob
     @Column (name = "content")

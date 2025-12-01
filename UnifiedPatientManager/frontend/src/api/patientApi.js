@@ -76,6 +76,20 @@ export const patientApi = {
   createNote: (patientId, payload) =>
     client.post(`/api/patients/${patientId}/notes`, payload),
 
+  // Multipart variant: @RequestPart("note") JSON + optional @RequestPart("attachment") file
+  createNoteMultipart: (patientId, noteDto, file) => {
+    const form = new FormData();
+    // append JSON as Blob so backend parses as application/json
+    const noteBlob = new Blob([JSON.stringify(noteDto)], { type: "application/json" });
+    form.append("note", noteBlob);
+    if (file) {
+      form.append("attachment", file, file.name);
+    }
+    return client.post(`/api/patients/${patientId}/notes`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
   // PUT /api/patients/{patientId}/notes/{noteId}
   updateNote: (patientId, noteId, payload) =>
     client.put(`/api/patients/${patientId}/notes/${noteId}`, payload),
@@ -83,6 +97,12 @@ export const patientApi = {
   // DELETE /api/patients/{patientId}/notes/{noteId}
   deleteNote: (patientId, noteId) =>
     client.delete(`/api/patients/${patientId}/notes/${noteId}`),
+
+  // GET /api/patients/{patientId}/notes/{noteId}/download (returns blob)
+  downloadNoteAttachment: (patientId, noteId) =>
+    client.get(`/api/patients/${patientId}/notes/${noteId}/download`, {
+      responseType: "blob",
+    }),
 
   // ---- Medications / Prescriptions ----
 

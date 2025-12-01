@@ -27,6 +27,10 @@ export default function PatientDashboardPage() {
   const [editedPatient, setEditedPatient] = useState(null);
   const [saveError, setSaveError] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [latestNote, setLatestNote] = useState(null);
+  const [latestDiagnosis, setLatestDiagnosis] = useState(null);
+  const [overviewLoading, setOverviewLoading] = useState(false);
+  const [overviewError, setOverviewError] = useState(null);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -37,9 +41,80 @@ export default function PatientDashboardPage() {
     try {
       const res = await patientApi.getPatientById(patientId);
       setPatient(res.data);
+      // Also refresh latest note & diagnosis when record refreshes
+      await loadOverviewData(patientId);
     } catch (err) {
       console.error("Failed to refresh patient data", err);
     }
+  };
+
+  const pickLatestByTimestamp = (items, timestampField) => {
+    if (!Array.isArray(items) || items.length === 0) return null;
+    // Prefer records with a real timestamp; if none have one, fall back to highest id or array order
+    const withTs = items.filter(it => !!it[timestampField]);
+    if (withTs.length > 0) {
+      return withTs.slice().sort((a,b) => new Date(b[timestampField]).getTime() - new Date(a[timestampField]).getTime())[0];
+    }
+    // Fallback: try by id descending
+    const withId = items.filter(it => typeof it.id === 'number');
+    if (withId.length > 0) {
+      return withId.slice().sort((a,b) => b.id - a.id)[0];
+    }
+    return items[0];
+  };
+
+  const loadOverviewData = async (pid) => {
+    setOverviewLoading(true);
+    setOverviewError(null);
+    try {
+      // Fetch notes & medical history in parallel
+      const [notesRes, historyRes] = await Promise.allSettled([
+        patientApi.getNotes(pid),
+        patientApi.getMedicalHistory(pid)
+      ]);
+
+      if (notesRes.status === 'fulfilled') {
+        const notesArr = Array.isArray(notesRes.value.data) ? notesRes.value.data : [];
+        // latest note by timestamp (or fallback to first)
+        const latest = pickLatestByTimestamp(notesArr, 'timestamp') || notesArr[0] || null;
+        setLatestNote(latest);
+      } else {
+        console.warn('Failed to load notes for overview', notesRes.reason);
+      }
+
+      if (historyRes.status === 'fulfilled') {
+        const raw = historyRes.value.data;
+        const histArr = Array.isArray(raw) ? raw : [];
+        // Strategy: prefer highest id (creation order) rather than date-only startDate (no time component)
+        // If startDate present for all, still rely on id to break ties.
+        let latestHist = null;
+        if (histArr.length > 0) {
+          latestHist = histArr.slice().sort((a,b) => {
+            const idA = typeof a.id === 'number' ? a.id : -1;
+            const idB = typeof b.id === 'number' ? b.id : -1;
+            return idB - idA; // descending by id
+          })[0];
+        }
+        // Normalize field for rendering: ensure 'diagnosis' exists even if backend changed naming
+        if (latestHist && !latestHist.diagnosis && latestHist.notes) {
+          latestHist.diagnosis = latestHist.notes;
+        }
+        setLatestDiagnosis(latestHist);
+      } else {
+        console.warn('Failed to load medical history for overview', historyRes.reason);
+      }
+    } catch (e) {
+      console.error('Overview load error', e);
+      setOverviewError(e?.message || 'Failed to load overview data');
+    } finally {
+      setOverviewLoading(false);
+    }
+  };
+
+  // Exposed wrapper used by child panels to refresh latest overview fields without full patient reload
+  const refreshOverviewOnly = async () => {
+    if (!patientId) return;
+    await loadOverviewData(patientId);
   };
 
   useEffect(() => {
@@ -60,6 +135,7 @@ export default function PatientDashboardPage() {
         const res = await patientApi.getPatientById(patientId);
         setPatient(res.data);
         setError(null);
+        await loadOverviewData(patientId);
       } catch (err) {
         console.error("Failed to load patient", err);
         const msg = err?.response?.data?.message || err?.message || "Failed to fetch patient";
@@ -391,9 +467,57 @@ export default function PatientDashboardPage() {
               <div className="upm-section-block">
                 <h3>Overview</h3>
                 <div className="upm-divider" />
-                <p style={{ whiteSpace: 'pre-line', opacity: 0.85 }}>
-                  This panel will later show appointment summaries and key history.
-                </p>
+                {overviewLoading && <p>Loading overview…</p>}
+                {overviewError && <p style={{ color: '#c00' }}>Overview error: {overviewError}</p>}
+                {!overviewLoading && !overviewError && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div>
+                      <strong>Most Recent Note:</strong>
+                      {latestNote ? (
+                        latestNote.noteType === 'FILE' || latestNote.noteType === 'FILE' ? (
+                          <div style={{ marginTop: 4 }}>
+                            Attachment: {latestNote.attachmentName || 'attachment.bin'}
+                            {latestNote.timestamp && (
+                              <div style={{ fontSize: 12, opacity: 0.7 }}>
+                                {new Date(latestNote.timestamp).toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div style={{ marginTop: 4 }}>
+                            {latestNote.content && latestNote.content.length > 160
+                              ? latestNote.content.slice(0,160) + '…'
+                              : (latestNote.content || '—')}
+                            {latestNote.timestamp && (
+                              <div style={{ fontSize: 12, opacity: 0.7 }}>
+                                {new Date(latestNote.timestamp).toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      ) : (
+                        <span style={{ marginLeft: 6, opacity: 0.6 }}>No notes yet</span>
+                      )}
+                    </div>
+                    <div>
+                      <strong>Most Recent Diagnosis:</strong>
+                      {latestDiagnosis ? (
+                        <div style={{ marginTop: 4 }}>
+                          {(latestDiagnosis.diagnosis && latestDiagnosis.diagnosis.length > 160)
+                            ? latestDiagnosis.diagnosis.slice(0,160) + '…'
+                            : (latestDiagnosis.diagnosis || '—')}
+                          {latestDiagnosis.startDate && (
+                            <div style={{ fontSize: 12, opacity: 0.7 }}>
+                              {new Date(latestDiagnosis.startDate).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span style={{ marginLeft: 6, opacity: 0.6 }}>No diagnoses yet</span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="upm-section-block">
                 <h3>Summary Counts</h3>
@@ -529,12 +653,18 @@ export default function PatientDashboardPage() {
 
         {/* NOTES VIEW — new two-column editor/history */}
         {activeTab === "notes" && (
-            <NotesPanel patientId={patient.id || patient.patientId || patientId || 1} />
+            <NotesPanel
+              patientId={patient.id || patient.patientId || patientId || 1}
+              onNotesChanged={refreshOverviewOnly}
+            />
         )}
 
         {/* other tabs can be placeholders for now */}
         {activeTab === "prescriptions" && (
-          <PrescriptionPanel patientId={patient.id || patient.patientId || patientId || 1} />
+          <PrescriptionPanel
+            patientId={patient.id || patient.patientId || patientId || 1}
+            onMedicationsChanged={refreshPatientData}
+          />
         )}
         {activeTab === "allergies" && (
           <AllergyPanel patientId={patient.id || patient.patientId || patientId || 1} onAllergyChange={refreshPatientData} />

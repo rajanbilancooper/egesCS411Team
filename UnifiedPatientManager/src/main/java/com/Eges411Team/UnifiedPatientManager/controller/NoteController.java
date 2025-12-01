@@ -2,11 +2,14 @@ package com.Eges411Team.UnifiedPatientManager.controller;
 
 import com.Eges411Team.UnifiedPatientManager.DTOs.requests.NoteRequestDTO;
 import com.Eges411Team.UnifiedPatientManager.entity.Note;
+import com.Eges411Team.UnifiedPatientManager.entity.NoteType;
 import com.Eges411Team.UnifiedPatientManager.services.NoteService;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -69,29 +72,63 @@ public class NoteController {
         @Valid @RequestPart("note") NoteRequestDTO noteRequestDTO,
         @RequestPart(value = "attachment", required = false) MultipartFile attachment
     ) throws IOException {
+        // Basic validation depending on type
+        NoteType type = noteRequestDTO.getNoteType();
 
+        // if try to upload nothing
+        if (type == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        final long MAX_FILE_BYTES = 5 * 1024 * 1024; // 5MB max size
+
+        // handle TEXT vs FILE note types for null/empty checks
+        if (type == NoteType.TEXT) {
+            if (noteRequestDTO.getContent() == null || noteRequestDTO.getContent().trim().isEmpty()) {
+                throw new IllegalArgumentException("Content is required for TEXT notes");
+            }
+            if (attachment != null && !attachment.isEmpty()) {
+                throw new IllegalArgumentException("FILE attachment provided for TEXT note; remove attachment or change type to FILE");
+            }
+        } else if (type == NoteType.FILE) {
+            if (attachment == null || attachment.isEmpty()) {
+                throw new IllegalArgumentException("Attachment file is required for FILE notes");
+            }
+            if (attachment.getSize() > MAX_FILE_BYTES) {
+                throw new IllegalArgumentException("Attachment exceeds 5MB size limit");
+            }
+        }
+
+        // create a new Note and populate fields with DTO data
         Note note = new Note();
         note.setPatientId(patientId);
         note.setDoctorId(noteRequestDTO.getDoctorId());
-        note.setNoteType(noteRequestDTO.getNoteType());
-        note.setContent(noteRequestDTO.getContent());
+        note.setNoteType(type);
         note.setTimestamp(noteRequestDTO.getTimestamp() != null ? noteRequestDTO.getTimestamp() : LocalDateTime.now());
 
-    if (attachment != null && !attachment.isEmpty()) {
-        note.setAttachmentName(attachment.getOriginalFilename());
-        note.setAttachmentData(attachment.getBytes());
-    }
+        // set content or attachment based on type
+        if (type == NoteType.TEXT) {
+            note.setContent(noteRequestDTO.getContent());
+        } else if (type == NoteType.FILE) {
+            // Store file bytes
+            String desiredName = (noteRequestDTO.getAttachmentName() != null && !noteRequestDTO.getAttachmentName().isBlank())
+                ? noteRequestDTO.getAttachmentName()
+                : attachment.getOriginalFilename();
+            note.setAttachmentName(desiredName);
+            note.setAttachmentData(attachment.getBytes());
+            // Optional: ignore content even if provided
+            note.setContent(null);
+        }
 
-    // Save using the service
-    Note saved = noteService.saveSingleNote(note);
-    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-}
+        // save the note to the repo via service
+        Note saved = noteService.saveSingleNote(note);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
 
     // Update a specific note
     @PutMapping("/{patient_id}/notes/{note_id}")
     @Operation(summary = "Update a specific note for a patient")
     public ResponseEntity<Note> update(
-        @RequestBody Note note,
         @PathVariable("patient_id")
         @Parameter(example = "3")
         Long patientId,
@@ -102,19 +139,54 @@ public class NoteController {
         @RequestPart(value = "attachment", required = false) MultipartFile attachment
         ) throws IOException {
 
+        // Basic validation depending on type
+        NoteType type = noteRequestDTO.getNoteType();
+        if (type == null) {
+            throw new IllegalArgumentException("Note type required");
+        }
+
+        final long MAX_FILE_BYTES = 5 * 1024 * 1024; // 5MB max size
+
+        // handle TEXT vs FILE note types for null/empty checks
+        if (type == NoteType.TEXT) {
+            if (noteRequestDTO.getContent() == null || noteRequestDTO.getContent().trim().isEmpty()) {
+                throw new IllegalArgumentException("Content is required for TEXT notes");
+            }
+            if (attachment != null && !attachment.isEmpty()) {
+                throw new IllegalArgumentException("Attachment provided for TEXT note; change type to FILE to upload");
+            }
+        } else if (type == NoteType.FILE) {
+            if (attachment == null || attachment.isEmpty()) {
+                throw new IllegalArgumentException("Attachment file is required for FILE notes");
+            }
+            if (attachment.getSize() > MAX_FILE_BYTES) {
+                throw new IllegalArgumentException("Attachment exceeds 5MB size limit");
+            }
+        }
+
+        // prepare updated Note object and populate fields with DTO data
         Note updated = new Note();
         updated.setDoctorId(noteRequestDTO.getDoctorId());
-        updated.setNoteType(noteRequestDTO.getNoteType());
-        updated.setContent(noteRequestDTO.getContent());
+        updated.setNoteType(type);
         updated.setTimestamp(noteRequestDTO.getTimestamp());
-
-        if (attachment != null && !attachment.isEmpty()) {
-            updated.setAttachmentName(attachment.getOriginalFilename());
+        if (type == NoteType.TEXT) {
+            // set content for TEXT type
+            updated.setContent(noteRequestDTO.getContent());
+            updated.setAttachmentName(null);
+            updated.setAttachmentData(null);
+        } else {
+            // otherwise clear content for FILE type, and store attachment + its data
+            updated.setContent(null);
+            String desiredName = (noteRequestDTO.getAttachmentName() != null && !noteRequestDTO.getAttachmentName().isBlank())
+                ? noteRequestDTO.getAttachmentName()
+                : attachment.getOriginalFilename();
+            updated.setAttachmentName(desiredName);
             updated.setAttachmentData(attachment.getBytes());
         }
 
-    Note saved = noteService.updateNote(patientId, noteId, updated);
-    return ResponseEntity.ok(saved);
+        // call service to update 
+        Note saved = noteService.updateNote(patientId, noteId, updated);
+        return ResponseEntity.ok(saved);
     }
 
     // Refresh patient notes
@@ -142,5 +214,22 @@ public class NoteController {
     ) {
         noteService.deleteNote(patientId, noteId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // Download attachment for FILE note
+    @GetMapping("/{patient_id}/notes/{note_id}/download")
+    @Operation(summary = "Download the attachment for a FILE note")
+    public ResponseEntity<byte[]> download(
+        @PathVariable("patient_id") Long patientId,
+        @PathVariable("note_id") Long noteId
+    ) {
+        Note note = noteService.getNoteForPatient(patientId, noteId);
+        if (note.getNoteType() != NoteType.FILE || note.getAttachmentData() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + (note.getAttachmentName() == null ? "attachment.bin" : note.getAttachmentName()));
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new ResponseEntity<>(note.getAttachmentData(), headers, HttpStatus.OK);
     }
 }

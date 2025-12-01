@@ -8,6 +8,9 @@ public class PatientRecordUpdateDTO {
     // dont need patientId here since it's in the URL path - obtained by controller
 
     // fields that the doctor will actually update
+    private String firstName;  // optional update
+    private String lastName;   // optional update
+    private String email;      // optional update
     private String phoneNumber;
     private String address;
     private String height;   // optional update
@@ -133,6 +136,12 @@ public class PatientRecordUpdateDTO {
     }
 
     // getters and setters for main DTO fields
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
     public String getPhoneNumber() {
         return phoneNumber;
     }

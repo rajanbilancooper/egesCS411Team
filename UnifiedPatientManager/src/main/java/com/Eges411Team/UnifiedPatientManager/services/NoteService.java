@@ -97,4 +97,14 @@ public class NoteService {
     public Note saveSingleNote(Note note) {
     return noteRepository.save(note);
 }
+
+    // Retrieve single note ensuring it belongs to patient
+    public Note getNoteForPatient(Long patientId, Long noteId) {
+        Note existing = noteRepository.findById(noteId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found with id: " + noteId));
+        if (existing.getPatientId() == null || !existing.getPatientId().equals(patientId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note does not belong to the specified patient");
+        }
+        return existing;
+    }
 }

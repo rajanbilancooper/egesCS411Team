@@ -2,14 +2,12 @@ package com.Eges411Team.UnifiedPatientManager.DTOs.requests;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.sql.Blob;
 
 @Getter
 @Setter
@@ -22,18 +20,20 @@ public class NoteRequestDTO {
     // @Schema(example = "3", description = "ID of the patient associated with this note")
     // private Long patient_id;
 
-    @NotBlank(message = "Doctor ID is required")
+    @NotNull(message = "Doctor ID is required")
     @Schema(example = "5", description = "ID of the doctor who wrote the note")
     private Long doctorId;
 
-    @NotBlank(message = "Note type cannot be blank")
-    @Schema(example = "Progress", description = "Type of note (e.g., Progress, SOAP, Summary)")
-    private String noteType;
+    @NotNull(message = "Note type is required")
+    @Schema(example = "TEXT", description = "Type of note: TEXT or FILE")
+    private com.Eges411Team.UnifiedPatientManager.entity.NoteType noteType;
 
-    @NotBlank(message = "Note content cannot be blank")
-    @Schema(example = "Patient reports improved mobility and reduced pain.", description = "Main content or body of the note")
+    @Schema(example = "Patient reports improved mobility and reduced pain.", description = "Main content or body of the note. Required for TEXT notes; ignored for FILE notes.")
     private String content;
 
     @Schema(example = "2025-11-12T14:30:00", description = "Timestamp when the note was created or updated")
     private LocalDateTime timestamp;
+
+    @Schema(example = "lab-results.pdf", description = "Optional custom attachment file name to override the uploaded file's original name for FILE notes.")
+    private String attachmentName;
 }

@@ -32,18 +32,21 @@ public class AuthenticationService {
     private final OtpService otpService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final com.Eges411Team.UnifiedPatientManager.repositories.OtpTokenRepository otpTokenRepository;
 
     //Constructor for dependencies
     public AuthenticationService(UserRepository userRepository,
                                 UserSessionRepository userSessionRepository,
                                 OtpService otpService,
                                 JwtTokenProvider jwtTokenProvider,
-                                PasswordEncoder passwordEncoder) {
+                                PasswordEncoder passwordEncoder,
+                                com.Eges411Team.UnifiedPatientManager.repositories.OtpTokenRepository otpTokenRepository) {
         this.userRepository = userRepository;
         this.userSessionRepository = userSessionRepository;
         this.otpService = otpService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
+        this.otpTokenRepository = otpTokenRepository;
     }
     
 
@@ -155,5 +158,58 @@ public class AuthenticationService {
         session.setIsActive(false);
         userSessionRepository.save(session);
     }
-}   
 
+    // Password reset: initiate by sending OTP to user's email
+    public void initiateForgotPassword(String username) {
+        logger.info("Initiating password reset for user: {}", username);
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        
+        // Generate and send OTP for password reset
+        otpService.generateAndSendOtp(user);
+    }
+
+    // Password reset: verify OTP and set new password
+    @Transactional
+    public void resetPassword(String username, String otpCode, String newPassword) {
+        logger.info("Resetting password for user: {}", username);
+        
+        // Find user
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        
+        // Retrieve the most recent valid OTP for this user
+        com.Eges411Team.UnifiedPatientManager.entity.OtpToken otpToken = otpTokenRepository
+            .findFirstByUser_IdAndExpiresAtAfterAndUsedFalseOrderByCreatedAtDesc(user.getId(), LocalDateTime.now())
+            .orElseThrow(() -> new InvalidOtpException("No valid OTP found for this user"));
+
+        // Check if OTP is expired
+        if (otpToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new com.Eges411Team.UnifiedPatientManager.ExceptionHandlers.OtpExpiredException("OTP has expired");
+        }
+
+        // Check if the OTP has already been used
+        if (otpToken.isUsed()) {
+            throw new InvalidOtpException("OTP has already been used");
+        }
+
+        // Verify the provided OTP code matches the stored hashed code
+        if (!passwordEncoder.matches(otpCode, otpToken.getOtpCode())) {
+            throw new InvalidOtpException("Invalid OTP code");
+        }
+
+        // Mark OTP as used
+        otpToken.setUsed(true);
+        otpTokenRepository.save(otpToken);
+        
+        // Hash and set new password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        
+        // Reset failed login attempts and unlock if locked
+        user.setFailedLoginAttempts(0);
+        user.setIsLocked(false);
+        
+        userRepository.save(user);
+        logger.info("Password reset successful for user: {}", username);
+    }
+}

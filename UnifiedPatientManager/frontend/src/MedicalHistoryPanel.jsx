@@ -76,7 +76,7 @@ export default function MedicalHistoryPanel({ patientId, onChange, onPrescribeRe
       <div className="upm-divider" />
       <form onSubmit={handleCreate} style={{ marginBottom: 12 }}>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <input placeholder="Doctor ID (optional)" value={doctorId} onChange={(e) => setDoctorId(e.target.value)} style={{ width: 120 }} />
+          <input placeholder="Doctor ID (required)" value={doctorId} onChange={(e) => setDoctorId(e.target.value)} style={{ width: 140 }} required />
           <input placeholder="Diagnosis (required)" value={diagnosis} onChange={(e) => setDiagnosis(e.target.value)} style={{ width: 240 }} required />
           <input placeholder="Frequency (required)" value={frequency} onChange={(e) => setFrequency(e.target.value)} style={{ width: 140 }} required />
           <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
