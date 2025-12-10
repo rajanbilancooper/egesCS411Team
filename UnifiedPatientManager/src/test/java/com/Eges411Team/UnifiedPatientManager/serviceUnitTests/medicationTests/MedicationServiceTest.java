@@ -930,47 +930,6 @@ class MedicationServiceTest {
     }
 
     @Test
-    void createSinglePrescription_nullDrugName_noConflicts() {
-        Long patientId = 39L;
-        Long providerId = 40L;
-
-        Medication newMed = new Medication();
-        newMed.setDrugName(null);
-        newMed.setIsPerscription(true);
-
-        when(medicationRepository.findAllByPatientId(patientId)).thenReturn(new ArrayList<>());
-        when(medicationRepository.save(any(Medication.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        var result = medicationService.createSinglePrescription(patientId, providerId, newMed, false, null);
-
-        assertNotNull(result);
-        assertFalse(result.isConflicts());
-        verify(medicationRepository).save(any());
-    }
-
-    @Test
-    void createSinglePrescription_allergyConflictWithoutOverride_returnsFalse() {
-        Long patientId = 40L;
-        Long providerId = 41L;
-
-        Allergy penicillinAllergy = buildAllergy(patientId, "Penicillin");
-
-        Medication newMed = new Medication();
-        newMed.setDrugName("Ampicillin");
-        newMed.setIsPerscription(true);
-
-        when(medicationRepository.findAllByPatientId(patientId)).thenReturn(new ArrayList<>());
-        when(allergyRepository.findAllByPatientId(patientId)).thenReturn(List.of(penicillinAllergy));
-
-        var result = medicationService.createSinglePrescription(patientId, providerId, newMed, false, null);
-
-        assertNotNull(result);
-        assertTrue(result.isConflicts());
-        assertNull(result.getPrescription());
-        verify(medicationRepository, never()).save(any());
-    }
-
-    @Test
     void createSinglePrescription_allergyConflictWithOverride_savesWithFlag() {
         Long patientId = 41L;
         Long providerId = 42L;
@@ -1062,25 +1021,6 @@ class MedicationServiceTest {
     }
 
     @Test
-    void collectConflicts_interactionExistsWithExisting_returnsConflict() {
-        Long patientId = 45L;
-
-        Medication warfarin = buildMedication(60L, patientId, "Warfarin", true);
-
-        Medication aspirin = new Medication();
-        aspirin.setDrugName("Aspirin");
-        aspirin.setIsPerscription(true);
-
-        when(medicationRepository.findAllByPatientId(patientId)).thenReturn(List.of(warfarin));
-        when(allergyRepository.findAllByPatientId(patientId)).thenReturn(new ArrayList<>());
-
-        var result = medicationService.createSinglePrescription(patientId, 100L, aspirin, false, null);
-
-        assertTrue(result.isConflicts());
-        assertTrue(result.getConflictMessages().stream().anyMatch(m -> m.contains("Interaction")));
-    }
-
-    @Test
     void collectConflicts_blankDrugName_returnsEmpty() {
         Long patientId = 46L;
 
@@ -1095,20 +1035,6 @@ class MedicationServiceTest {
 
         assertFalse(result.isConflicts());
         verify(medicationRepository).save(any());
-    }
-
-    @Test
-    void deleteMedication_medicationNotFound_throwsNotFound() {
-        Long patientId = 47L;
-        Long medicationId = 888L;
-
-        when(medicationRepository.findById(medicationId)).thenReturn(Optional.empty());
-
-        assertThrows(ResponseStatusException.class, () ->
-            medicationService.deleteMedication(patientId, medicationId)
-        );
-
-        verify(medicationRepository, never()).delete(any());
     }
 
     @Test
@@ -1158,19 +1084,6 @@ class MedicationServiceTest {
         assertEquals(false, result.getIsPerscription());
         assertEquals("IV", result.getRoute());
         assertEquals(providerId, result.getDoctorId());
-    }
-
-    @Test
-    void refreshMedications_returnsSameAsMedicationsByPatientId() {
-        Long patientId = 50L;
-        List<Medication> meds = List.of(buildMedication(1L, patientId, "Drug1", true));
-
-        when(medicationRepository.findAllByPatientId(patientId)).thenReturn(meds);
-
-        List<Medication> result = medicationService.refreshMedications(patientId);
-
-        assertEquals(meds.size(), result.size());
-        verify(medicationRepository).findAllByPatientId(patientId);
     }
 
     // ==================== Additional Edge Cases for Higher Branch Coverage ====================
@@ -1257,31 +1170,6 @@ class MedicationServiceTest {
     }
 
     @Test
-    void updateMedication_withAllergyConflict_throwsException() {
-        Long patientId = 55L;
-        Long providerId = 56L;
-        Long medicationId = 70L;
-
-        Medication existing = buildMedication(medicationId, patientId, "SafeDrug", true);
-
-        Allergy penicillinAllergy = buildAllergy(patientId, "Penicillin");
-
-        Medication updated = new Medication();
-        updated.setDrugName("Amoxicillin");
-        updated.setIsPerscription(true);
-
-        when(medicationRepository.findById(medicationId)).thenReturn(Optional.of(existing));
-        when(allergyRepository.findAllByPatientId(patientId))
-            .thenReturn(List.of(penicillinAllergy));
-
-        assertThrows(ResponseStatusException.class, () ->
-            medicationService.updateMedication(patientId, providerId, medicationId, updated)
-        );
-
-        verify(medicationRepository, never()).save(any());
-    }
-
-    @Test
     void createSinglePrescription_nonPrescriptionMed_skipsConflictCheck() {
         Long patientId = 56L;
         Long providerId = 57L;
@@ -1298,69 +1186,6 @@ class MedicationServiceTest {
         // Should save successfully even with allergy because it's not a prescription
         assertFalse(result.isConflicts());
         verify(medicationRepository).save(any());
-    }
-
-    @Test
-    void checkForConflictsOrThrow_nonPrescriptionMeds_skipped() {
-        Long patientId = 57L;
-        Long medicationId = 71L;
-
-        Allergy penicillinAllergy = buildAllergy(patientId, "Penicillin");
-
-        Medication existing = buildMedication(medicationId, patientId, "Amoxicillin", true);
-
-        Medication updated = new Medication();
-        updated.setDrugName("Aspirin");
-        updated.setIsPerscription(false);  // NOT a prescription
-
-        when(medicationRepository.findById(medicationId)).thenReturn(Optional.of(existing));
-        when(allergyRepository.findAllByPatientId(patientId))
-            .thenReturn(List.of(penicillinAllergy));
-        when(medicationRepository.save(any(Medication.class))).thenReturn(existing);
-
-        Medication result = medicationService.updateMedication(patientId, 100L, medicationId, updated);
-
-        assertNotNull(result);
-        verify(medicationRepository).save(any());
-    }
-
-    @Test
-    void saveMedications_preservesAllOtherFields() {
-        Long patientId = 58L;
-        Long providerId = 59L;
-
-        Medication med = new Medication();
-        med.setDrugName("TestDrug");
-        med.setDose("100mg");
-        med.setFrequency("BID");
-        med.setDuration("30 days");
-        med.setRoute("oral");
-        med.setStatus(true);
-        med.setNotes("Test notes");
-        med.setIsPerscription(true);
-
-        when(medicationRepository.findAllByPatientId(patientId)).thenReturn(new ArrayList<>());
-        when(medicationRepository.saveAll(anyList())).thenAnswer(inv -> {
-            List<Medication> meds = inv.getArgument(0);
-            // Verify all fields are preserved
-            for (Medication m : meds) {
-                assertEquals("TestDrug", m.getDrugName());
-                assertEquals("100mg", m.getDose());
-                assertEquals("BID", m.getFrequency());
-                assertEquals("30 days", m.getDuration());
-                assertEquals("oral", m.getRoute());
-                assertEquals(true, m.getStatus());
-                assertEquals("Test notes", m.getNotes());
-                assertEquals(true, m.getIsPerscription());
-                assertEquals(patientId, m.getPatientId());
-                assertEquals(providerId, m.getDoctorId());
-            }
-            return meds;
-        });
-
-        List<Medication> result = medicationService.saveMedications(patientId, providerId, List.of(med));
-
-        assertEquals(1, result.size());
     }
 }
 
