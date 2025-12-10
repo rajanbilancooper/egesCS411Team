@@ -1,9 +1,9 @@
 **Unified Patient Manager README**
 
-##### **How to compile and run the system**
+### **How to compile and run the system**
 Before you start, you need to have these applications installed on your computer:
 
-### 1. **Java 17 or Higher**
+## 1. **Java 17 or Higher**
    - **Why needed:** The backend is written in Java
    - **Check if installed:** Open terminal and run:
      ```bash
@@ -14,7 +14,7 @@ Before you start, you need to have these applications installed on your computer
      - **Windows:** Download from https://www.oracle.com/java/technologies/downloads/#java17
      - **Linux:** `sudo apt-get install openjdk-17-jdk` (Ubuntu/Debian)
 
-### 2. **Maven 3.6+**
+## 2. **Maven 3.6+**
    - **Why needed:** Builds the Java backend and manages dependencies
    - **Check if installed:** Open terminal and run:
      ```bash
@@ -25,7 +25,7 @@ Before you start, you need to have these applications installed on your computer
      - **Windows:** Download from https://maven.apache.org/download.cgi (then add to PATH)
      - **Linux:** `sudo apt-get install maven` (Ubuntu/Debian)
 
-### 3. **Node.js 16+ and npm**
+## 3. **Node.js 16+ and npm**
    - **Why needed:** Runs and builds the React frontend
    - **Check if installed:** Open terminal and run:
      ```bash
@@ -37,7 +37,7 @@ Before you start, you need to have these applications installed on your computer
      - **Windows:** Download from https://nodejs.org/ (includes npm)
      - **Linux:** `sudo apt-get install nodejs npm` (Ubuntu/Debian)
 
-### 4. **MySQL 8.0+**
+## 4. **MySQL 8.0+**
    - **Why needed:** Database for storing patient records
    - **Check if installed:** Open terminal and run:
      ```bash
@@ -65,16 +65,16 @@ Before you start, you need to have these applications installed on your computer
 
 ---
 
-## Database Setup (Critical - Do This First)
+# Database Setup (Critical - Do This First)
 
-### Quick Setup - Import Pre-built Database 
+## Quick Setup - Import Pre-built Database 
 
-#### Step 1: Navigate to Project Root
+## Step 1: Navigate to Project Root
 ```bash
 cd /path/to/egesCS411Team
 ```
 
-#### Step 2: Start MySQL
+## Step 2: Start MySQL
 **macOS/Linux:**
 ```bash
 mysql.server start
@@ -82,7 +82,7 @@ mysql.server start
 
 **Windows:** Open Services and start MySQL80 (or open MySQL Command Line Client)
 
-#### Step 3: Verify MySQL is Running
+## Step 3: Verify MySQL is Running
 ```bash
 mysql -u root -p
 ```
@@ -90,7 +90,7 @@ mysql -u root -p
 - You should see `mysql>` prompt
 - Type `exit` to quit
 
-#### Step 4: Import the Database
+## Step 4: Import the Database
 
 **macOS/Linux:**
 ```bash
@@ -102,7 +102,7 @@ mysql -u root -p < database.sql
 mysql -u root -p < database.sql
 ```
 
-#### Step 5: Verify Import
+## Step 5: Verify Import
 ```bash
 mysql -u root -p
 USE EHR;
@@ -117,18 +117,18 @@ You should see tables like `user`, `medication`, `allergy`, `medical_history`, e
 
 
 
-## Configure Database Connection (Critical)
+# Configure Database Connection (Critical)
 
 The backend needs your MySQL password to connect. Follow these steps:
 
-### Step 1: Find the Configuration File
+## Step 1: Find the Configuration File
 ```bash
 cd /path/to/egesCS411Team/UnifiedPatientManager
 # Then open this file in your text editor:
 src/main/resources/application.properties
 ```
 
-### Step 2: Add Your MySQL Password
+## Step 2: Add Your MySQL Password
 
 **Find this section:**
 ```properties
@@ -150,12 +150,12 @@ spring.datasource.password=myPassword123
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 ```
 
-### Step 3: Save the File
+## Step 3: Save the File
 
 ---
-## Actual Compilation of the System
+# Actual Compilation of the System
 
-### Step 1: Navigate to Project Directory
+## Step 1: Navigate to Project Directory
 
 Open your terminal and navigate to the project root:
 
@@ -167,7 +167,7 @@ Replace `/path/to/` with your actual path. Example:
 - **macOS/Linux:** `cd ~/Downloads/egesCS411Team/UnifiedPatientManager`
 - **Windows:** `cd C:\Users\YourName\Downloads\egesCS411Team\UnifiedPatientManager`
 
-### Step 2: Compile Backend with Maven
+## Step 2: Compile Backend with Maven
 
 **For macOS/Linux:**
 ```bash
@@ -188,7 +188,7 @@ mvnw.cmd clean compile
 [INFO] BUILD SUCCESS
 ```
 
-### Step 3: Install Frontend Dependencies
+## Step 3: Install Frontend Dependencies
 
 Open a **new terminal window** (keep the old one open) and navigate to the frontend directory:
 
@@ -212,15 +212,15 @@ added XXX packages
 
 ---
 
-## Actually Running the System
+# Actually Running the System
 
-### Important: Start Services in This Order
+## Important: Start Services in This Order
 
 You need to run **three services simultaneously** in separate terminal windows. Open three terminal windows and follow these steps in order.
 
 ---
 
-### **Terminal 1: Start MySQL Database**
+## **Terminal 1: Start MySQL Database**
 
 Run this command first to ensure the database is ready:
 
@@ -236,7 +236,7 @@ Success!
 ```
 ---
 
-### **Terminal 2: Start Backend (Java Spring Boot)**
+## **Terminal 2: Start Backend (Java Spring Boot)**
 
 In the first terminal (or a new one), navigate to the backend directory:
 
@@ -268,7 +268,7 @@ mvnw.cmd spring-boot:run
 
 ---
 
-### **Terminal 3: Start Frontend (React)**
+## **Terminal 3: Start Frontend (React)**
 
 Open a **third terminal window** and navigate to the frontend directory:
 
@@ -295,7 +295,7 @@ npm run dev
 
 ---
 
-### **Step 4: Access the Application**
+## **Step 4: Access the Application**
 
 Open your web browser and go to:
 
@@ -306,6 +306,6 @@ http://localhost:5173
 **You should see the UPM login page.**
 
 
-##### **How to run the tests and get a coverage report**
+### **How to run the tests and get a coverage report**
 
 
