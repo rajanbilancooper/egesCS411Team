@@ -67,6 +67,29 @@
        FLUSH PRIVILEGES;
        exit
        ```
+     - **If you need to reset root password**
+      - Start MySQL in password-reset mode:
+        ```bash
+        /opt/homebrew/opt/mysql/bin/mysqld_safe --skip-grant-tables --skip-networking &
+        ```
+      - Log in with root (no password):
+        ```bash
+        mysql -u root
+        ```
+      - Change the root password:
+        ```bash
+        FLUSH PRIVILEGES;
+        ALTER USER 'root'@'localhost' IDENTIFIED BY 'YOUR_NEW_PASSWORD_HERE!';
+        EXIT;
+        ```
+      - Stop the password-reset server:
+        ```bash
+        ps aux | grep mysqld
+        ```
+      - Start MySQL normally:
+        ```bash
+        brew services start mysql
+        ```
      - **Important:** Remember this password - you'll need it later!
 
 ---
