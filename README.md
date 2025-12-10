@@ -176,14 +176,14 @@ Replace `/path/to/` with your actual path. Example:
 
 #### Step 2: Compile Backend with Maven
 
-**For macOS/Linux:**
+**For macOS:**
 ```bash
-./mvnw clean compile
+./mvn clean install
 ```
 
 **For Windows:**
 ```bash
-mvnw.cmd clean compile
+mvnw.cmd clean install
 ```
 
 **What this does:**
@@ -254,9 +254,9 @@ cd /path/to/egesCS411Team/UnifiedPatientManager
 
 **Start the Spring Boot server:**
 
-**For macOS/Linux:**
+**For macOS:**
 ```bash
-./mvnw spring-boot:run
+./mvn spring-boot:run
 ```
 
 **For Windows:**
