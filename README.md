@@ -92,6 +92,11 @@
         ```
      - **Important:** Remember this password - you'll need it later!
 
+Now, open up a text editor of your choice and clone this repository in a terminal in it. 
+To do this, you should:
+- Click the green 'code' botton, navigate to SSH, and click the copy button. 
+- Write 'git clone <SSH>'
+  
 ---
 
 ### 2. Database Setup
@@ -100,6 +105,9 @@
 #### Quick Setup - Import Pre-built Database
 
 ##### Step 1: Navigate to Project Root
+
+Replace `/path/to/` with your actual path. 
+
 ```bash
 cd /path/to/egesCS411Team
 ```
@@ -173,9 +181,9 @@ spring.datasource.username=root
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 ```
 
-**Add your password on a new line after `spring.datasource.username=root`:**
+**Add your password on the line after `spring.datasource.username=root`:**
 ```properties
-spring.datasource.password=your_mysql_password_here
+spring.datasource.password=yourpasswordhere
 ```
 
 **Example (if your password is "myPassword123"):**
@@ -200,11 +208,6 @@ Open your terminal and navigate to the project root:
 ```bash
 cd /path/to/egesCS411Team/UnifiedPatientManager
 ```
-
-Replace `/path/to/` with your actual path. Example:
-- **macOS/Linux:** `cd ~/Downloads/egesCS411Team/UnifiedPatientManager`
-- **Windows:** `cd C:\Users\YourName\Downloads\egesCS411Team\UnifiedPatientManager`
-
 #### Step 2: Compile Backend with Maven
 
 **For macOS:**
