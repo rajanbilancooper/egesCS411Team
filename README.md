@@ -152,7 +152,7 @@ CREATE DATABASE EHR;
 - You can use any name — but in this case EHR is correct
 - Type `exit` to quit
 
-##### Step 4: Import the Database
+#### Step 4: Import the Database
 In the repository files, there should be a downloadable file named "dump-EHR-202512101655.sql". Download that. Ensure you are in the correct directory where the dump file is located.
 
 **macOS/Linux:**
@@ -164,13 +164,8 @@ mysql -u root -p EHR < dump-EHR-202512101655.sql
 ```bash
 mysql -u root -p EHR < dump-EHR-202512101655.sql
 ```
-***Now we must install 'DBeaver' to finish the database connection.***
-##### Step 5: Install DBeaver***
-If you have homebrew: 
 
-If you do not have homebrew, please download the correct version for your specific laptop via this link: 
-
-##### Step 6: Verify Import
+##### Step 5: Verify Import
 ```bash
 mysql -u root -p
 USE EHR;
