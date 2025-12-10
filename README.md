@@ -157,6 +157,7 @@ You should see tables like `user`, `medication`, `allergy`, `medical_history`, e
 The backend needs your MySQL password to connect. Follow these steps:
 
 #### Step 1: Find the Configuration File
+In regular terminal, run: 
 ```bash
 cd /path/to/egesCS411Team/UnifiedPatientManager
 # Then open this file in your text editor:
