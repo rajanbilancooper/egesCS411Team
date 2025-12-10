@@ -127,7 +127,7 @@ mysql -u root -p
 - Enter your MySQL root password (set during installation)
 - You should see `mysql>` prompt
 
-### Step 3b: Create the database (if it doesn’t already exist):
+### Step 3b: Create the database:
 ```bash
 CREATE DATABASE EHR;
 ```
@@ -135,16 +135,16 @@ CREATE DATABASE EHR;
 - Type `exit` to quit
 
 ##### Step 4: Import the Database
-In the repository files, there should be a downloadable file named "dump-EHR-202512101432.sql". Download that. Ensure you are in the correct directory where the dump file is located.
+In the repository files, there should be a downloadable file named "dump-EHR-202512101655.sql". Download that. Ensure you are in the correct directory where the dump file is located.
 
 **macOS/Linux:**
 ```bash
-mysql -u root -p < dump-EHR-202512101432.sql
+mysql -u root -p < dump-EHR-202512101655.sql
 ```
 
 **Windows (Command Prompt):**
 ```bash
-mysql -u root -p < dump-EHR-202512101432.sql
+mysql -u root -p < dump-EHR-202512101655.sql
 ```
 
 ##### Step 5: Verify Import
@@ -215,6 +215,7 @@ cd /path/to/egesCS411Team/UnifiedPatientManager
 mvn clean install
 ```
 ***NOTICE: This will take roughly 5 minutes and 10 seconds to install.***
+
 **For Windows:**
 ```bash
 mvnw.cmd clean install
