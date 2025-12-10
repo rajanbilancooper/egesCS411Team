@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
  * Technique: Robustness Testing – Testing Min - boundary for password length
  */
 @ExtendWith(MockitoExtension.class)
-class passwordTooShortTest {
+class PasswordTooShortTest {
 
     @Mock
     private UserRepository userRepository;

@@ -150,4 +150,13 @@ class JwtTokenProviderTest {
         
         assertEquals(exp1, exp2);
     }
+
+    @Test
+    void validateToken_malformedTokenVariations_returnsFalse() {
+        // Test various malformed token formats
+        assertFalse(jwtTokenProvider.validateToken(""));
+        assertFalse(jwtTokenProvider.validateToken("justonepart"));
+        assertFalse(jwtTokenProvider.validateToken("part1.part2.part3.part4"));
+        assertFalse(jwtTokenProvider.validateToken("!!!invalid!!!"));
+    }
 }
