@@ -127,7 +127,7 @@ CREATE DATABASE EHR;
 - Type `exit` to quit
 
 ##### Step 4: Import the Database
-In the repository files, there should be a downloadable file named "dump-EHR-202512101432.sql". Download that. 
+In the repository files, there should be a downloadable file named "dump-EHR-202512101432.sql". Download that. Ensure you are in the correct directory where the dump file is located.
 
 **macOS/Linux:**
 ```bash
