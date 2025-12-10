@@ -146,8 +146,13 @@ mysql -u root -p < dump-EHR-202512101655.sql
 ```bash
 mysql -u root -p < dump-EHR-202512101655.sql
 ```
+***Now we must install 'DBeaver' to finish the database connection.***
+##### Step 5: Install DBeaver***
+If you have homebrew: 
 
-##### Step 5: Verify Import
+If you do not have homebrew, please download the correct version for your specific laptop via this link: 
+
+##### Step 6: Verify Import
 ```bash
 mysql -u root -p
 USE EHR;
@@ -158,7 +163,6 @@ You should see tables like `user`, `medication`, `allergy`, `medical_history`, e
 
 
 ---
-
 ### 3. Configure Database Connection
 ---
 
