@@ -226,12 +226,6 @@ public class MedicationService {
         return medicationRepository.save(existing);
     }
 
-    // GET /{patient_id}/medications/refresh
-    // Currently same as getMedicationsByPatientId; hook external sync if needed.
-    public List<Medication> refreshMedications(Long patientId) {
-        return medicationRepository.findAllByPatientId(patientId);
-    }
-
     // DELETE /{patient_id}/medications/{medication_id}
     public void deleteMedication(Long patientId, Long medicationId) {
         Medication existing = medicationRepository.findById(medicationId).orElseThrow(() -> new ResponseStatusException(

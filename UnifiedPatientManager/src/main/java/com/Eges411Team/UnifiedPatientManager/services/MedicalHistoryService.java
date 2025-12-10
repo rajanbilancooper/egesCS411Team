@@ -66,12 +66,6 @@ public class MedicalHistoryService {
         return medicalHistoryRepository.save(existing);
     }
 
-    // GET /{patient_id}/medicalhistory/refresh
-    // Currently same as get; hook external sync here if needed
-    public List<MedicalHistory> refreshMedicalHistory(Long patientId) {
-        return medicalHistoryRepository.findAllByPatientId(patientId);
-    }
-
     // DELETE /{patient_id}/medicalhistory/{history_id}
     public void deleteMedicalHistory(Long patientId, Long historyId) {
         Optional<MedicalHistory> existingOpt = medicalHistoryRepository.findById(historyId);

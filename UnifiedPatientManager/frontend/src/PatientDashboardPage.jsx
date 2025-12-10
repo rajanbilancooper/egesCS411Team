@@ -370,24 +370,10 @@ export default function PatientDashboardPage() {
           </button>
 
           <button
-            className={`upm-tab ${activeTab === "appointments" ? "upm-tab-active" : ""}`}
-            onClick={() => handleTabClick("appointments")}
-          >
-            Appointment history
-          </button>
-
-          <button
             className={`upm-tab ${activeTab === "notes" ? "upm-tab-active" : ""}`}
             onClick={() => { console.log("switch tab -> notes"); handleTabClick("notes"); }}
           >
             Notes
-          </button>
-
-          <button
-            className={`upm-tab ${activeTab === "history" ? "upm-tab-active" : ""}`}
-            onClick={() => handleTabClick("history")}
-          >
-            Patient History
           </button>
 
           <button
@@ -668,16 +654,6 @@ export default function PatientDashboardPage() {
         )}
         {activeTab === "allergies" && (
           <AllergyPanel patientId={patient.id || patient.patientId || patientId || 1} onAllergyChange={refreshPatientData} />
-        )}
-        {activeTab === "appointments" && (
-          <div className="upm-card" style={{ marginTop: "16px" }}>
-            Appointment History coming soon…
-          </div>
-        )}
-        {activeTab === "history" && (
-          <div className="upm-card" style={{ marginTop: "16px" }}>
-            Patient History coming soon…
-          </div>
         )}
         {activeTab === "diagnoses" && (
           <MedicalHistoryPanel
