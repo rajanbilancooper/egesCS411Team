@@ -74,7 +74,7 @@
 ### Database Setup
 ---
 
-#### Option A: Quick Setup - Import Pre-built Database
+#### Quick Setup - Import Pre-built Database
 
 ##### Step 1: Navigate to Project Root
 ```bash
@@ -118,7 +118,6 @@ SHOW TABLES;
 
 You should see tables like `user`, `medication`, `allergy`, `medical_history`, etc.
 
-#### Option B: Manual Database Setup
 
 ---
 
