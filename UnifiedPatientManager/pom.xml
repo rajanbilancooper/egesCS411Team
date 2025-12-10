@@ -138,6 +138,16 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.10</version>
+				<configuration>
+					<!-- Exclude controllers, DTOs, mappers, and exception handlers from coverage -->
+					<excludes>
+						<exclude>**/controller/**</exclude>
+						<exclude>**/ExceptionHandlers/**</exclude>
+						<exclude>**/DTOs/**</exclude>
+						<exclude>**/mapper/**</exclude>
+						<exclude>**/config/**</exclude>
+					</excludes>
+				</configuration>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>

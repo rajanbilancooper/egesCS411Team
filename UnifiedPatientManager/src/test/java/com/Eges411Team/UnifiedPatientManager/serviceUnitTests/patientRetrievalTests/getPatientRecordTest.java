@@ -17,10 +17,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Date;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -331,5 +331,49 @@ class getPatientRecordTest {
         assertEquals("Flu", result.getMedicalHistory().get(0).getNotes());
 
         verify(medicalHistoryRepository, times(1)).findAllByPatientId(patientId);
+    }
+
+    @Test
+    void getPatientRecord_medicalHistoryWithUnsupportedToInstant_usesFallbackConversion() {
+        // Arrange - Create a Date that throws UnsupportedOperationException on toInstant()
+        Long patientId = 124L;
+
+        User patient = new User();
+        patient.setId(patientId);
+        patient.setFirstName("Dana");
+        patient.setLastName("Mills");
+        patient.setEmail("dana@email.com");
+        patient.setPhoneNumber("555-7777");
+        patient.setAddress("444 Oak St");
+        patient.setDateOfBirth(LocalDateTime.of(1991, 2, 2, 0, 0));
+        patient.setGender("Female");
+
+        Date legacyDate = new Date(0) {
+            @Override
+            public Instant toInstant() {
+                throw new UnsupportedOperationException("Legacy date");
+            }
+        };
+
+        MedicalHistory history = new MedicalHistory();
+        history.setId(10L);
+        history.setPatientId(patientId);
+        history.setDoctorId(200L);
+        history.setDiagnosis("Asthma");
+        history.setStartDate(legacyDate);
+
+        when(userRepository.findById(patientId)).thenReturn(Optional.of(patient));
+        when(allergyRepository.findAllByPatientId(patientId)).thenReturn(new ArrayList<>());
+        when(medicationRepository.findAllByPatientId(patientId)).thenReturn(new ArrayList<>());
+        when(medicalHistoryRepository.findAllByPatientId(patientId)).thenReturn(Arrays.asList(history));
+
+        // Act
+        PatientRecordDTO result = patientRecordService.getPatientRecord(patientId);
+
+        // Assert - Fallback conversion should populate startDate without throwing
+        assertNotNull(result.getMedicalHistory());
+        assertEquals(1, result.getMedicalHistory().size());
+        assertEquals("Asthma", result.getMedicalHistory().get(0).getNotes());
+        assertNotNull(result.getMedicalHistory().get(0).getStartDate());
     }
 }
