@@ -97,12 +97,20 @@
   ```bash
      brew install --cask dbeaver-community
   ```
-  - After installation, launch DBeaver from your Applications folder and create a new MySQL connection.
+  
 - If you do not have Homebrew, download the DBeaver installer directly from the official website:
      https://dbeaver.io/download/
   - Download the installer according to your device (macOS, Windows, or Linux), open the file, and move the DBeaver app to your Applications folder. Then launch DBeaver and set up your MySQL connection using the project’s credentials.
+
+#### After installation, launch DBeaver from your Applications folder and create a new MySQL connection.
+  - To create a connection
+         - Open the application
+         - Navifate to 'Help' at the top of the screen and input 'Database Navigator'
+         - Once here, navigate to 'Database' at the top of the screen again and click New Database Connection
+         - Select MySql
+         - Upon clicking next, input your MySql password where stated. Then click 'Finish' 
   
-Now, open up a text editor of your choice and clone this repository in a terminal in it. 
+#### Now, open up a text editor of your choice and clone this repository in a terminal in it. 
 To do this, you should:
 - Click the green 'code' botton, navigate to SSH, and click the copy button. 
 - Write 'git clone <SSH>'
