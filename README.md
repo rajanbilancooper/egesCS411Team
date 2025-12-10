@@ -112,12 +112,18 @@ mysql.server start
 
 **Windows:** Open Services and start MySQL80 (or open MySQL Command Line Client)
 
-##### Step 3: Verify MySQL is Running
+##### Step 3a: Verify MySQL is Running
 ```bash
 mysql -u root -p
 ```
 - Enter your MySQL root password (set during installation)
 - You should see `mysql>` prompt
+
+### Step 3b: Create the database (if it doesn’t already exist):
+```bash
+CREATE DATABASE EHR;
+```
+- You can use any name — but in this case EHR is correct
 - Type `exit` to quit
 
 ##### Step 4: Import the Database
