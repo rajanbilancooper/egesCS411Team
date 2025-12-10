@@ -177,6 +177,9 @@ public class PatientRecordService {
         if (userTemplate.getUsername() == null || userTemplate.getUsername().isBlank()) {
             throw new RuntimeException("Username is required");
         }
+        if (userTemplate.getPasswordHash() == null || userTemplate.getPasswordHash().length() <= 6) {
+            throw new RuntimeException("Password Length must be longer than 6 characters");
+        }
         if (userTemplate.getFirstName() == null || userTemplate.getLastName() == null) {
             throw new RuntimeException("First and last name are required");
         }
@@ -197,6 +200,11 @@ public class PatientRecordService {
         String phoneDigitsOnly = userTemplate.getPhoneNumber().replaceAll("[^0-9]", "");
         if (phoneDigitsOnly.length() != 10) {
             throw new RuntimeException("Phone number must be 10 digits");
+        }
+
+        // Duplicate check: prevent same username
+        if (userRepository.existsByUsername(userTemplate.getUsername())) {
+            throw new RuntimeException("User already exists");
         }
 
         // Duplicate check: prevent same full name + date of birth combination
