@@ -98,15 +98,16 @@ mysql -u root -p
 - Type `exit` to quit
 
 ##### Step 4: Import the Database
+In the repository files, there should be a downloadable file named "dump-EHR-202512101432.sql". Download that. 
 
 **macOS/Linux:**
 ```bash
-mysql -u root -p < database.sql
+mysql -u root -p < dump-EHR-202512101432.sql
 ```
 
 **Windows (Command Prompt):**
 ```bash
-mysql -u root -p < database.sql
+mysql -u root -p < dump-EHR-202512101432.sql
 ```
 
 ##### Step 5: Verify Import
@@ -178,7 +179,7 @@ Replace `/path/to/` with your actual path. Example:
 
 **For macOS:**
 ```bash
-./mvn clean install
+mvn clean install
 ```
 
 **For Windows:**
@@ -256,7 +257,7 @@ cd /path/to/egesCS411Team/UnifiedPatientManager
 
 **For macOS:**
 ```bash
-./mvn spring-boot:run
+mvn spring-boot:run
 ```
 
 **For Windows:**
@@ -318,5 +319,48 @@ http://localhost:5173
 
 ## Section 2: How to Run Tests and Get Coverage Report
 
-(Instructions to be added)
+### Run All Tests
+
+```bash
+# Navigate to project root
+cd /path/to/UnifiedPatientManager
+
+# Run all tests using Maven
+mvn test
+```
+
+## Understanding Test Results
+
+### What You'll See
+NOTICE: The full tests take at a minimum 5 minutes to run completely. This is because the test to see if our One Time Password has does robustness testing on the max +. The full test suite should realistically take no more than 5 minutes and 15 seconds to run. 
+
+When tests complete successfully, you'll see output like this:
+
+```
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.Eges411Team.UnifiedPatientManager.serviceUnitTests.loginTests.LoginAttemptWindowTest
+[INFO] Tests run: X, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.064 s
+...
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: XX, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+### Viewing Coverage Reports
+After running tests, a coverage report is automatically generated:
+
+The completion prompt includes coverage statistics:
+
+```
+INSTR: X  # Instruction coverage
+BR:    X     # Branch coverage
+LINE:  X   # Line coverage
+```
+
 
