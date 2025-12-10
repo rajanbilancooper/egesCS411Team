@@ -157,12 +157,12 @@ In the repository files, there should be a downloadable file named "dump-EHR-202
 
 **macOS/Linux:**
 ```bash
-mysql -u root -p < dump-EHR-202512101655.sql
+mysql -u root -p EHR < dump-EHR-202512101655.sql
 ```
 
 **Windows (Command Prompt):**
 ```bash
-mysql -u root -p < dump-EHR-202512101655.sql
+mysql -u root -p EHR < dump-EHR-202512101655.sql
 ```
 ***Now we must install 'DBeaver' to finish the database connection.***
 ##### Step 5: Install DBeaver***
