@@ -21,7 +21,7 @@ SET @@SESSION.SQL_LOG_BIN= 0;
 -- GTID state at the beginning of the backup 
 --
 
-/* SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '8d1176a6-c5af-11f0-bf29-2efc6507f1a6:1-396'; */
+-- SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '8d1176a6-c5af-11f0-bf29-2efc6507f1a6:1-396'; */
 
 --
 -- Table structure for table `allergy`
