@@ -218,6 +218,13 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 #### Step 3: Save the File
 
+### Step 4: Add the .env File
+- Navigate to the front end
+- Right click to create a new file and name it : .env
+- Within this file, insert the following line:
+```bash
+VITE_API_ URL= http://localhost:8080
+```  
 ---
 
 ### 4. Compilation of the System
