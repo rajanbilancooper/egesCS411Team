@@ -122,18 +122,6 @@ public class MedicationController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{patient_id}/medications/refresh")
-    @Operation(summary = "Refresh a patient's medication list")
-    public ResponseEntity<List<MedicationResponse>> refresh(
-        @PathVariable("patient_id") @Parameter(example = "3") Long patientId
-    ) {
-        List<Medication> refreshed = medicationService.refreshMedications(patientId);
-        List<MedicationResponse> response = refreshed.stream()
-            .map(MedicationMapper::toResponseDto)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
-
     @DeleteMapping("/{patient_id}/medications/{medication_id}")
     @Operation(summary = "Delete a specific medication for a patient")
     public ResponseEntity<HttpStatus> delete(

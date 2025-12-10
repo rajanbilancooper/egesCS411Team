@@ -120,18 +120,6 @@ public class MedicalHistoryController {
         return ResponseEntity.ok(updated);
     }
 
-    // Refresh a patient’s medical history list
-    @GetMapping("/{patient_id}/medicalhistory/refresh")
-    @Operation(summary = "Refresh a patient's medical history list")
-    public ResponseEntity<List<MedicalHistory>> refresh(
-        @PathVariable("patient_id")
-        @Parameter(example = "3")
-        Long patientId
-    ) {
-        List<MedicalHistory> refreshed = medicalHistoryService.refreshMedicalHistory(patientId);
-        return ResponseEntity.ok(refreshed);
-    }
-
     // Delete a specific medical history record
     @DeleteMapping("/{patient_id}/medicalhistory/{history_id}")
     @Operation(summary = "Delete a specific medical history record for a patient")
