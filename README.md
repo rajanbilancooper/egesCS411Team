@@ -127,7 +127,7 @@ mysql -u root -p
 - Enter your MySQL root password (set during installation)
 - You should see `mysql>` prompt
 
-### Step 3b: Create the database:
+#### Step 3b: Create the database:
 ```bash
 CREATE DATABASE EHR;
 ```
