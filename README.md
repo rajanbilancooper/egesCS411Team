@@ -4,7 +4,10 @@
 
 ## Section 1: How to Compile and Run the System
 
+---
+
 ### Prerequisites
+---
 
 #### Java 17 or Higher
    - **Why needed:** The backend is written in Java
@@ -66,9 +69,12 @@
        ```
      - **Important:** Remember this password - you'll need it later!
 
-### Database Setup
+---
 
-#### Quick Setup - Import Pre-built Database
+### Database Setup
+---
+
+#### Option A: Quick Setup - Import Pre-built Database
 
 ##### Step 1: Navigate to Project Root
 ```bash
@@ -112,7 +118,12 @@ SHOW TABLES;
 
 You should see tables like `user`, `medication`, `allergy`, `medical_history`, etc.
 
+#### Option B: Manual Database Setup
+
+---
+
 ### Configure Database Connection
+---
 
 The backend needs your MySQL password to connect. Follow these steps:
 
@@ -148,7 +159,9 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 #### Step 3: Save the File
 
 ---
+
 ### Compilation of the System
+---
 
 #### Step 1: Navigate to Project Directory
 
@@ -208,6 +221,7 @@ added XXX packages
 ---
 
 ### Running the System
+---
 
 #### Important: Start Services in This Order
 
@@ -300,6 +314,7 @@ http://localhost:5173
 
 **You should see the UPM login page.**
 
+---
 ---
 
 ## Section 2: How to Run Tests and Get Coverage Report
