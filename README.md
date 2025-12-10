@@ -214,7 +214,7 @@ cd /path/to/egesCS411Team/UnifiedPatientManager
 ```bash
 mvn clean install
 ```
-
+***NOTICE: This will take roughly 5 minutes and 10 seconds to install.***
 **For Windows:**
 ```bash
 mvnw.cmd clean install
