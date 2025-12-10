@@ -1,9 +1,6 @@
 **Unified Patient Manager README**
 
-**How to compile and run the system**
-
-**How to run the tests and get a coverage report**
-
+##### **How to compile and run the system**
 Before you start, you need to have these applications installed on your computer:
 
 ### 1. **Java 17 or Higher**
@@ -307,4 +304,8 @@ http://localhost:5173
 ```
 
 **You should see the UPM login page.**
+
+
+##### **How to run the tests and get a coverage report**
+
 
