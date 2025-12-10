@@ -6,7 +6,7 @@
 
 ---
 
-### Prerequisites
+### 1. Prerequisites
 ---
 
 #### Java 17 or Higher
@@ -71,7 +71,7 @@
 
 ---
 
-### Database Setup
+### 2. Database Setup
 ---
 
 #### Quick Setup - Import Pre-built Database
@@ -121,7 +121,7 @@ You should see tables like `user`, `medication`, `allergy`, `medical_history`, e
 
 ---
 
-### Configure Database Connection
+### 3. Configure Database Connection
 ---
 
 The backend needs your MySQL password to connect. Follow these steps:
@@ -159,7 +159,7 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 ---
 
-### Compilation of the System
+### 4. Compilation of the System
 ---
 
 #### Step 1: Navigate to Project Directory
@@ -219,7 +219,7 @@ added XXX packages
 
 ---
 
-### Running the System
+### 5. Running the System
 ---
 
 #### Important: Start Services in This Order
