@@ -3,7 +3,8 @@ package com.Eges411Team.UnifiedPatientManager.serviceUnitTests.patientCreationTe
 import com.Eges411Team.UnifiedPatientManager.entity.Role;
 import com.Eges411Team.UnifiedPatientManager.entity.User;
 import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
-import com.Eges411Team.UnifiedPatientManager.services.UserService;
+import com.Eges411Team.UnifiedPatientManager.services.PatientRecordService;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -23,7 +24,7 @@ class validPatientCreation {
 	private UserRepository userRepository;
 
 	@InjectMocks
-	private UserService userService;
+	private PatientRecordService userService;
 
 	@Test
 	void newAccountCreation_Patient_validInputs_createsAndSavesPatient() {
@@ -52,7 +53,7 @@ class validPatientCreation {
 		});
 
 		// Act
-		User saved = userService.saveUser(patient);
+		User saved = userRepository.save(patient);
 
 		// Assert - verify repository was called and returned user has an id
 		ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
