@@ -1,7 +1,10 @@
 package com.Eges411Team.UnifiedPatientManager.services;
 
 import com.Eges411Team.UnifiedPatientManager.entity.Note;
+import com.Eges411Team.UnifiedPatientManager.entity.NoteType;
 import com.Eges411Team.UnifiedPatientManager.repositories.NoteRepo;
+import com.Eges411Team.UnifiedPatientManager.repositories.UserRepository;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -14,9 +17,22 @@ import org.springframework.web.server.ResponseStatusException;
 public class NoteService {
 
     private final NoteRepo noteRepository;
+    private final UserRepository userRepository;
+    
+    // Supported file extensions
+    private static final List<String> SUPPORTED_FILE_EXTENSIONS = Arrays.asList(
+        ".pdf", ".doc", ".docx", ".png", ".jpg", ".jpeg", ".mp3", ".wav", ".m4a"
+    );
+    
+    // Maximum content length for notes (matches database VARCHAR limit)
+    private static final int MAX_CONTENT_LENGTH = 500;
+    
+    // Maximum file size for attachments (5 MB)
+    private static final int MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB in bytes
 
-    public NoteService(NoteRepo noteRepository) {
+    public NoteService(NoteRepo noteRepository, UserRepository userRepository) {
         this.noteRepository = noteRepository;
+        this.userRepository = userRepository;
     }
 
     // GET /{patient_id}/notes
@@ -95,8 +111,47 @@ public class NoteService {
 
     // save a single note
     public Note saveSingleNote(Note note) {
-    return noteRepository.save(note);
-}
+        // Validate that the patient exists
+        if (note.getPatientId() != null) {
+            userRepository.findById(note.getPatientId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient Not Found")
+            );
+        }
+        
+        // Validate content length for TEXT notes
+        if (note.getContent() != null && note.getContent().length() > MAX_CONTENT_LENGTH) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, 
+                "Note content exceeds maximum length of " + MAX_CONTENT_LENGTH + " characters"
+            );
+        }
+        
+        // Validate file size for FILE type notes with attachment data
+        if (note.getNoteType() == NoteType.FILE && note.getAttachmentData() != null) {
+            if (note.getAttachmentData().length > MAX_FILE_SIZE_BYTES) {
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, 
+                    "File size exceeds maximum allowed size of " + (MAX_FILE_SIZE_BYTES / 1024 / 1024) + " MB"
+                );
+            }
+        }
+        
+        // Validate file format for FILE type notes with attachments
+        if (note.getNoteType() == NoteType.FILE && note.getAttachmentName() != null) {
+            String fileName = note.getAttachmentName().toLowerCase();
+            boolean isSupported = SUPPORTED_FILE_EXTENSIONS.stream()
+                .anyMatch(fileName::endsWith);
+            
+            if (!isSupported) {
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, 
+                    "Unsupported file type. Supported formats: " + SUPPORTED_FILE_EXTENSIONS
+                );
+            }
+        }
+        
+        return noteRepository.save(note);
+    }
 
     // Retrieve single note ensuring it belongs to patient
     public Note getNoteForPatient(Long patientId, Long noteId) {
