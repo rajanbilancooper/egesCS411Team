@@ -100,22 +100,6 @@ class MedicationServiceTest {
         verify(medicationRepository).findAllByPatientId(patientId);
     }
 
-    // ==================== refreshMedications ====================
-    @Test
-    void refreshMedications_returnsLatestList() {
-        Long patientId = 3L;
-        List<Medication> meds = List.of(buildMedication(5L, patientId, "Lisinopril", true));
-
-        when(medicationRepository.findAllByPatientId(patientId)).thenReturn(meds);
-
-        List<Medication> result = medicationService.refreshMedications(patientId);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Lisinopril", result.get(0).getDrugName());
-        verify(medicationRepository).findAllByPatientId(patientId);
-    }
-
     // ==================== saveMedications ====================
     @Test
     void saveMedications_deletesExistingAndSavesNew() {

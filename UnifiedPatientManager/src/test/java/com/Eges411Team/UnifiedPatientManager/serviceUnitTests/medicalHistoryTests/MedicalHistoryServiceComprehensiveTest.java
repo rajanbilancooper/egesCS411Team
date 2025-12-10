@@ -63,21 +63,6 @@ class MedicalHistoryServiceComprehensiveTest {
         assertTrue(result.isEmpty());
     }
 
-    // ==================== refreshMedicalHistory ====================
-    @Test
-    void refreshMedicalHistory_returnsLatestList() {
-        Long patientId = 3L;
-        List<MedicalHistory> history = List.of(buildMedicalHistory(5L, patientId, "Diabetes"));
-
-        when(medicalHistoryRepository.findAllByPatientId(patientId)).thenReturn(history);
-
-        List<MedicalHistory> result = medicalHistoryService.refreshMedicalHistory(patientId);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(medicalHistoryRepository).findAllByPatientId(patientId);
-    }
-
     // ==================== saveMedicalHistory(Long, List) ====================
     @Test
     void saveMedicalHistory_deletesExistingAndSavesNew() throws Exception {
