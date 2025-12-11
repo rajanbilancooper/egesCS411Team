@@ -113,7 +113,7 @@
 #### Now, open up a text editor of your choice and clone this repository in a terminal in it. 
 To do this, you should:
 - Click the green 'code' botton, navigate to SSH, and click the copy button. 
-- Write 'git clone <SSH>'
+- Write 'git clone 'SSH''
   
 ---
 
